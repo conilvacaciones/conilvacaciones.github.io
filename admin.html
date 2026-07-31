@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel · Conil Vacaciones</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230B3D5C'/%3E%3Cpath d='M15 60 Q30 45 50 60 T85 60' stroke='%23F1F2EA' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='68' cy='30' r='12' fill='%23E7B15C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500&family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --atlantic:#0B3D5C; --atlantic-dark:#082A40; --cal:#F1F2EA; --cal-2:#E7E8DC;
+  --card:#FFFFFF; --ink:#122130; --ink-soft:#51606B; --ink-faint:#8B9AA3;
+  --bougain:#D6336C; --bougain-dark:#AD1E56; --sol:#E7B15C; --teal:#177268;
+  --line:#DEDFD2; --radius-lg:18px; --radius-md:12px;
+  --ff-display:'Fraunces',serif; --ff-body:'Archivo',sans-serif; --ff-mono:'IBM Plex Mono',monospace;
+  --shadow:0 20px 50px -24px rgba(11,61,92,.4);
+}
+*,*::before,*::after{box-sizing:border-box;}
+body{margin:0;font-family:var(--ff-body);background:var(--cal);color:var(--ink);-webkit-font-smoothing:antialiased;}
+h1,h2,h3,p{margin:0;}
+button{font:inherit;cursor:pointer;}
+input,select,textarea{font:inherit;}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px;}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;padding:11px 20px;border-radius:999px;border:none;transition:transform .15s ease, background .15s ease;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--bougain);color:#fff;}
+.btn-primary:hover{background:var(--bougain-dark);}
+.btn-dark{background:var(--atlantic);color:#fff;}
+.btn-dark:hover{background:var(--atlantic-dark);}
+.btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--line);}
+.btn-ghost:hover{background:var(--cal-2);}
+.btn-danger{background:#fff;color:var(--bougain);border:1px solid rgba(214,51,108,.3);}
+.btn-danger:hover{background:rgba(214,51,108,.08);}
+.btn-sm{padding:7px 13px;font-size:12.5px;}
+.btn[disabled]{opacity:.4;pointer-events:none;}
+
+/* ---- login ---- */
+#loginView{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--atlantic);padding:20px;}
+.login-card{background:var(--card);border-radius:var(--radius-lg);padding:40px 36px;width:100%;max-width:380px;box-shadow:var(--shadow);}
+.login-card h1{font-family:var(--ff-display);font-weight:600;font-style:italic;font-size:26px;color:var(--atlantic);margin-bottom:6px;}
+.login-card p.sub{color:var(--ink-soft);font-size:13.5px;margin-bottom:26px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;font-family:var(--ff-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;background:var(--cal);color:var(--ink);}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--sol);border-color:transparent;}
+.field textarea{resize:vertical;min-height:80px;}
+#loginError{color:var(--bougain);font-size:13px;margin-top:10px;display:none;}
+
+/* ---- app shell ---- */
+#appView{display:none;}
+.topbar{background:var(--atlantic);color:var(--cal);padding:16px 0;}
+.topbar .wrap{display:flex;justify-content:space-between;align-items:center;}
+.topbar .logo{font-family:var(--ff-display);font-weight:600;font-style:italic;font-size:19px;}
+main.wrap{padding:40px 24px 90px;}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;flex-wrap:wrap;gap:14px;}
+.toolbar h1{font-family:var(--ff-display);font-weight:600;font-size:26px;color:var(--atlantic);}
+
+#viviendasList{display:flex;flex-direction:column;gap:14px;}
+.v-row{background:var(--card);border-radius:var(--radius-md);padding:16px 20px;display:flex;align-items:center;gap:18px;box-shadow:0 8px 22px -16px rgba(11,61,92,.35);flex-wrap:wrap;}
+.v-row .v-info{flex:1;min-width:200px;}
+.v-row .v-info b{font-family:var(--ff-display);font-size:17px;color:var(--ink);}
+.v-row .v-info span{display:block;font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+.v-row .v-price{font-family:var(--ff-mono);font-size:14px;color:var(--atlantic);min-width:110px;}
+.v-row .v-rating{font-family:var(--ff-mono);font-size:12.5px;color:#9C6B1F;min-width:130px;}
+.v-row .v-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+.tabs{display:flex;gap:8px;margin-bottom:18px;}
+.tab-btn{background:var(--card);border:1px solid var(--line);color:var(--ink-soft);padding:8px 16px;border-radius:999px;font-size:13px;font-weight:600;}
+.tab-btn.is-active{background:var(--atlantic);color:#fff;border-color:var(--atlantic);}
+
+.rv-row{background:var(--card);border-radius:var(--radius-md);padding:14px 18px;margin-bottom:10px;box-shadow:0 8px 22px -16px rgba(11,61,92,.3);}
+.rv-row .rv-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+.rv-row b{font-size:14.5px;}
+.rv-row .rv-house{font-size:12px;color:var(--ink-faint);font-family:var(--ff-mono);}
+.rv-row .rv-stars{color:#E7B15C;font-size:14px;letter-spacing:1px;}
+.rv-row p{font-size:13.5px;color:var(--ink-soft);margin:8px 0;}
+.rv-row .rv-date{font-size:11px;color:var(--ink-faint);font-family:var(--ff-mono);}
+.rv-row .rv-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.v-toggle{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-soft);}
+.empty-note{color:var(--ink-soft);font-size:14px;padding:30px 0;text-align:center;}
+
+/* ---- modal ---- */
+.modal-backdrop{position:fixed;inset:0;background:rgba(8,26,38,.55);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+.modal-backdrop.open{opacity:1;pointer-events:auto;}
+.modal-panel{background:var(--card);border-radius:var(--radius-lg);max-width:640px;width:100%;padding:30px 30px 34px;position:relative;box-shadow:var(--shadow);margin-bottom:40px;}
+.modal-panel h2{font-family:var(--ff-display);font-weight:600;font-size:21px;color:var(--atlantic);margin-bottom:20px;}
+.modal-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;background:var(--cal);border:none;font-size:18px;color:var(--ink-soft);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;}
+.form-grid .field.full{grid-column:1/-1;}
+.servicios-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;min-height:20px;}
+.servicio-chip{display:flex;align-items:center;gap:7px;background:var(--cal);border-radius:999px;padding:6px 8px 6px 11px;font-size:13px;}
+.servicio-chip .icon{width:15px;height:15px;color:var(--bougain);flex-shrink:0;}
+.servicio-chip button{width:18px;height:18px;border-radius:50%;background:#fff;border:none;font-size:11px;line-height:1;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.servicios-add{display:flex;gap:8px;}
+.servicios-add input{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--cal);}
+.icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+.icon-picker{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin:10px 0;}
+.icon-picker button{width:32px;height:32px;border-radius:8px;background:var(--cal);border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);}
+.icon-picker button.is-active{background:var(--atlantic);border-color:var(--atlantic);color:#fff;}
+.icon-picker .icon{width:16px;height:16px;}
+
+.precios-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin:18px 0;}
+.precio-row{display:flex;align-items:center;gap:8px;}
+.precio-row label{width:86px;font-size:13px;color:var(--ink-soft);flex-shrink:0;}
+.precio-row input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--cal);}
+.precio-row span{font-size:11.5px;color:var(--ink-faint);white-space:nowrap;}
+@media (max-width:560px){.precios-grid{grid-template-columns:1fr;}}
+.photos-box{margin-top:6px;}
+.photo-thumbs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+.photo-thumb{position:relative;width:90px;height:68px;border-radius:8px;overflow:hidden;background:var(--cal-2);}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-thumb .p-actions{position:absolute;inset:0;background:rgba(8,26,38,.55);display:flex;align-items:center;justify-content:center;gap:4px;opacity:0;transition:opacity .15s ease;}
+.photo-thumb:hover .p-actions{opacity:1;}
+.photo-thumb .p-actions button{width:22px;height:22px;border-radius:50%;border:none;background:#fff;font-size:11px;color:var(--ink);}
+.upload-note{font-size:12px;color:var(--ink-faint);margin-top:4px;}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line);}
+.form-error{color:var(--bougain);font-size:13px;margin-top:8px;display:none;}
+.slug-hint{font-size:11.5px;color:var(--ink-faint);margin-top:4px;}
+
+.reserva-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--cal);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13.5px;}
+.reserva-row b{font-family:var(--ff-mono);font-weight:500;}
+.reserva-row span.nota{color:var(--ink-soft);font-size:12.5px;}
+#reservaForm{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<!-- ICON SPRITE (mismos iconos que la web pública, para elegir el dibujito de cada servicio) -->
+<svg style="display:none">
+  <symbol id="i-pool" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M2 20c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5.5 12.5a11 11 0 0 1 13 0"/><path d="M9 16.5a5.5 5.5 0 0 1 6 0"/><circle cx="12" cy="20" r=".9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-parking" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9.5 17V7h4a3 3 0 0 1 0 6h-4"/></symbol>
+  <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2v20M4 6l16 12M20 6 4 18M2 12h20M6 4l4 4M18 20l-4-4M6 20l4-4M18 4l-4 4"/></symbol>
+  <symbol id="i-bbq" viewBox="0 0 24 24"><path d="M6 14a6 6 0 0 0 12 0c0-3-2-4-2-7a4 4 0 0 0-8 0c0 3-2 4-2 7Z"/><path d="M9 22h6M12 22v-3"/></symbol>
+  <symbol id="i-terrace" viewBox="0 0 24 24"><circle cx="12" cy="13" r="4"/><path d="M12 2.5v3M4.5 6.5l2.2 2.2M19.5 6.5l-2.2 2.2M2.5 13h3M18.5 13h3"/></symbol>
+  <symbol id="i-tv" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="i-kitchen" viewBox="0 0 24 24"><path d="M6 3v7a2.5 2.5 0 0 0 5 0V3M8.5 3v7M6 3v3M17 3c-1.6.3-2.5 1.8-2.5 4.5S15.4 12 17 12"/><path d="M8.5 10v11M17 12v9"/></symbol>
+  <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8Z"/><path d="M17 9h2a3 3 0 0 1 0 6h-2M7.5 3c-.6 1 .5 1.5 0 3M11.5 3c-.6 1 .5 1.5 0 3"/></symbol>
+  <symbol id="i-washer" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="13" r="5"/><circle cx="12" cy="13" r="2"/><circle cx="7" cy="6.2" r=".6" fill="currentColor" stroke="none"/><circle cx="9.5" cy="6.2" r=".6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-pets" viewBox="0 0 24 24"><path d="M8 14a4 4 0 1 0 8 0 4 4 0 0 0-8 0Z"/><circle cx="5" cy="8" r="1.6"/><circle cx="10" cy="5" r="1.6"/><circle cx="14" cy="5" r="1.6"/><circle cx="19" cy="8" r="1.6"/></symbol>
+  <symbol id="i-garden" viewBox="0 0 24 24"><path d="M12 3 7.5 10h2.7L6 16h5v5h2v-5h5l-4.2-6h2.7Z"/></symbol>
+  <symbol id="i-shower" viewBox="0 0 24 24"><path d="M6 9h12a2 2 0 0 1 2 2v1"/><path d="M9 9V6a3 3 0 0 1 3-3h1"/><path d="M4 13h16"/><path d="M8 17v3M12 17v3M16 17v3"/></symbol>
+  <symbol id="i-bath" viewBox="0 0 24 24"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-3Z"/><path d="M4 12V7a2 2 0 0 1 2-2 2 2 0 0 1 2 2"/><path d="M2 12h1M21 12h1"/></symbol>
+  <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18v3M21 18v3"/><path d="M5 12V8a2 2 0 0 1 2-2h3v6"/><rect x="12" y="10" width="8" height="4" rx="1"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c1-3.8 3.4-5.6 6.5-5.6s5.5 1.8 6.5 5.6"/><circle cx="17.5" cy="8.5" r="2.4"/><path d="M15.8 14.9c2.4.2 4 1.9 4.8 5.1"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><path d="M9 3H3v6M15 3h6v6M15 21h6v-6M9 21H3v-6"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.8 6.3.7-4.7 4.4 1.2 6.3L12 17l-5.5 3.2 1.2-6.3-4.7-4.4 6.3-.7Z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7.3 7-12.5A7 7 0 0 0 5 9.5C5 14.7 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6"/></symbol>
+  <symbol id="i-facebook" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M13.8 21v-7.2h2.4l.4-2.8h-2.8v-1.8c0-.8.2-1.4 1.4-1.4h1.5V5.1c-.3 0-1.1-.1-2.1-.1-2.1 0-3.6 1.3-3.6 3.6v2.4H8.6v2.8h2.4V21" fill="none"/></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M14 3v10.6a3.4 3.4 0 1 1-2.6-3.3"/><path d="M14 3c.4 2.7 2.1 4.3 4.5 4.6v2.7c-1.7 0-3.2-.5-4.5-1.5"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M10 8.5v7l6-3.5Z" fill="currentColor" stroke="none"/></symbol>
+</svg>
+
+<!-- ============ LOGIN ============ -->
+<div id="loginView">
+  <div class="login-card">
+    <h1>Conil Vacaciones</h1>
+    <p class="sub">Panel privado de gestión de viviendas y reservas.</p>
+    <form id="loginForm">
+      <div class="field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="loginPass">Contraseña</label><input id="loginPass" type="password" autocomplete="current-password" required></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">Iniciar sesión</button>
+      <p id="loginError"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="appView">
+  <div class="topbar">
+    <div class="wrap">
+      <span class="logo">Conil Vacaciones · Panel</span>
+      <button class="btn btn-ghost btn-sm" id="btnLogout" style="color:var(--cal);border-color:rgba(241,242,234,.35)">Cerrar sesión</button>
+    </div>
+  </div>
+  <main class="wrap">
+    <div class="toolbar">
+      <h1>Viviendas</h1>
+      <button class="btn btn-primary" id="btnNewVivienda">+ Añadir vivienda</button>
+    </div>
+    <div id="viviendasList"><p class="empty-note">Cargando…</p></div>
+
+    <div class="toolbar" style="margin-top:52px">
+      <h1>Reseñas</h1>
+    </div>
+    <div class="tabs" id="reviewTabs">
+      <button type="button" class="tab-btn is-active" data-tab="pendiente">Pendientes</button>
+      <button type="button" class="tab-btn" data-tab="aprobada">Aprobadas</button>
+      <button type="button" class="tab-btn" data-tab="oculta">Ocultas</button>
+    </div>
+    <div id="reviewsAdminList"><p class="empty-note">Cargando…</p></div>
+  </main>
+</div>
+
+<!-- ============ MODAL: VIVIENDA ============ -->
+<div class="modal-backdrop" id="viviendaModalBackdrop">
+  <div class="modal-panel">
+    <button class="modal-close" id="viviendaModalClose">×</button>
+    <h2 id="viviendaFormTitle">Nueva vivienda</h2>
+    <form id="viviendaForm">
+      <div class="form-grid">
+        <div class="field full">
+          <label for="f-id">Identificador único (sin espacios ni tildes)</label>
+          <input id="f-id" type="text" placeholder="ej. casitapiscina" pattern="[a-z0-9-]+" required>
+          <p class="slug-hint">Solo minúsculas, números y guiones. No se puede cambiar después de crear la vivienda.</p>
+        </div>
+        <div class="field full"><label for="f-nombre">Nombre</label><input id="f-nombre" type="text" required></div>
+        <div class="field full"><label for="f-tagline">Frase corta</label><input id="f-tagline" type="text"></div>
+        <div class="field"><label for="f-zona">Zona</label><input id="f-zona" type="text"></div>
+        <div class="field"><label for="f-distancia">Distancia a la playa</label><input id="f-distancia" type="text"></div>
+        <div class="field"><label for="f-huespedes">Huéspedes</label><input id="f-huespedes" type="number" min="1"></div>
+        <div class="field"><label for="f-dormitorios">Dormitorios</label><input id="f-dormitorios" type="number" min="0"></div>
+        <div class="field"><label for="f-banos">Baños</label><input id="f-banos" type="number" min="0"></div>
+        <div class="field"><label for="f-area">Metros² (opcional)</label><input id="f-area" type="number" min="0"></div>
+        <div class="field"><label for="f-noches-min">Mínimo de noches</label><input id="f-noches-min" type="number" min="1" step="1" value="1"></div>
+        <div class="field"><label for="f-precio">Precio (vacío = "Consultar precio")</label><input id="f-precio" type="number" min="0" step="0.01"></div>
+        <div class="field"><label for="f-unidad">Precio por</label>
+          <select id="f-unidad"><option value="noche">Noche</option><option value="semana">Semana</option></select>
+        </div>
+        <div class="field"><label for="f-valoracion">Valoración inicial (0-5, opcional)</label><input id="f-valoracion" type="number" min="0" max="5" step="0.1"></div>
+        <div class="field"><label for="f-opiniones">Nº de opiniones inicial</label><input id="f-opiniones" type="number" min="0"></div>
+        <div class="field full" style="margin-top:-10px"><p class="slug-hint">La valoración inicial solo se muestra hasta que la vivienda tenga sus primeras reseñas reales aprobadas; a partir de ahí, la media se calcula sola.</p></div>
+        <div class="field full"><label for="f-badges">Etiquetas (separadas por coma)</label><input id="f-badges" type="text" placeholder="Cancelación gratuita, Se admiten mascotas"></div>
+        <div class="field full">
+          <label>Servicios de esta vivienda</label>
+          <div class="servicios-box">
+            <div class="servicios-chips" id="serviciosChips"></div>
+            <p class="slug-hint" style="margin:0 0 6px">Elige un dibujito para el servicio:</p>
+            <div class="icon-picker" id="iconPicker"></div>
+            <div class="servicios-add">
+              <input type="text" id="servicioInput" placeholder="Ej. Piscina privada, Vistas al mar, Chimenea…">
+              <button type="button" class="btn btn-ghost btn-sm" id="btnAddServicio">+ Añadir</button>
+            </div>
+            <p class="slug-hint">Escribe el servicio, elige el icono y pulsa "Añadir" o Intro. Puedes añadir tantos como quieras, son propios de esta vivienda.</p>
+          </div>
+        </div>
+        <div class="field full"><label for="f-descripcion">Descripción</label><textarea id="f-descripcion"></textarea></div>
+        <div class="field full">
+          <label>Vídeos (TikTok, Facebook, YouTube, Instagram…)</label>
+          <div class="servicios-box">
+            <div class="servicios-chips" id="videosChips"></div>
+            <div class="servicios-add">
+              <input type="url" id="videoInput" placeholder="Pega aquí el enlace del vídeo, ej. https://www.tiktok.com/@usuario/video/123">
+              <button type="button" class="btn btn-ghost btn-sm" id="btnAddVideo">+ Añadir</button>
+            </div>
+            <p class="slug-hint">Pega el enlace y pulsa "Añadir" o Intro. Se detecta solo si es TikTok, Facebook, YouTube o Instagram.</p>
+          </div>
+        </div>
+        <div class="field full">
+          <label>Fotos</label>
+          <div class="photos-box">
+            <div class="photo-thumbs" id="photoThumbs"></div>
+            <input type="file" id="f-fotos" accept="image/*" multiple>
+            <p class="upload-note" id="uploadNote">Guarda primero el identificador de la vivienda (arriba) para poder subir fotos.</p>
+          </div>
+        </div>
+        <div class="field full">
+          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="f-activo" style="width:auto" checked> Visible en la web</label>
+        </div>
+      </div>
+      <p class="form-error" id="viviendaFormError"></p>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="btnCancelVivienda">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="btnSaveVivienda">Guardar vivienda</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: RESERVAS ============ -->
+<div class="modal-backdrop" id="reservasModalBackdrop">
+  <div class="modal-panel">
+    <button class="modal-close" id="reservasModalClose">×</button>
+    <h2 id="reservasTitle">Fechas ocupadas</h2>
+    <div id="reservasList"></div>
+    <form id="reservaForm">
+      <div class="field"><label for="r-inicio">Entrada</label><input id="r-inicio" type="date" required></div>
+      <div class="field"><label for="r-fin">Salida</label><input id="r-fin" type="date" required></div>
+      <div class="field full"><label for="r-nota">Nota interna (opcional)</label><input id="r-nota" type="text" placeholder="ej. nombre del huésped"></div>
+      <div class="field full" style="text-align:right"><button type="submit" class="btn btn-dark">Añadir fechas ocupadas</button></div>
+      <p class="form-error" id="reservaFormError" style="grid-column:1/-1"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: PRECIOS POR TEMPORADA ============ -->
+<div class="modal-backdrop" id="preciosModalBackdrop">
+  <div class="modal-panel">
+    <button class="modal-close" id="preciosModalClose">×</button>
+    <h2 id="preciosTitle">Precios por temporada</h2>
+    <p class="slug-hint">Precio semanal para cada mes. Deja un mes vacío para que use el precio base de la vivienda ese mes.</p>
+    <div class="precios-grid" id="preciosGrid"></div>
+    <p class="form-error" id="preciosError"></p>
+    <div class="form-actions">
+      <button type="button" class="btn btn-ghost" id="btnCancelPrecios">Cancelar</button>
+      <button type="button" class="btn btn-primary" id="btnSavePrecios">Guardar precios</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+"use strict";
+
+var SUPABASE_URL = "https://bjuxswhdktkvlrnuejuz.supabase.co";
+var SUPABASE_KEY = "sb_publishable_Z_Mlw0dn2p9uOOpQn4QL4w_wx74m27G";
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+var viviendas = [];
+var editingId = null;      // id de la vivienda que se está editando (null = nueva)
+var draftFotos = [];       // rutas de fotos de la vivienda en edición
+var draftServicios = [];   // servicios (texto libre) de la vivienda en edición
+var draftVideos = [];      // enlaces de vídeo (TikTok, Facebook...) de la vivienda en edición
+var reservasViviendaId = null;
+var reservasActuales = [];  // reservas ya cargadas de la vivienda que se está viendo, para validar solapes
+
+/* ============ AUTH ============ */
+var loginView = document.getElementById("loginView");
+var appView = document.getElementById("appView");
+
+async function checkSession(){
+  var res = await sb.auth.getSession();
+  if(res.data && res.data.session){
+    showApp();
+  } else {
+    loginView.style.display = "flex";
+    appView.style.display = "none";
+  }
+}
+
+document.getElementById("loginForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  var email = document.getElementById("loginEmail").value.trim();
+  var pass = document.getElementById("loginPass").value;
+  var errEl = document.getElementById("loginError");
+  errEl.style.display = "none";
+  var res = await sb.auth.signInWithPassword({ email: email, password: pass });
+  if(res.error){
+    errEl.textContent = "No se ha podido iniciar sesión: revisa el email y la contraseña.";
+    errEl.style.display = "block";
+    return;
+  }
+  showApp();
+});
+
+document.getElementById("btnLogout").addEventListener("click", async function(){
+  await sb.auth.signOut();
+  loginView.style.display = "flex";
+  appView.style.display = "none";
+});
+
+function showApp(){
+  loginView.style.display = "none";
+  appView.style.display = "block";
+  loadViviendas();
+  loadReviewsAdmin();
+}
+
+checkSession();
+
+/* ============ VIVIENDAS: LISTADO ============ */
+async function loadViviendas(){
+  var list = document.getElementById("viviendasList");
+  list.innerHTML = '<p class="empty-note">Cargando…</p>';
+  var res = await sb.from("viviendas").select("*").order("orden", {ascending:true});
+  if(res.error){
+    list.innerHTML = '<p class="empty-note" style="color:var(--bougain)">Error al cargar: '+res.error.message+'</p>';
+    return;
+  }
+  viviendas = res.data || [];
+  if(viviendas.length === 0){
+    list.innerHTML = '<p class="empty-note">Todavía no has añadido ninguna vivienda.</p>';
+    return;
+  }
+
+  var resenasRes = await sb.from("resenas").select("vivienda_id, valoracion").eq("estado", "aprobada");
+  var ratingMap = {};
+  (resenasRes.data || []).forEach(function(r){
+    if(!ratingMap[r.vivienda_id]) ratingMap[r.vivienda_id] = [];
+    ratingMap[r.vivienda_id].push(r.valoracion);
+  });
+
+  list.innerHTML = viviendas.map(function(v){
+    var votos = ratingMap[v.id] || [];
+    var avgTxt = votos.length
+      ? "★ " + (votos.reduce(function(a,b){return a+b;},0)/votos.length).toFixed(1).replace(".",",") + "/5 (" + votos.length + ")"
+      : "Sin reseñas";
+    return '<div class="v-row">'+
+      '<div class="v-info"><b>'+v.nombre+'</b><span>'+(v.zona||"")+' · '+(v.dormitorios||0)+' dorm. · '+(v.huespedes||0)+' huéspedes · mín. '+(v.noches_minimas||1)+' noches</span></div>'+
+      '<div class="v-price">'+(v.precio ? v.precio+' € / '+(v.unidad_precio||"noche") : "Consultar precio")+'</div>'+
+      '<div class="v-rating">'+avgTxt+'</div>'+
+      '<label class="v-toggle"><input type="checkbox" data-activo="'+v.id+'" '+(v.activo?"checked":"")+'> Visible</label>'+
+      '<div class="v-actions">'+
+        '<button class="btn btn-ghost btn-sm" data-fechas="'+v.id+'">Fechas</button>'+
+        '<button class="btn btn-ghost btn-sm" data-precios="'+v.id+'">Precios</button>'+
+        '<button class="btn btn-ghost btn-sm" data-editar="'+v.id+'">Editar</button>'+
+        '<button class="btn btn-danger btn-sm" data-borrar="'+v.id+'">Eliminar</button>'+
+      '</div>'+
+    '</div>';
+  }).join("");
+
+  list.querySelectorAll("[data-editar]").forEach(function(b){ b.addEventListener("click", function(){ openViviendaForm(b.getAttribute("data-editar")); }); });
+  list.querySelectorAll("[data-borrar]").forEach(function(b){ b.addEventListener("click", function(){ borrarVivienda(b.getAttribute("data-borrar")); }); });
+  list.querySelectorAll("[data-fechas]").forEach(function(b){ b.addEventListener("click", function(){ openReservas(b.getAttribute("data-fechas")); }); });
+  list.querySelectorAll("[data-precios]").forEach(function(b){ b.addEventListener("click", function(){ openPrecios(b.getAttribute("data-precios")); }); });
+  list.querySelectorAll("[data-activo]").forEach(function(chk){
+    chk.addEventListener("change", async function(){
+      var id = chk.getAttribute("data-activo");
+      await sb.from("viviendas").update({ activo: chk.checked }).eq("id", id);
+    });
+  });
+}
+
+async function borrarVivienda(id){
+  if(!confirm("¿Seguro que quieres eliminar esta vivienda? También se borrarán sus fechas de reserva. Esta acción no se puede deshacer.")) return;
+  var res = await sb.from("viviendas").delete().eq("id", id);
+  if(res.error){ alert("No se ha podido eliminar: "+res.error.message); return; }
+  loadViviendas();
+}
+
+/* ============ VIVIENDAS: FORMULARIO ============ */
+var viviendaBackdrop = document.getElementById("viviendaModalBackdrop");
+
+var ICONOS_SERVICIO = [
+  ["i-pool","Piscina"], ["i-wifi","Wifi"], ["i-parking","Parking"], ["i-snow","Aire acondicionado"],
+  ["i-bbq","Barbacoa"], ["i-terrace","Terraza"], ["i-tv","TV"], ["i-kitchen","Cocina"],
+  ["i-coffee","Cafetera"], ["i-washer","Lavadora"], ["i-pets","Mascotas"], ["i-garden","Jardín"],
+  ["i-shower","Ducha"], ["i-bath","Baño"], ["i-bed","Dormitorio"], ["i-users","Personas"],
+  ["i-expand","Tamaño"], ["i-star","Destacado"], ["i-pin","Ubicación"], ["i-check","Genérico"]
+];
+var selectedIcon = "i-check";
+var iconPicker = document.getElementById("iconPicker");
+iconPicker.innerHTML = ICONOS_SERVICIO.map(function(ic){
+  return '<button type="button" data-icon="'+ic[0]+'" title="'+ic[1]+'"'+(ic[0]===selectedIcon?' class="is-active"':'')+'><svg class="icon"><use href="#'+ic[0]+'"/></svg></button>';
+}).join("");
+iconPicker.querySelectorAll("button").forEach(function(b){
+  b.addEventListener("click", function(){
+    selectedIcon = b.getAttribute("data-icon");
+    iconPicker.querySelectorAll("button").forEach(function(x){ x.classList.remove("is-active"); });
+    b.classList.add("is-active");
+  });
+});
+function resetIconPicker(){
+  selectedIcon = "i-check";
+  iconPicker.querySelectorAll("button").forEach(function(x){ x.classList.toggle("is-active", x.getAttribute("data-icon")==="i-check"); });
+}
+
+function renderServiciosChips(){
+  var box = document.getElementById("serviciosChips");
+  if(draftServicios.length === 0){
+    box.innerHTML = '<span style="font-size:12.5px;color:var(--ink-faint)">Todavía no has añadido ningún servicio.</span>';
+    return;
+  }
+  box.innerHTML = draftServicios.map(function(s, i){
+    var icon = s.icon || "i-check";
+    return '<span class="servicio-chip"><svg class="icon"><use href="#'+icon+'"/></svg>'+escapeHTMLAdmin(s.label)+'<button type="button" data-rm-serv="'+i+'" aria-label="Quitar">×</button></span>';
+  }).join("");
+  box.querySelectorAll("[data-rm-serv]").forEach(function(b){
+    b.addEventListener("click", function(){
+      draftServicios.splice(parseInt(b.getAttribute("data-rm-serv"), 10), 1);
+      renderServiciosChips();
+    });
+  });
+}
+
+function addServicioFromInput(){
+  var input = document.getElementById("servicioInput");
+  var val = input.value.trim();
+  if(!val) return;
+  draftServicios.push({ label: val, icon: selectedIcon });
+  input.value = "";
+  resetIconPicker();
+  renderServiciosChips();
+  input.focus();
+}
+document.getElementById("btnAddServicio").addEventListener("click", addServicioFromInput);
+document.getElementById("servicioInput").addEventListener("keydown", function(e){
+  if(e.key === "Enter"){ e.preventDefault(); addServicioFromInput(); }
+});
+
+function detectVideoPlatform(url){
+  var host = "";
+  try{ host = new URL(url).hostname.replace("www.",""); }catch(e){ host = ""; }
+  if(host.indexOf("tiktok.com") > -1) return { icon:"i-tiktok", label:"TikTok" };
+  if(host.indexOf("facebook.com") > -1 || host.indexOf("fb.watch") > -1) return { icon:"i-facebook", label:"Facebook" };
+  if(host.indexOf("instagram.com") > -1) return { icon:"i-play", label:"Instagram" };
+  if(host.indexOf("youtube.com") > -1 || host.indexOf("youtu.be") > -1) return { icon:"i-play", label:"YouTube" };
+  return { icon:"i-play", label:"Vídeo" };
+}
+
+function renderVideosChips(){
+  var box = document.getElementById("videosChips");
+  if(draftVideos.length === 0){
+    box.innerHTML = '<span style="font-size:12.5px;color:var(--ink-faint)">Todavía no has añadido ningún vídeo.</span>';
+    return;
+  }
+  box.innerHTML = draftVideos.map(function(url, i){
+    var info = detectVideoPlatform(url);
+    return '<span class="servicio-chip"><svg class="icon"><use href="#'+info.icon+'"/></svg>'+info.label+'<button type="button" data-rm-video="'+i+'" aria-label="Quitar">×</button></span>';
+  }).join("");
+  box.querySelectorAll("[data-rm-video]").forEach(function(b){
+    b.addEventListener("click", function(){
+      draftVideos.splice(parseInt(b.getAttribute("data-rm-video"), 10), 1);
+      renderVideosChips();
+    });
+  });
+}
+
+function addVideoFromInput(){
+  var input = document.getElementById("videoInput");
+  var val = input.value.trim();
+  if(!val) return;
+  try{ new URL(val); }catch(e){ alert("Ese enlace no parece válido. Debe empezar por https://"); return; }
+  draftVideos.push(val);
+  input.value = "";
+  renderVideosChips();
+  input.focus();
+}
+document.getElementById("btnAddVideo").addEventListener("click", addVideoFromInput);
+document.getElementById("videoInput").addEventListener("keydown", function(e){
+  if(e.key === "Enter"){ e.preventDefault(); addVideoFromInput(); }
+});
+
+document.getElementById("btnNewVivienda").addEventListener("click", function(){ openViviendaForm(null); });
+document.getElementById("viviendaModalClose").addEventListener("click", closeViviendaForm);
+document.getElementById("btnCancelVivienda").addEventListener("click", closeViviendaForm);
+viviendaBackdrop.addEventListener("click", function(e){ if(e.target === viviendaBackdrop) closeViviendaForm(); });
+
+function openViviendaForm(id){
+  editingId = id;
+  document.getElementById("viviendaFormError").style.display = "none";
+  document.getElementById("viviendaForm").reset();
+
+  var v = id ? viviendas.find(function(x){ return x.id === id; }) : null;
+
+  document.getElementById("viviendaFormTitle").textContent = v ? "Editar vivienda" : "Nueva vivienda";
+  document.getElementById("f-id").value = v ? v.id : "";
+  document.getElementById("f-id").disabled = !!v;
+  document.getElementById("f-nombre").value = v ? (v.nombre||"") : "";
+  document.getElementById("f-tagline").value = v ? (v.tagline||"") : "";
+  document.getElementById("f-zona").value = v ? (v.zona||"") : "";
+  document.getElementById("f-distancia").value = v ? (v.distancia||"") : "";
+  document.getElementById("f-huespedes").value = v ? (v.huespedes||"") : "";
+  document.getElementById("f-dormitorios").value = v ? (v.dormitorios||"") : "";
+  document.getElementById("f-banos").value = v ? (v.banos||"") : "";
+  document.getElementById("f-area").value = v ? (v.area||"") : "";
+  document.getElementById("f-noches-min").value = v ? (v.noches_minimas || 1) : 1;
+  document.getElementById("f-precio").value = v ? (v.precio||"") : "";
+  document.getElementById("f-unidad").value = v ? (v.unidad_precio||"noche") : "noche";
+  document.getElementById("f-valoracion").value = v ? (v.valoracion||"") : "";
+  document.getElementById("f-opiniones").value = v ? (v.opiniones||"") : "";
+  document.getElementById("f-badges").value = v && v.badges ? v.badges.join(", ") : "";
+  document.getElementById("f-descripcion").value = v ? (v.descripcion||"") : "";
+  document.getElementById("f-activo").checked = v ? !!v.activo : true;
+
+  draftServicios = v && v.amenities ? v.amenities.slice() : [];
+  resetIconPicker();
+  document.getElementById("servicioInput").value = "";
+  renderServiciosChips();
+
+  draftVideos = v && v.videos ? v.videos.slice() : [];
+  document.getElementById("videoInput").value = "";
+  renderVideosChips();
+
+  draftFotos = v && v.fotos ? v.fotos.slice() : [];
+  renderPhotoThumbs();
+  document.getElementById("f-fotos").disabled = !v;
+  document.getElementById("uploadNote").style.display = v ? "none" : "block";
+
+  viviendaBackdrop.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeViviendaForm(){
+  viviendaBackdrop.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function renderPhotoThumbs(){
+  var box = document.getElementById("photoThumbs");
+  box.innerHTML = draftFotos.map(function(path, i){
+    var url = sb.storage.from("fotos-viviendas").getPublicUrl(path).data.publicUrl;
+    return '<div class="photo-thumb"><img src="'+url+'" alt="">'+
+      '<div class="p-actions">'+
+        (i>0 ? '<button type="button" data-mv="'+i+':-1" title="Mover a la izquierda">‹</button>' : '')+
+        (i<draftFotos.length-1 ? '<button type="button" data-mv="'+i+':1" title="Mover a la derecha">›</button>' : '')+
+        '<button type="button" data-rm="'+i+'" title="Quitar">×</button>'+
+      '</div></div>';
+  }).join("");
+  box.querySelectorAll("[data-rm]").forEach(function(b){
+    b.addEventListener("click", function(){
+      draftFotos.splice(parseInt(b.getAttribute("data-rm"),10), 1);
+      renderPhotoThumbs();
+    });
+  });
+  box.querySelectorAll("[data-mv]").forEach(function(b){
+    b.addEventListener("click", function(){
+      var parts = b.getAttribute("data-mv").split(":");
+      var i = parseInt(parts[0],10), dir = parseInt(parts[1],10);
+      var j = i+dir;
+      if(j<0 || j>=draftFotos.length) return;
+      var tmp = draftFotos[i]; draftFotos[i] = draftFotos[j]; draftFotos[j] = tmp;
+      renderPhotoThumbs();
+    });
+  });
+}
+
+document.getElementById("f-fotos").addEventListener("change", async function(e){
+  var files = Array.from(e.target.files || []);
+  var id = document.getElementById("f-id").value.trim();
+  if(!id || files.length === 0) return;
+  for(var i=0;i<files.length;i++){
+    var file = files[i];
+    var safeName = file.name.replace(/[^a-zA-Z0-9.-]/g,"_");
+    var path = id + "/" + Date.now() + "-" + safeName;
+    var up = await sb.storage.from("fotos-viviendas").upload(path, file, { upsert:true });
+    if(up.error){
+      alert("Error al subir "+file.name+": "+up.error.message);
+      continue;
+    }
+    draftFotos.push(path);
+  }
+  e.target.value = "";
+  renderPhotoThumbs();
+});
+
+document.getElementById("viviendaForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  var errEl = document.getElementById("viviendaFormError");
+  errEl.style.display = "none";
+
+  var id = document.getElementById("f-id").value.trim().toLowerCase();
+  if(!/^[a-z0-9-]+$/.test(id)){
+    errEl.textContent = "El identificador solo puede tener minúsculas, números y guiones.";
+    errEl.style.display = "block";
+    return;
+  }
+
+  var num = function(elId){ var v = document.getElementById(elId).value; return v === "" ? null : Number(v); };
+  var payload = {
+    nombre: document.getElementById("f-nombre").value.trim(),
+    tagline: document.getElementById("f-tagline").value.trim() || null,
+    zona: document.getElementById("f-zona").value.trim() || null,
+    distancia: document.getElementById("f-distancia").value.trim() || null,
+    huespedes: num("f-huespedes"),
+    dormitorios: num("f-dormitorios"),
+    banos: num("f-banos"),
+    area: num("f-area"),
+    noches_minimas: Math.max(1, parseInt(document.getElementById("f-noches-min").value, 10) || 1),
+    precio: num("f-precio"),
+    unidad_precio: document.getElementById("f-unidad").value,
+    valoracion: num("f-valoracion"),
+    opiniones: num("f-opiniones"),
+    badges: document.getElementById("f-badges").value.split(",").map(function(s){ return s.trim(); }).filter(Boolean),
+    amenities: draftServicios,
+    videos: draftVideos,
+    descripcion: document.getElementById("f-descripcion").value.trim() || null,
+    fotos: draftFotos,
+    activo: document.getElementById("f-activo").checked
+  };
+
+  var res;
+  if(editingId){
+    res = await sb.from("viviendas").update(payload).eq("id", editingId);
+  } else {
+    payload.id = id;
+    res = await sb.from("viviendas").insert(payload);
+  }
+
+  if(res.error){
+    errEl.textContent = "Error al guardar: "+res.error.message;
+    errEl.style.display = "block";
+    return;
+  }
+  closeViviendaForm();
+  loadViviendas();
+});
+
+/* ============ RESERVAS ============ */
+var reservasBackdrop = document.getElementById("reservasModalBackdrop");
+document.getElementById("reservasModalClose").addEventListener("click", closeReservas);
+reservasBackdrop.addEventListener("click", function(e){ if(e.target === reservasBackdrop) closeReservas(); });
+
+function closeReservas(){
+  reservasBackdrop.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+async function openReservas(viviendaId){
+  reservasViviendaId = viviendaId;
+  var v = viviendas.find(function(x){ return x.id === viviendaId; });
+  document.getElementById("reservasTitle").textContent = "Fechas ocupadas · " + (v ? v.nombre : "");
+  document.getElementById("reservaForm").reset();
+  document.getElementById("reservaFormError").style.display = "none";
+  await loadReservasList();
+  reservasBackdrop.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+async function loadReservasList(){
+  var box = document.getElementById("reservasList");
+  box.innerHTML = "<p class=\"empty-note\">Cargando…</p>";
+  var res = await sb.from("reservas").select("*").eq("vivienda_id", reservasViviendaId).order("fecha_inicio", {ascending:true});
+  if(res.error){
+    box.innerHTML = '<p class="empty-note" style="color:var(--bougain)">Error: '+res.error.message+'</p>';
+    return;
+  }
+  var rows = res.data || [];
+  reservasActuales = rows;
+  if(rows.length === 0){
+    box.innerHTML = '<p class="empty-note">No hay fechas ocupadas registradas.</p>';
+    return;
+  }
+  box.innerHTML = rows.map(function(r){
+    return '<div class="reserva-row"><span><b>'+r.fecha_inicio+'</b> → <b>'+r.fecha_fin+'</b> '+(r.nota?'<span class="nota">· '+r.nota+'</span>':'')+'</span>'+
+      '<button type="button" class="btn btn-danger btn-sm" data-del-reserva="'+r.id+'">Eliminar</button></div>';
+  }).join("");
+  box.querySelectorAll("[data-del-reserva]").forEach(function(b){
+    b.addEventListener("click", async function(){
+      if(!confirm("¿Eliminar estas fechas ocupadas?")) return;
+      await sb.from("reservas").delete().eq("id", b.getAttribute("data-del-reserva"));
+      loadReservasList();
+    });
+  });
+}
+
+// Dos reservas se solapan solo si comparten alguna NOCHE. La fecha de salida no ocupa
+// noche, así que una reserva puede entrar el mismo día que otra sale (ej. res1 sale el
+// 06/09 y res2 entra el 06/09: eso está permitido, ambas comparten fecha pero no noche).
+function reservasSolapan(inicioA, finA, inicioB, finB){
+  return (inicioA < finB) && (finA > inicioB);
+}
+function haySolapeConExistentes(inicio, fin){
+  for(var i=0;i<reservasActuales.length;i++){
+    var r = reservasActuales[i];
+    if(reservasSolapan(inicio, fin, r.fecha_inicio, r.fecha_fin)) return true;
+  }
+  return false;
+}
+
+document.getElementById("reservaForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  var errEl = document.getElementById("reservaFormError");
+  errEl.style.display = "none";
+  var inicio = document.getElementById("r-inicio").value;
+  var fin = document.getElementById("r-fin").value;
+  var nota = document.getElementById("r-nota").value.trim();
+  if(!inicio || !fin || fin < inicio){
+    errEl.textContent = "Revisa las fechas: la salida debe ser igual o posterior a la entrada.";
+    errEl.style.display = "block";
+    return;
+  }
+  if(fin === inicio){
+    errEl.textContent = "La entrada y la salida no pueden ser el mismo día: no habría ninguna noche reservada.";
+    errEl.style.display = "block";
+    return;
+  }
+  if(haySolapeConExistentes(inicio, fin)){
+    errEl.textContent = "Esas fechas se solapan con una reserva ya existente para esta vivienda (comparten al menos una noche).";
+    errEl.style.display = "block";
+    return;
+  }
+  var res = await sb.from("reservas").insert({ vivienda_id: reservasViviendaId, fecha_inicio: inicio, fecha_fin: fin, nota: nota || null });
+  if(res.error){
+    errEl.textContent = "Error al guardar: "+res.error.message;
+    errEl.style.display = "block";
+    return;
+  }
+  document.getElementById("reservaForm").reset();
+  loadReservasList();
+});
+
+/* ============ PRECIOS POR TEMPORADA ============ */
+var MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+var preciosBackdrop = document.getElementById("preciosModalBackdrop");
+var preciosViviendaId = null;
+
+(function buildPreciosGrid(){
+  var grid = document.getElementById("preciosGrid");
+  grid.innerHTML = MESES.map(function(nombre, i){
+    var mes = i + 1;
+    return '<div class="precio-row"><label for="precio-mes-'+mes+'">'+nombre+'</label><input type="number" min="0" step="0.01" id="precio-mes-'+mes+'"><span>€ / semana</span></div>';
+  }).join("");
+})();
+
+document.getElementById("preciosModalClose").addEventListener("click", closePrecios);
+document.getElementById("btnCancelPrecios").addEventListener("click", closePrecios);
+preciosBackdrop.addEventListener("click", function(e){ if(e.target === preciosBackdrop) closePrecios(); });
+
+function closePrecios(){
+  preciosBackdrop.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+async function openPrecios(viviendaId){
+  preciosViviendaId = viviendaId;
+  var v = viviendas.find(function(x){ return x.id === viviendaId; });
+  document.getElementById("preciosTitle").textContent = "Precios por temporada · " + (v ? v.nombre : "");
+  document.getElementById("preciosError").style.display = "none";
+  for(var m=1; m<=12; m++){ document.getElementById("precio-mes-"+m).value = ""; }
+
+  var res = await sb.from("precios_mensuales").select("*").eq("vivienda_id", viviendaId);
+  if(!res.error){
+    (res.data || []).forEach(function(row){
+      var el = document.getElementById("precio-mes-"+row.mes);
+      if(el) el.value = row.precio_semana;
+    });
+  }
+
+  preciosBackdrop.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+document.getElementById("btnSavePrecios").addEventListener("click", async function(){
+  var errEl = document.getElementById("preciosError");
+  errEl.style.display = "none";
+  try{
+    for(var m=1; m<=12; m++){
+      var el = document.getElementById("precio-mes-"+m);
+      var val = el.value.trim();
+      if(val === ""){
+        var delRes = await sb.from("precios_mensuales").delete().eq("vivienda_id", preciosViviendaId).eq("mes", m);
+        if(delRes.error) throw delRes.error;
+      } else {
+        var num = Number(val);
+        if(isNaN(num) || num < 0) continue;
+        var upRes = await sb.from("precios_mensuales").upsert({ vivienda_id: preciosViviendaId, mes: m, precio_semana: num }, { onConflict: "vivienda_id,mes" });
+        if(upRes.error) throw upRes.error;
+      }
+    }
+    closePrecios();
+  }catch(err){
+    errEl.textContent = "Error al guardar: " + err.message;
+    errEl.style.display = "block";
+  }
+});
+
+/* ============ RESEÑAS: MODERACIÓN ============ */
+function escapeHTMLAdmin(str){
+  var div = document.createElement("div");
+  div.textContent = str == null ? "" : str;
+  return div.innerHTML;
+}
+
+var currentReviewTab = "pendiente";
+document.querySelectorAll(".tab-btn").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    document.querySelectorAll(".tab-btn").forEach(function(b){ b.classList.remove("is-active"); });
+    btn.classList.add("is-active");
+    currentReviewTab = btn.getAttribute("data-tab");
+    loadReviewsAdmin();
+  });
+});
+
+async function loadReviewsAdmin(){
+  var box = document.getElementById("reviewsAdminList");
+  box.innerHTML = '<p class="empty-note">Cargando…</p>';
+  var res = await sb.from("resenas").select("*, viviendas(nombre)").eq("estado", currentReviewTab).order("created_at", {ascending:false});
+  if(res.error){
+    box.innerHTML = '<p class="empty-note" style="color:var(--bougain)">Error al cargar: '+res.error.message+'</p>';
+    return;
+  }
+  var rows = res.data || [];
+  if(rows.length === 0){
+    box.innerHTML = '<p class="empty-note">No hay reseñas en este estado.</p>';
+    return;
+  }
+  box.innerHTML = rows.map(function(r){
+    var houseName = r.viviendas ? r.viviendas.nombre : r.vivienda_id;
+    var stars = "★".repeat(r.valoracion) + "☆".repeat(5 - r.valoracion);
+    var actions = "";
+    if(currentReviewTab !== "aprobada") actions += '<button type="button" class="btn btn-dark btn-sm" data-approve="'+r.id+'">Aprobar</button>';
+    if(currentReviewTab !== "oculta") actions += '<button type="button" class="btn btn-ghost btn-sm" data-hide="'+r.id+'">Ocultar</button>';
+    actions += '<button type="button" class="btn btn-danger btn-sm" data-del-review="'+r.id+'">Eliminar</button>';
+    return '<div class="rv-row">'+
+      '<div class="rv-head"><div><b>'+escapeHTMLAdmin(r.nombre)+'</b> <span class="rv-house">· '+escapeHTMLAdmin(houseName)+'</span></div><span class="rv-stars">'+stars+'</span></div>'+
+      (r.comentario ? '<p>'+escapeHTMLAdmin(r.comentario)+'</p>' : '<p style="font-style:italic;color:var(--ink-faint)">Sin comentario</p>')+
+      '<span class="rv-date">'+new Date(r.created_at).toLocaleDateString("es-ES")+'</span>'+
+      '<div class="rv-actions">'+actions+'</div>'+
+    '</div>';
+  }).join("");
+
+  box.querySelectorAll("[data-approve]").forEach(function(b){ b.addEventListener("click", function(){ setReviewEstado(b.getAttribute("data-approve"), "aprobada"); }); });
+  box.querySelectorAll("[data-hide]").forEach(function(b){ b.addEventListener("click", function(){ setReviewEstado(b.getAttribute("data-hide"), "oculta"); }); });
+  box.querySelectorAll("[data-del-review]").forEach(function(b){ b.addEventListener("click", function(){ deleteReview(b.getAttribute("data-del-review")); }); });
+}
+
+async function setReviewEstado(id, estado){
+  var res = await sb.from("resenas").update({ estado: estado }).eq("id", id);
+  if(res.error){ alert("No se ha podido actualizar: "+res.error.message); return; }
+  loadReviewsAdmin();
+  loadViviendas();
+}
+
+async function deleteReview(id){
+  if(!confirm("¿Eliminar esta reseña? No se puede deshacer.")) return;
+  var res = await sb.from("resenas").delete().eq("id", id);
+  if(res.error){ alert("No se ha podido eliminar: "+res.error.message); return; }
+  loadReviewsAdmin();
+  loadViviendas();
+}
+
+})();
+</script>
+</body>
+</html>
