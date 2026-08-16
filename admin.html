@@ -184,6 +184,12 @@ main.wrap{padding:40px 24px 90px;}
     <div id="viviendasList"><p class="empty-note">Cargando…</p></div>
 
     <div class="toolbar" style="margin-top:52px">
+      <h1>Blog</h1>
+      <button class="btn btn-primary" id="btnNewPost">+ Añadir entrada</button>
+    </div>
+    <div id="blogList"><p class="empty-note">Cargando…</p></div>
+
+    <div class="toolbar" style="margin-top:52px">
       <h1>Reseñas</h1>
     </div>
     <div class="tabs" id="reviewTabs">
@@ -298,6 +304,50 @@ main.wrap{padding:40px 24px 90px;}
       <button type="button" class="btn btn-ghost" id="btnCancelPrecios">Cancelar</button>
       <button type="button" class="btn btn-primary" id="btnSavePrecios">Guardar precios</button>
     </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: ENTRADA DE BLOG ============ -->
+<div class="modal-backdrop" id="postModalBackdrop">
+  <div class="modal-panel">
+    <button class="modal-close" id="postModalClose">×</button>
+    <h2 id="postFormTitle">Nueva entrada</h2>
+    <form id="postForm">
+      <div class="form-grid">
+        <div class="field full">
+          <label for="p-id">Identificador único (sin espacios ni tildes)</label>
+          <input id="p-id" type="text" placeholder="ej. mejores-playas-conil" pattern="[a-z0-9-]+" required>
+          <p class="slug-hint">Solo minúsculas, números y guiones. No se puede cambiar después de crear la entrada.</p>
+        </div>
+        <div class="field full"><label for="p-titulo">Título</label><input id="p-titulo" type="text" required></div>
+        <div class="field full"><label for="p-resumen">Resumen corto (aparece en la lista del blog)</label><textarea id="p-resumen" style="min-height:60px"></textarea></div>
+        <div class="field full"><label for="p-contenido">Contenido</label><textarea id="p-contenido" style="min-height:220px"></textarea></div>
+        <div class="field full">
+          <label>Foto de portada</label>
+          <div class="photos-box">
+            <div class="photo-thumbs" id="portadaThumb"></div>
+            <input type="file" id="p-portada" accept="image/*">
+            <p class="upload-note" id="portadaNote">Guarda primero el identificador (arriba) para poder subir la portada.</p>
+          </div>
+        </div>
+        <div class="field full">
+          <label>Más fotos (galería dentro de la entrada)</label>
+          <div class="photos-box">
+            <div class="photo-thumbs" id="postPhotoThumbs"></div>
+            <input type="file" id="p-fotos" accept="image/*" multiple>
+            <p class="upload-note" id="postUploadNote">Guarda primero el identificador (arriba) para poder subir fotos.</p>
+          </div>
+        </div>
+        <div class="field full">
+          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="p-publicado" style="width:auto" checked> Publicada (visible en la web)</label>
+        </div>
+      </div>
+      <p class="form-error" id="postFormError"></p>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="btnCancelPost">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="btnSavePost">Guardar entrada</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -903,6 +953,190 @@ async function deleteReview(id){
   loadReviewsAdmin();
   loadViviendas();
 }
+
+/* ============ BLOG ============ */
+var blogPosts = [];
+var postBackdrop = document.getElementById("postModalBackdrop");
+var editingPostId = null;
+var draftPortada = null;
+var draftPostFotos = [];
+
+async function loadBlog(){
+  var box = document.getElementById("blogList");
+  box.innerHTML = '<p class="empty-note">Cargando…</p>';
+  var res = await sb.from("blog_posts").select("*").order("created_at", {ascending:false});
+  if(res.error){
+    box.innerHTML = '<p class="empty-note" style="color:var(--bougain)">Error al cargar: '+res.error.message+'</p>';
+    return;
+  }
+  blogPosts = res.data || [];
+  if(blogPosts.length === 0){
+    box.innerHTML = '<p class="empty-note">Todavía no has añadido ninguna entrada.</p>';
+    return;
+  }
+  box.innerHTML = blogPosts.map(function(p){
+    return '<div class="v-row">'+
+      '<div class="v-info"><b>'+escapeHTMLAdmin(p.titulo)+'</b><span>'+(p.publicado ? "Publicada" : "Borrador")+' · '+new Date(p.created_at).toLocaleDateString("es-ES")+'</span></div>'+
+      '<div class="v-actions">'+
+        '<button type="button" class="btn btn-ghost btn-sm" data-edit-post="'+p.id+'">Editar</button>'+
+        '<button type="button" class="btn btn-danger btn-sm" data-del-post="'+p.id+'">Eliminar</button>'+
+      '</div>'+
+    '</div>';
+  }).join("");
+  box.querySelectorAll("[data-edit-post]").forEach(function(b){
+    b.addEventListener("click", function(){ openPostForm(blogPosts.find(function(p){ return p.id === b.getAttribute("data-edit-post"); })); });
+  });
+  box.querySelectorAll("[data-del-post]").forEach(function(b){
+    b.addEventListener("click", async function(){
+      if(!confirm("¿Eliminar esta entrada del blog? No se puede deshacer.")) return;
+      var res = await sb.from("blog_posts").delete().eq("id", b.getAttribute("data-del-post"));
+      if(res.error){ alert("No se ha podido eliminar: "+res.error.message); return; }
+      loadBlog();
+    });
+  });
+}
+
+document.getElementById("btnNewPost").addEventListener("click", function(){ openPostForm(null); });
+document.getElementById("postModalClose").addEventListener("click", closePostForm);
+document.getElementById("btnCancelPost").addEventListener("click", closePostForm);
+postBackdrop.addEventListener("click", function(e){ if(e.target === postBackdrop) closePostForm(); });
+
+function openPostForm(p){
+  editingPostId = p ? p.id : null;
+  document.getElementById("postFormTitle").textContent = p ? "Editar entrada" : "Nueva entrada";
+  document.getElementById("postFormError").style.display = "none";
+
+  document.getElementById("p-id").value = p ? p.id : "";
+  document.getElementById("p-id").disabled = !!p;
+  document.getElementById("p-titulo").value = p ? p.titulo : "";
+  document.getElementById("p-resumen").value = p ? (p.resumen || "") : "";
+  document.getElementById("p-contenido").value = p ? (p.contenido || "") : "";
+  document.getElementById("p-publicado").checked = p ? !!p.publicado : true;
+
+  draftPortada = p ? (p.portada || null) : null;
+  draftPostFotos = p && p.fotos ? p.fotos.slice() : [];
+  renderPortadaThumb();
+  renderPostPhotoThumbs();
+  document.getElementById("p-portada").disabled = !p;
+  document.getElementById("p-fotos").disabled = !p;
+  document.getElementById("portadaNote").style.display = p ? "none" : "block";
+  document.getElementById("postUploadNote").style.display = p ? "none" : "block";
+
+  postBackdrop.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closePostForm(){
+  postBackdrop.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function renderPortadaThumb(){
+  var box = document.getElementById("portadaThumb");
+  if(!draftPortada){ box.innerHTML = ""; return; }
+  var url = sb.storage.from("fotos-blog").getPublicUrl(draftPortada).data.publicUrl;
+  box.innerHTML = '<div class="photo-thumb"><img src="'+url+'" alt="">'+
+    '<div class="p-actions"><button type="button" id="btnRmPortada" title="Quitar">×</button></div></div>';
+  document.getElementById("btnRmPortada").addEventListener("click", function(){ draftPortada = null; renderPortadaThumb(); });
+}
+
+function renderPostPhotoThumbs(){
+  var box = document.getElementById("postPhotoThumbs");
+  box.innerHTML = draftPostFotos.map(function(path, i){
+    var url = sb.storage.from("fotos-blog").getPublicUrl(path).data.publicUrl;
+    return '<div class="photo-thumb"><img src="'+url+'" alt="">'+
+      '<div class="p-actions">'+
+        (i>0 ? '<button type="button" data-mv-p="'+i+':-1" title="Mover a la izquierda">‹</button>' : '')+
+        (i<draftPostFotos.length-1 ? '<button type="button" data-mv-p="'+i+':1" title="Mover a la derecha">›</button>' : '')+
+        '<button type="button" data-rm-p="'+i+'" title="Quitar">×</button>'+
+      '</div></div>';
+  }).join("");
+  box.querySelectorAll("[data-rm-p]").forEach(function(b){
+    b.addEventListener("click", function(){
+      draftPostFotos.splice(parseInt(b.getAttribute("data-rm-p"),10), 1);
+      renderPostPhotoThumbs();
+    });
+  });
+  box.querySelectorAll("[data-mv-p]").forEach(function(b){
+    b.addEventListener("click", function(){
+      var parts = b.getAttribute("data-mv-p").split(":");
+      var i = parseInt(parts[0],10), dir = parseInt(parts[1],10);
+      var j = i+dir;
+      if(j<0 || j>=draftPostFotos.length) return;
+      var tmp = draftPostFotos[i]; draftPostFotos[i] = draftPostFotos[j]; draftPostFotos[j] = tmp;
+      renderPostPhotoThumbs();
+    });
+  });
+}
+
+document.getElementById("p-portada").addEventListener("change", async function(e){
+  var file = (e.target.files || [])[0];
+  var id = document.getElementById("p-id").value.trim();
+  if(!id || !file) return;
+  var safeName = file.name.replace(/[^a-zA-Z0-9.-]/g,"_");
+  var path = id + "/portada-" + Date.now() + "-" + safeName;
+  var up = await sb.storage.from("fotos-blog").upload(path, file, { upsert:true });
+  if(up.error){ alert("Error al subir "+file.name+": "+up.error.message); return; }
+  draftPortada = path;
+  e.target.value = "";
+  renderPortadaThumb();
+});
+
+document.getElementById("p-fotos").addEventListener("change", async function(e){
+  var files = Array.from(e.target.files || []);
+  var id = document.getElementById("p-id").value.trim();
+  if(!id || files.length === 0) return;
+  for(var i=0;i<files.length;i++){
+    var file = files[i];
+    var safeName = file.name.replace(/[^a-zA-Z0-9.-]/g,"_");
+    var path = id + "/" + Date.now() + "-" + safeName;
+    var up = await sb.storage.from("fotos-blog").upload(path, file, { upsert:true });
+    if(up.error){ alert("Error al subir "+file.name+": "+up.error.message); continue; }
+    draftPostFotos.push(path);
+  }
+  e.target.value = "";
+  renderPostPhotoThumbs();
+});
+
+document.getElementById("postForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  var errEl = document.getElementById("postFormError");
+  errEl.style.display = "none";
+
+  var id = document.getElementById("p-id").value.trim().toLowerCase();
+  if(!/^[a-z0-9-]+$/.test(id)){
+    errEl.textContent = "El identificador solo puede tener minúsculas, números y guiones.";
+    errEl.style.display = "block";
+    return;
+  }
+
+  var payload = {
+    titulo: document.getElementById("p-titulo").value.trim(),
+    resumen: document.getElementById("p-resumen").value.trim() || null,
+    contenido: document.getElementById("p-contenido").value.trim() || null,
+    portada: draftPortada,
+    fotos: draftPostFotos,
+    publicado: document.getElementById("p-publicado").checked
+  };
+
+  var res;
+  if(editingPostId){
+    res = await sb.from("blog_posts").update(payload).eq("id", editingPostId);
+  } else {
+    payload.id = id;
+    res = await sb.from("blog_posts").insert(payload);
+  }
+
+  if(res.error){
+    errEl.textContent = "Error al guardar: "+res.error.message;
+    errEl.style.display = "block";
+    return;
+  }
+  closePostForm();
+  loadBlog();
+});
+
+loadBlog();
 
 })();
 </script>
