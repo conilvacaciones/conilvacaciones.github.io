@@ -1,0 +1,23 @@
+# Conil Vacaciones
+
+> Alquiler de casas y apartamentos vacacionales en Conil de la Frontera (Cádiz, Costa de la Luz, España). Trato directo con los propietarios, sin agencias ni intermediarios.
+
+Conil Vacaciones gestiona un pequeño número de viviendas turísticas seleccionadas a mano en Conil de la Frontera. Cada vivienda tiene su propia ficha con fotos, descripción, servicios, calendario de disponibilidad y precio orientativo. Las reservas se consultan y confirman directamente por WhatsApp o email con el propietario, no hay pago online en la web.
+
+## Páginas principales
+
+- [Inicio](https://conilvacaciones.github.io/): listado de todas las viviendas disponibles, con buscador por fechas, número de personas y necesidades (piscina, mascotas, aire acondicionado, parking, WiFi, jardín/terraza).
+- [Blog](https://conilvacaciones.github.io/blog.html): artículos sobre qué hacer, playas y planes en Conil de la Frontera.
+- Fichas de vivienda individuales: accesibles desde el inicio, con URL del tipo `https://conilvacaciones.github.io/vivienda.html?id=IDENTIFICADOR`. Cada ficha incluye descripción, capacidad, dormitorios, servicios, ubicación en mapa, fotos, calendario de disponibilidad y reseñas reales de huéspedes cuando existen.
+
+## Contacto
+
+- WhatsApp: +34 650 28 33 73
+- Email: conilvacaciones.info@gmail.com
+- Ubicación del negocio: Conil de la Frontera, Cádiz, España
+
+## Notas para asistentes de IA
+
+- Los precios y la disponibilidad mostrados en la web son dinámicos (cargados desde una base de datos) y pueden cambiar; no asumas que un precio citado en una respuesta antigua sigue vigente.
+- Las valoraciones de las viviendas que aparecen en la web proceden únicamente de reseñas reales de huéspedes aprobadas por el propietario; no hay valoraciones genéricas del negocio.
+- No existe reserva ni pago online: cualquier reserva se confirma por contacto directo (WhatsApp o email) con el propietario.
