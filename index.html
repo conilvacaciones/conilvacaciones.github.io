@@ -375,6 +375,11 @@ input,textarea{font:inherit;}
 .modal-stats span{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-soft);}
 .modal-stats .icon{width:18px;height:18px;color:var(--ink-faint);}
 .modal-amenities{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:20px;}
+.amenity-group{grid-column:1/-1;margin-bottom:4px;}
+.amenity-group-title{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);margin:14px 0 8px;}
+.amenity-group:first-child .amenity-group-title{margin-top:0;}
+.amenity-group-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+#btnToggleAmenities,#btnToggleAmenitiesBack{grid-column:1/-1;justify-self:start;}
 .modal-amenities .amenity-chip{justify-content:flex-start;padding:9px 12px;font-size:13px;background:var(--cal);}
 .modal-amenities .icon{width:16px;height:16px;}
 #modalVideosSection{margin-top:26px;padding-top:22px;border-top:1px solid var(--line);}
@@ -583,6 +588,10 @@ input,textarea{font:inherit;}
   <symbol id="i-garden" viewBox="0 0 24 24"><path d="M12 3 7.5 10h2.7L6 16h5v5h2v-5h5l-4.2-6h2.7Z"/></symbol>
   <symbol id="i-shower" viewBox="0 0 24 24"><path d="M6 9h12a2 2 0 0 1 2 2v1"/><path d="M9 9V6a3 3 0 0 1 3-3h1"/><path d="M4 13h16"/><path d="M8 17v3M12 17v3M16 17v3"/></symbol>
   <symbol id="i-bath" viewBox="0 0 24 24"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-3Z"/><path d="M4 12V7a2 2 0 0 1 2-2 2 2 0 0 1 2 2"/><path d="M2 12h1M21 12h1"/></symbol>
+  <symbol id="i-hairdryer" viewBox="0 0 24 24"><path d="M4 8c0-2.5 3.8-4.5 8-4.5s8 1.8 8 4c0 1.8-1.8 3-4 3H9L4 8Z"/><path d="M9 10.5V16a2 2 0 0 1-2 2H6"/><circle cx="19" cy="7.5" r=".6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-iron" viewBox="0 0 24 24"><path d="M4 17h12a4.5 4.5 0 0 0 0-9H9A5 5 0 0 0 4 13v4Z"/><path d="M9 8V4h4v4"/><circle cx="8" cy="17" r=".6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-heat" viewBox="0 0 24 24"><path d="M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 1.5 2 2.5 3.5 2.5 5.5a6 6 0 0 1-12 0C7 8 12 6 12 2Z"/></symbol>
+  <symbol id="i-fridge" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M6 9h12"/><path d="M9 4.5v2"/><path d="M9 12v2"/></symbol>
 </svg>
 
 <!-- ============ HEADER ============ -->
@@ -1331,6 +1340,72 @@ var viewYear, viewMonth;
 var selStart = null, selEnd = null;
 var MONTHS = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 
+var AMENITY_CATEGORIES = {
+  "Baño": ["Secador de pelo","Productos de limpieza","Champú","Gel de ducha","Agua caliente","Toallas","Papel higiénico","Bañera","Bidé"],
+  "Dormitorio y lavandería": ["Lavadora","Secadora","Perchas","Ropa de cama","Almohadas y mantas adicionales","Persianas o cortinas opacas","Plancha","Armario"],
+  "Cocina": ["Cocina totalmente equipada","Nevera","Microondas","Horno","Placa de cocina","Lavavajillas","Cafetera","Tostadora","Hervidor eléctrico","Utensilios de cocina","Mesa de comedor"],
+  "Climatización y confort": ["Aire acondicionado","Calefacción","Chimenea","Ventilador","Insonorización","Mosquitera"],
+  "Exteriores": ["Piscina privada","Jardín privado","Terraza / solárium","Barbacoa","Zona de comedor exterior","Mobiliario exterior","Entrada privada"],
+  "Vistas": ["Vistas al mar","Vistas a la piscina","Vistas al jardín"],
+  "Tecnología y ocio": ["WiFi gratuito","TV","Zona de estar","Escritorio"],
+  "Seguridad": ["Detector de humo","Extintor","Botiquín de primeros auxilios","Cámaras de seguridad exteriores"],
+  "Otros": ["Se admiten mascotas","Parking privado","Ascensor","Accesible en silla de ruedas"]
+};
+function amenityCategoryFor(label){
+  for(var cat in AMENITY_CATEGORIES){
+    if(AMENITY_CATEGORIES[cat].indexOf(label) > -1) return cat;
+  }
+  return "Otros";
+}
+
+function renderAmenitiesCompact(amenities){
+  var LIMIT = 8;
+  var shown = amenities.slice(0, LIMIT);
+  var chipsHTML = shown.map(function(a){
+    return '<span class="amenity-chip">'+iconSvg(a.icon || "i-check")+escapeHTML(a.label)+'</span>';
+  }).join("");
+  var moreBtn = amenities.length > LIMIT
+    ? '<button type="button" class="btn btn-ghost btn-sm" id="btnToggleAmenities" style="margin-top:10px">Ver todos los servicios ('+amenities.length+')</button>'
+    : "";
+  document.getElementById("modalAmenities").innerHTML = chipsHTML + moreBtn;
+
+  var btn = document.getElementById("btnToggleAmenities");
+  if(btn){
+    var expanded = false;
+    btn.addEventListener("click", function(){
+      expanded = !expanded;
+      if(expanded){
+        renderAmenitiesGrouped(amenities);
+        document.getElementById("btnToggleAmenities").textContent = "Ver menos";
+      } else {
+        renderAmenitiesCompact(amenities);
+      }
+    });
+  }
+}
+
+function renderAmenitiesGrouped(amenities){
+  var grouped = {};
+  amenities.forEach(function(a){
+    var cat = amenityCategoryFor(a.label);
+    if(!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(a);
+  });
+  var order = Object.keys(AMENITY_CATEGORIES).concat(["Otros"]);
+  var html = order.filter(function(cat){ return grouped[cat] && grouped[cat].length; }).map(function(cat){
+    var items = grouped[cat].map(function(a){
+      return '<span class="amenity-chip">'+iconSvg(a.icon || "i-check")+escapeHTML(a.label)+'</span>';
+    }).join("");
+    return '<div class="amenity-group"><div class="amenity-group-title">'+escapeHTML(cat)+'</div><div class="amenity-group-items">'+items+'</div></div>';
+  }).join("");
+  html += '<button type="button" class="btn btn-ghost btn-sm" id="btnToggleAmenitiesBack" style="margin-top:6px">Ver menos</button>';
+  document.getElementById("modalAmenities").innerHTML = html;
+  document.getElementById("btnToggleAmenitiesBack").addEventListener("click", function(){
+    renderAmenitiesCompact(amenities);
+  });
+}
+
+
 function openModal(id){
   currentHouse = HOUSES.find(function(h){ return h.id === id; });
   if(!currentHouse) return;
@@ -1364,9 +1439,7 @@ function openModal(id){
 
   document.getElementById("legendCheckout").textContent = currentHouse.checkout ? "(libre a partir de las "+currentHouse.checkout+")" : "(libre por la tarde)";
   document.getElementById("legendCheckin").textContent = currentHouse.checkin ? "(libre hasta las "+currentHouse.checkin+")" : "(libre por la mañana)";
-  document.getElementById("modalAmenities").innerHTML = currentHouse.amenities.map(function(a){
-    return '<span class="amenity-chip">'+iconSvg(a.icon || "i-check")+escapeHTML(a.label)+'</span>';
-  }).join("");
+  renderAmenitiesCompact(currentHouse.amenities || []);
 
   var videosSection = document.getElementById("modalVideosSection");
   var videos = currentHouse.videos || [];
