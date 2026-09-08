@@ -161,7 +161,13 @@ main.wrap{padding:40px 24px 90px;}
 .rte-editor h2{font-family:var(--ff-display);font-size:22px;margin:14px 0 6px;color:var(--atlantic);}
 .rte-editor h3{font-family:var(--ff-display);font-size:18px;margin:12px 0 6px;color:var(--atlantic);}
 .rte-editor p{margin:0 0 10px;}
+.rte-editor blockquote{margin:14px 0;padding:10px 16px;border-left:4px solid var(--sol);background:var(--cal);font-style:italic;color:var(--ink-soft);}
+.rte-editor hr{border:none;border-top:1.5px dashed var(--line);margin:16px 0;}
+.rte-editor ul,.rte-editor ol{margin:0 0 10px;padding-left:22px;}
 .rte-editor:empty:before{content:attr(data-placeholder);color:var(--ink-faint);}
+.emoji-picker{display:flex;flex-wrap:wrap;gap:4px;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;}
+.emoji-picker button{width:34px;height:34px;font-size:18px;border:none;background:transparent;border-radius:7px;cursor:pointer;}
+.emoji-picker button:hover{background:var(--cal);}
 
 .reserva-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--cal);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13.5px;}
 .reserva-row b{font-family:var(--ff-mono);font-weight:500;}
@@ -453,13 +459,24 @@ main.wrap{padding:40px 24px 90px;}
             <div class="rte-sep"></div>
             <select id="descRteBlock" title="Estilo de texto">
               <option value="P">Texto normal</option>
-              <option value="H3">Título</option>
+              <option value="H2">Título grande</option>
+              <option value="H3">Título mediano</option>
+              <option value="BLOCKQUOTE">Cita destacada</option>
             </select>
-            <input type="color" id="descRteColor" title="Color de texto" value="#122130">
+            <input type="color" id="descRteColor" title="Color del texto" value="#122130">
+            <input type="color" id="descRteHighlight" title="Resaltar con color de fondo" value="#ffe58a">
+            <div class="rte-sep"></div>
+            <button type="button" data-cmd="justifyLeft" data-target="f-descripcion" title="Alinear a la izquierda">◧</button>
+            <button type="button" data-cmd="justifyCenter" data-target="f-descripcion" title="Centrar">▤</button>
             <div class="rte-sep"></div>
             <button type="button" data-cmd="insertUnorderedList" data-target="f-descripcion" title="Lista de puntos">•≡</button>
+            <button type="button" data-cmd="insertOrderedList" data-target="f-descripcion" title="Lista numerada">1≡</button>
+            <button type="button" data-cmd="insertHorizontalRule" data-target="f-descripcion" title="Línea separadora">―</button>
+            <div class="rte-sep"></div>
+            <button type="button" id="descRteEmojiBtn" title="Insertar emoji">🙂</button>
             <button type="button" data-cmd="removeFormat" data-target="f-descripcion" title="Quitar formato">✕</button>
           </div>
+          <div class="emoji-picker" id="descEmojiPicker" style="display:none"></div>
           <div class="rte-editor" id="f-descripcion" contenteditable="true" data-placeholder="Describe la vivienda…"></div>
         </div>
         <div class="field full">
@@ -929,6 +946,24 @@ document.getElementById("descRteBlock").addEventListener("change", function(){
 document.getElementById("descRteColor").addEventListener("input", function(){
   descRteEditor.focus();
   document.execCommand("foreColor", false, this.value);
+});
+document.getElementById("descRteHighlight").addEventListener("input", function(){
+  descRteEditor.focus();
+  document.execCommand("hiliteColor", false, this.value);
+});
+
+var DESC_EMOJIS = ["🏖️","🌊","☀️","🌴","🏡","🔑","✨","💧","🛏️","🍽️","🚗","🐾","📶","❄️","🔥","⭐","📍","🌅"];
+var descEmojiPicker = document.getElementById("descEmojiPicker");
+descEmojiPicker.innerHTML = DESC_EMOJIS.map(function(e){ return '<button type="button" data-emoji="'+e+'">'+e+'</button>'; }).join("");
+document.getElementById("descRteEmojiBtn").addEventListener("click", function(){
+  descEmojiPicker.style.display = descEmojiPicker.style.display === "none" ? "flex" : "none";
+});
+descEmojiPicker.querySelectorAll("button").forEach(function(b){
+  b.addEventListener("click", function(){
+    descRteEditor.focus();
+    document.execCommand("insertText", false, b.getAttribute("data-emoji"));
+    descEmojiPicker.style.display = "none";
+  });
 });
 
 function addServicioFromInput(){
