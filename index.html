@@ -761,7 +761,7 @@ input,textarea{font:inherit;}
       <p>Escríbenos con las fechas que te interesan y la casa que has visto, y te confirmamos disponibilidad y precio directamente. También puedes usar el calendario de cada casa para elegir tus fechas antes de escribirnos.</p>
       <div class="contact-list">
         <div class="contact-item"><svg class="icon"><use href="#i-chat"/></svg><div><b>WhatsApp</b><span>+34 650 28 33 73</span></div></div>
-        <div class="contact-item"><svg class="icon"><use href="#i-mail"/></svg><div><b>Email</b><span><a href="#" class="js-email-link" data-user="conilvacaciones.info" data-domain="gmail.com" style="color:inherit;text-decoration:none">correo electrónico</a></span></div></div>
+        <div class="contact-item"><svg class="icon"><use href="#i-mail"/></svg><div><b>Email</b><span><a href="#" class="js-email-link" id="contactEmailLink" data-user="conilvacaciones.info" data-domain="gmail.com" style="color:inherit;text-decoration:none">correo electrónico</a></span></div></div>
         <div class="contact-item"><svg class="icon"><use href="#i-pin"/></svg><div><b>Dónde estamos</b><span>Conil de la Frontera, Cádiz</span></div></div>
       </div>
     </div>
@@ -1296,6 +1296,10 @@ document.querySelectorAll(".js-email-link").forEach(function(el){
   var addr = el.getAttribute("data-user") + "@" + el.getAttribute("data-domain");
   el.setAttribute("href", "mailto:" + addr);
 });
+var contactEmailLink = document.getElementById("contactEmailLink");
+if(contactEmailLink){
+  contactEmailLink.textContent = contactEmailLink.getAttribute("data-user") + "@" + contactEmailLink.getAttribute("data-domain");
+}
 
 /* ============ FAQ (editable desde el admin) ============ */
 async function initFaq(){
