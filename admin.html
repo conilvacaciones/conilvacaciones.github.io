@@ -434,6 +434,11 @@ main.wrap{padding:40px 24px 90px;}
         <div class="field"><label for="f-unidad">Precio por</label>
           <select id="f-unidad"><option value="noche">Noche</option><option value="semana">Semana</option></select>
         </div>
+        <div class="field"><label for="f-oferta-descuento">Descuento de oferta (%, vacío = sin oferta)</label><input id="f-oferta-descuento" type="number" min="1" max="90" placeholder="Ej. 15"></div>
+        <div class="field">
+          <label for="f-oferta-fin">Fin de la oferta (opcional)</label><input id="f-oferta-fin" type="date">
+          <p class="slug-hint">El descuento se aplica sobre el precio que corresponda a cada fecha. Deja "Fin de la oferta" vacío si no quieres que caduque sola.</p>
+        </div>
         <div class="field"><label for="f-valoracion">Valoración inicial (0-5, opcional)</label><input id="f-valoracion" type="number" min="0" max="5" step="0.1"></div>
         <div class="field"><label for="f-opiniones">Nº de opiniones inicial</label><input id="f-opiniones" type="number" min="0"></div>
         <div class="field full" style="margin-top:-10px"><p class="slug-hint">La valoración inicial solo se muestra hasta que la vivienda tenga sus primeras reseñas reales aprobadas; a partir de ahí, la media se calcula sola.</p></div>
@@ -1056,6 +1061,8 @@ function openViviendaForm(id){
   document.getElementById("f-checkout").value = v ? (v.checkout || "") : "";
   document.getElementById("f-precio").value = v ? (v.precio||"") : "";
   document.getElementById("f-unidad").value = v ? (v.unidad_precio||"noche") : "noche";
+  document.getElementById("f-oferta-descuento").value = v && v.oferta_descuento ? v.oferta_descuento : "";
+  document.getElementById("f-oferta-fin").value = v && v.oferta_fin ? v.oferta_fin : "";
   document.getElementById("f-valoracion").value = v ? (v.valoracion||"") : "";
   document.getElementById("f-opiniones").value = v ? (v.opiniones||"") : "";
   document.getElementById("f-badges").value = v && v.badges ? v.badges.join(", ") : "";
@@ -1249,6 +1256,8 @@ document.getElementById("viviendaForm").addEventListener("submit", async functio
     checkout: document.getElementById("f-checkout").value.trim() || null,
     precio: num("f-precio"),
     unidad_precio: document.getElementById("f-unidad").value,
+    oferta_descuento: document.getElementById("f-oferta-descuento").value ? parseInt(document.getElementById("f-oferta-descuento").value, 10) : null,
+    oferta_fin: document.getElementById("f-oferta-fin").value || null,
     valoracion: num("f-valoracion"),
     opiniones: num("f-opiniones"),
     badges: document.getElementById("f-badges").value.split(",").map(function(s){ return s.trim(); }).filter(Boolean),
