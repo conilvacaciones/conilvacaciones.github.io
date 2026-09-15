@@ -931,8 +931,208 @@ function renderServiciosExtraChips(){
   });
 }
 
+/* ---- pegado con formato (tipo Google Docs) para los editores enriquecidos ---- */
+function limpiarHtmlPegado(html){
+  var origen = document.createElement("div");
+  origen.innerHTML = html;
+
+  var destino = document.createDocumentFragment();
+
+  function pesoFuente(el){
+    var fw = (el.style && el.style.fontWeight) || "";
+    if(fw === "bold" || fw === "bolder") return 700;
+    var n = parseInt(fw, 10);
+    return isNaN(n) ? 400 : n;
+  }
+  function tamanoPt(el){
+    var fs = (el.style && el.style.fontSize) || "";
+    var m = /([\d.]+)pt/.exec(fs);
+    return m ? parseFloat(m[1]) : null;
+  }
+  function esItalica(el){
+    return el.style && el.style.fontStyle === "italic";
+  }
+  function esSubrayado(el){
+    var td = el.style && (el.style.textDecorationLine || el.style.textDecoration) || "";
+    return td.indexOf("underline") !== -1;
+  }
+  function esTachado(el){
+    var td = el.style && (el.style.textDecorationLine || el.style.textDecoration) || "";
+    return td.indexOf("line-through") !== -1;
+  }
+
+  // envuelve un nodo (o texto) ya procesado con las marcas de estilo en línea detectadas
+  function envolverConEstilo(nodo, el){
+    var out = nodo;
+    if(esTachado(el)){ var s2=document.createElement("s"); s2.appendChild(out); out=s2; }
+    if(esSubrayado(el)){ var u2=document.createElement("u"); u2.appendChild(out); out=u2; }
+    if(esItalica(el)){ var i2=document.createElement("em"); i2.appendChild(out); out=i2; }
+    if(pesoFuente(el) >= 600){ var b2=document.createElement("strong"); b2.appendChild(out); out=b2; }
+    var color = el.style && el.style.color;
+    var fondo = el.style && el.style.backgroundColor;
+    if((color && color !== "rgb(0, 0, 0)") || (fondo && fondo !== "transparent" && fondo !== "rgb(255, 255, 255)")){
+      var span = document.createElement("span");
+      if(color) span.style.color = color;
+      if(fondo) span.style.backgroundColor = fondo;
+      span.appendChild(out);
+      out = span;
+    }
+    return out;
+  }
+
+  function procesarInline(nodo){
+    var frag = document.createDocumentFragment();
+    nodo.childNodes.forEach(function(hijo){
+      if(hijo.nodeType === 3){
+        var texto = hijo.textContent.replace(/\u00a0/g, " ");
+        if(texto) frag.appendChild(document.createTextNode(texto));
+        return;
+      }
+      if(hijo.nodeType !== 1) return;
+      var tag = hijo.tagName.toLowerCase();
+      if(tag === "br"){ frag.appendChild(document.createElement("br")); return; }
+      if(tag === "img"){
+        var src = hijo.getAttribute("src") || "";
+        if(/^https?:\/\//.test(src)){
+          var img = document.createElement("img");
+          img.src = src;
+          img.alt = hijo.getAttribute("alt") || "";
+          frag.appendChild(img);
+        }
+        return;
+      }
+      if(tag === "a"){
+        var a = document.createElement("a");
+        var href = hijo.getAttribute("href") || "";
+        if(/^https?:\/\//.test(href)) a.setAttribute("href", href);
+        a.setAttribute("target", "_blank");
+        a.setAttribute("rel", "noopener");
+        a.appendChild(procesarInline(hijo));
+        frag.appendChild(envolverConEstilo(a, hijo));
+        return;
+      }
+      var interior = procesarInline(hijo);
+      if(["b","strong"].indexOf(tag) !== -1){ var s=document.createElement("strong"); s.appendChild(interior); interior=s; }
+      if(["i","em"].indexOf(tag) !== -1){ var e=document.createElement("em"); e.appendChild(interior); interior=e; }
+      if(tag === "u"){ var u=document.createElement("u"); u.appendChild(interior); interior=u; }
+      if(["s","strike","del"].indexOf(tag) !== -1){ var st=document.createElement("s"); st.appendChild(interior); interior=st; }
+      frag.appendChild(envolverConEstilo(interior, hijo));
+    });
+    return frag;
+  }
+
+  function bloqueVacio(el){
+    return !el.textContent.trim() && !el.querySelector("img");
+  }
+
+  Array.prototype.forEach.call(origen.childNodes, function recorrer(nodo){
+    if(nodo.nodeType === 3){
+      var texto = nodo.textContent.trim();
+      if(texto){
+        var p = document.createElement("p");
+        p.appendChild(document.createTextNode(texto));
+        destino.appendChild(p);
+      }
+      return;
+    }
+    if(nodo.nodeType !== 1) return;
+    var tag = nodo.tagName.toLowerCase();
+
+    if(tag === "ul" || tag === "ol"){
+      var lista = document.createElement(tag);
+      nodo.querySelectorAll(":scope > li").forEach(function(li){
+        var itemLi = document.createElement("li");
+        itemLi.appendChild(procesarInline(li));
+        if(itemLi.textContent.trim()) lista.appendChild(itemLi);
+      });
+      if(lista.children.length) destino.appendChild(lista);
+      return;
+    }
+    if(tag === "li"){
+      var ul = document.createElement("ul");
+      var itemLi2 = document.createElement("li");
+      itemLi2.appendChild(procesarInline(nodo));
+      ul.appendChild(itemLi2);
+      destino.appendChild(ul);
+      return;
+    }
+    if(tag === "blockquote"){
+      if(bloqueVacio(nodo)) return;
+      var bq = document.createElement("blockquote");
+      bq.appendChild(procesarInline(nodo));
+      destino.appendChild(bq);
+      return;
+    }
+    if(tag === "hr"){ destino.appendChild(document.createElement("hr")); return; }
+    if(tag === "img"){
+      var src2 = nodo.getAttribute("src") || "";
+      if(/^https?:\/\//.test(src2)){
+        var pimg = document.createElement("p");
+        var img2 = document.createElement("img");
+        img2.src = src2;
+        img2.alt = nodo.getAttribute("alt") || "";
+        pimg.appendChild(img2);
+        destino.appendChild(pimg);
+      }
+      return;
+    }
+    if(["h1","h2","h3","h4","h5","h6","p","div","span"].indexOf(tag) !== -1){
+      if(bloqueVacio(nodo)){
+        // los <br> sueltos dentro de divs vacíos se ignoran
+        return;
+      }
+      var nivel = null;
+      if(tag === "h1" || tag === "h2") nivel = "h2";
+      else if(tag === "h3" || tag === "h4") nivel = "h3";
+      else {
+        var pt = tamanoPt(nodo);
+        var peso = pesoFuente(nodo);
+        if(pt !== null && pt >= 18) nivel = "h2";
+        else if(pt !== null && pt >= 13.5) nivel = "h3";
+        else if(pt !== null && pt >= 13 && peso >= 600) nivel = "h3";
+      }
+      var contenedor = document.createElement(nivel || "p");
+      contenedor.appendChild(procesarInline(nodo));
+      if(contenedor.textContent.trim() || contenedor.querySelector("img")) destino.appendChild(contenedor);
+      return;
+    }
+    // cualquier otra etiqueta (span suelto en el nivel raíz, etc.): procesar su contenido inline
+    var suelto = procesarInline(nodo);
+    if(suelto.textContent && suelto.textContent.trim()){
+      var pSuelto = document.createElement("p");
+      pSuelto.appendChild(suelto);
+      destino.appendChild(pSuelto);
+    }
+  });
+
+  var envoltorio = document.createElement("div");
+  envoltorio.appendChild(destino);
+  return envoltorio.innerHTML;
+}
+
+function activarPegadoConFormato(editorEl){
+  editorEl.addEventListener("paste", function(e){
+    e.preventDefault();
+    var portapapeles = e.clipboardData || window.clipboardData;
+    var html = portapapeles.getData("text/html");
+    var limpio;
+    if(html && html.trim()){
+      limpio = limpiarHtmlPegado(html);
+    } else {
+      var texto = portapapeles.getData("text/plain") || "";
+      limpio = texto.split(/\n{2,}/).map(function(parrafo){
+        var seguro = document.createElement("p");
+        seguro.textContent = parrafo;
+        return seguro.outerHTML;
+      }).join("");
+    }
+    document.execCommand("insertHTML", false, limpio);
+  });
+}
+
 /* ---- editor de texto enriquecido: descripción de vivienda ---- */
 var descRteEditor = document.getElementById("f-descripcion");
+activarPegadoConFormato(descRteEditor);
 
 document.getElementById("descRteToolbar").addEventListener("mousedown", function(e){
   if(e.target.closest("button")) e.preventDefault();
@@ -1649,6 +1849,7 @@ function renderPostPhotoThumbs(){
 
 /* ---- editor de texto enriquecido ---- */
 var rteEditor = document.getElementById("p-contenido");
+activarPegadoConFormato(rteEditor);
 
 function rteFocusEditor(){ rteEditor.focus(); }
 
