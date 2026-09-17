@@ -1438,10 +1438,32 @@ function openModal(id){
   resetReviewForm();
 
   document.title = currentHouse.name + " · Conil Vacaciones";
+  updateViviendaHeroHeading(currentHouse);
   updateViviendaJsonLd(currentHouse);
   updateViviendaSocialMeta(currentHouse);
   var canonicalEl = document.getElementById("canonicalLink");
   if(canonicalEl) canonicalEl.setAttribute("href", window.location.href);
+}
+
+function updateViviendaHeroHeading(house){
+  var heroTitulo = document.getElementById("heroTitulo");
+  var heroSubtitulo = document.getElementById("heroSubtitulo");
+  if(heroTitulo){
+    heroTitulo.textContent = house.name + ", Conil de la Frontera";
+  }
+  if(heroSubtitulo){
+    var resumen = house.tagline || stripHTML(house.description) || "";
+    if(resumen.length > 220) resumen = resumen.slice(0, 217).trim() + "…";
+    heroSubtitulo.textContent = resumen ?
+      house.name + " es una vivienda vacacional en Conil de la Frontera. " + resumen :
+      "Alquiler de " + house.name + ", vivienda vacacional en Conil de la Frontera. Trato directo con el propietario, sin agencias.";
+  }
+  var metaDesc = document.querySelector('meta[name="description"]');
+  if(metaDesc){
+    var descTexto = house.tagline || stripHTML(house.description) || "";
+    if(descTexto.length > 140) descTexto = descTexto.slice(0, 137).trim() + "…";
+    metaDesc.setAttribute("content", house.name + ", vivienda vacacional en Conil de la Frontera. " + (descTexto || "Fotos, precio, servicios y disponibilidad. Reserva directa con el propietario."));
+  }
 }
 
 function setMetaContent(selector, value){
