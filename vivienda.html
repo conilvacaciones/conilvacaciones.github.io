@@ -360,6 +360,10 @@ input,textarea{font:inherit;}
 .share-btn svg{width:16px;height:16px;}
 .share-btn:hover{background:var(--sol);color:#fff;transform:translateY(-2px);}
 .share-btn.copied{background:#3fb37f;color:#fff;}
+.fav-detail-btn{width:34px;height:34px;border-radius:50%;background:var(--cal-2);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .15s,transform .15s;flex-shrink:0;}
+.fav-detail-btn:hover{transform:scale(1.06);}
+.fav-detail-btn svg{width:16px;height:16px;fill:none;stroke:var(--ink-soft);stroke-width:2;}
+.fav-detail-btn.is-fav svg{fill:var(--bougain);stroke:var(--bougain);}
 .badge-pill{background:var(--teal-soft);color:var(--teal);font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;}
 .modal-price-box{text-align:right;}
 .modal-desc{margin-top:20px;font-size:15px;line-height:1.7;color:var(--ink-soft);}
@@ -565,6 +569,7 @@ input,textarea{font:inherit;}
   <symbol id="i-iron" viewBox="0 0 24 24"><path d="M4 17h12a4.5 4.5 0 0 0 0-9H9A5 5 0 0 0 4 13v4Z"/><path d="M9 8V4h4v4"/><circle cx="8" cy="17" r=".6" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-heat" viewBox="0 0 24 24"><path d="M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 1.5 2 2.5 3.5 2.5 5.5a6 6 0 0 1-12 0C7 8 12 6 12 2Z"/></symbol>
   <symbol id="i-fridge" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M6 9h12"/><path d="M9 4.5v2"/><path d="M9 12v2"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5s-7.6-4.6-10-9.4C.5 8 2 4.4 5.6 4c2.1-.3 4 .8 6.4 3.3C14.4 4.8 16.3 3.7 18.4 4c3.6.4 5.1 4 3.6 7.1-2.4 4.8-10 9.4-10 9.4Z"/></symbol>
 </svg>
 
 <!-- ============ HEADER ============ -->
@@ -603,7 +608,10 @@ input,textarea{font:inherit;}
           <p class="house-tagline" id="modalTagline"></p>
           <div id="modalRating" style="margin-top:8px"></div>
           <div class="modal-badges" id="modalBadges"></div>
-          <div class="share-buttons" id="shareButtons"></div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div class="share-buttons" id="shareButtons" style="margin-top:0"></div>
+            <button type="button" class="fav-detail-btn" id="favDetailBtn" title="Guardar como favorita" aria-label="Guardar como favorita"><svg><use href="#i-heart"/></svg></button>
+          </div>
         </div>
         <div class="modal-price-box">
           <span class="house-price from" id="modalPriceFrom">desde</span>
@@ -1153,6 +1161,7 @@ async function initHouses(){
         area: row.area,
         minNights: row.noches_minimas || 1,
         ofertaDescuento: row.oferta_descuento || null,
+        ofertaInicio: row.oferta_inicio || null,
         ofertaFin: row.oferta_fin || null,
         checkin: row.checkin || "",
         checkout: row.checkout || "",
@@ -1426,7 +1435,7 @@ function openModal(id){
   }
   thumbs.innerHTML = photoUrls.map(function(url,i){
     return '<div class="gallery-thumb" style="background:linear-gradient(135deg,'+pal[0]+','+pal[1]+')" data-i="'+i+'">'+
-      (url ? '<img src="'+url+'" alt="'+currentHouse.name+'" onerror="this.style.display=\'none\'">' : '')+
+      (url ? '<img src="'+url+'" alt="'+currentHouse.name+'" loading="lazy" onerror="this.style.display=\'none\'">' : '')+
       iconSvg("i-wave")+'</div>';
   }).join("");
   thumbs.style.display = photoUrls.length > 1 ? "" : "none";
@@ -1450,6 +1459,37 @@ function openModal(id){
   updateViviendaSocialMeta(currentHouse);
   var canonicalEl = document.getElementById("canonicalLink");
   if(canonicalEl) canonicalEl.setAttribute("href", window.location.href);
+}
+
+/* ============ FAVORITOS (localStorage, compartido con la home) ============ */
+var FAV_KEY = "cv_favoritos";
+function getFavoritos(){
+  try{
+    var datos = JSON.parse(localStorage.getItem(FAV_KEY) || "[]");
+    return Array.isArray(datos) ? datos : [];
+  }catch(e){ return []; }
+}
+function esFavorito(id){ return getFavoritos().indexOf(id) !== -1; }
+function toggleFavorito(id){
+  var favs = getFavoritos();
+  var i = favs.indexOf(id);
+  var ahoraFavorito;
+  if(i === -1){ favs.push(id); ahoraFavorito = true; }
+  else { favs.splice(i, 1); ahoraFavorito = false; }
+  try{ localStorage.setItem(FAV_KEY, JSON.stringify(favs)); }catch(e){}
+  return ahoraFavorito;
+}
+function actualizarBotonFavorito(house){
+  var btn = document.getElementById("favDetailBtn");
+  if(!btn) return;
+  var activo = esFavorito(house.id);
+  btn.classList.toggle("is-fav", activo);
+  btn.title = activo ? "Quitar de favoritos" : "Guardar como favorita";
+  btn.onclick = function(){
+    var ahoraFavorito = toggleFavorito(house.id);
+    btn.classList.toggle("is-fav", ahoraFavorito);
+    btn.title = ahoraFavorito ? "Quitar de favoritos" : "Guardar como favorita";
+  };
 }
 
 function renderShareButtons(containerId, url, title, resumen){
@@ -1506,6 +1546,7 @@ function updateViviendaHeroHeading(house){
     metaDesc.setAttribute("content", house.name + ", vivienda vacacional en Conil de la Frontera. " + (descTexto || "Fotos, precio, servicios y disponibilidad. Reserva directa con el propietario."));
   }
   renderShareButtons("shareButtons", window.location.href, house.name + ", Conil de la Frontera", house.tagline || "");
+  actualizarBotonFavorito(house);
 }
 
 function setMetaContent(selector, value){
@@ -1550,8 +1591,12 @@ function addDays(d, n){ var x = new Date(d); x.setDate(x.getDate()+n); return x;
 // 3) si no hay nada de lo anterior, el precio base de la vivienda
 function isOfferActive(house){
   if(!house.ofertaDescuento || house.ofertaDescuento <= 0) return false;
+  var hoy = new Date(); hoy.setHours(0,0,0,0);
+  if(house.ofertaInicio){
+    var inicio = parseISO(house.ofertaInicio);
+    if(inicio > hoy) return false;
+  }
   if(house.ofertaFin){
-    var hoy = new Date(); hoy.setHours(0,0,0,0);
     var fin = parseISO(house.ofertaFin);
     if(fin < hoy) return false;
   }

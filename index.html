@@ -226,7 +226,25 @@ input,textarea{font:inherit;}
 .search-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
 .search-result-msg{margin-top:14px;font-size:13.5px;color:var(--ink-soft);}
 .search-result-msg.has-results{color:var(--teal);font-weight:600;}
-.house-match-tag{display:inline-flex;align-items:center;gap:5px;background:var(--sol);color:var(--atlantic-dark);font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;position:absolute;top:14px;right:14px;z-index:2;}
+.house-match-tag{display:inline-flex;align-items:center;gap:5px;background:var(--sol);color:var(--atlantic-dark);font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;position:absolute;top:54px;right:14px;z-index:2;}
+.fav-btn{
+  position:absolute;top:14px;right:14px;z-index:4;width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,.92);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:transform .15s ease;box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+.fav-btn:hover{transform:scale(1.08);}
+.fav-btn svg{width:18px;height:18px;color:var(--ink-soft);fill:none;stroke:currentColor;stroke-width:2;transition:color .15s,fill .15s;}
+.fav-btn.is-fav svg{color:var(--bougain);fill:var(--bougain);}
+.fav-toggle-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:10px;background:var(--cal-2);color:var(--ink-soft);border:none;cursor:pointer;transition:background .15s,color .15s;flex-shrink:0;}
+.fav-toggle-btn:hover{background:var(--cal);}
+.fav-toggle-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;}
+.fav-toggle-btn.is-active{background:var(--bougain);color:#fff;}
+.fav-toggle-btn.is-active svg{fill:#fff;}
+.fav-count{
+  position:absolute;top:-6px;right:-6px;background:var(--bougain);color:#fff;font-family:var(--ff-mono);
+  font-size:10.5px;font-weight:700;min-width:17px;height:17px;border-radius:999px;display:none;
+  align-items:center;justify-content:center;padding:0 4px;
+}
 @media (max-width:720px){.search-row{grid-template-columns:1fr;}}
 
 .houses-grid{display:grid;grid-template-columns:1fr;gap:26px;align-items:stretch;}
@@ -603,6 +621,7 @@ input,textarea{font:inherit;}
   <symbol id="i-iron" viewBox="0 0 24 24"><path d="M4 17h12a4.5 4.5 0 0 0 0-9H9A5 5 0 0 0 4 13v4Z"/><path d="M9 8V4h4v4"/><circle cx="8" cy="17" r=".6" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-heat" viewBox="0 0 24 24"><path d="M12 2c2 3-1 4-1 7a3 3 0 1 0 6 0c0-1-.5-2-.5-2 1.5 2 2.5 3.5 2.5 5.5a6 6 0 0 1-12 0C7 8 12 6 12 2Z"/></symbol>
   <symbol id="i-fridge" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M6 9h12"/><path d="M9 4.5v2"/><path d="M9 12v2"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5s-7.6-4.6-10-9.4C.5 8 2 4.4 5.6 4c2.1-.3 4 .8 6.4 3.3C14.4 4.8 16.3 3.7 18.4 4c3.6.4 5.1 4 3.6 7.1-2.4 4.8-10 9.4-10 9.4Z"/></symbol>
 </svg>
 
 <!-- ============ HEADER ============ -->
@@ -622,6 +641,10 @@ input,textarea{font:inherit;}
       </ul>
     </nav>
     <div class="header-actions">
+      <button class="fav-toggle-btn" id="favToggleBtn" title="Ver mis casas favoritas" aria-label="Ver mis casas favoritas">
+        <svg><use href="#i-heart"/></svg>
+        <span class="fav-count" id="favCount">0</span>
+      </button>
       <a class="btn btn-primary" href="#contacto"><svg class="icon" style="width:16px;height:16px"><use href="#i-chat"/></svg>WhatsApp</a>
       <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
         <svg class="icon" id="navToggleIcon"><use href="#i-users"/></svg>
@@ -1035,6 +1058,61 @@ function photoTileHTML(big){
   return iconSvg("i-wave", big ? "icon-big":"icon-big");
 }
 
+/* ============ FAVORITOS (localStorage) ============ */
+var FAV_KEY = "cv_favoritos";
+var mostrarSoloFavoritos = false;
+
+function getFavoritos(){
+  try{
+    var datos = JSON.parse(localStorage.getItem(FAV_KEY) || "[]");
+    return Array.isArray(datos) ? datos : [];
+  }catch(e){ return []; }
+}
+function esFavorito(id){ return getFavoritos().indexOf(id) !== -1; }
+function toggleFavorito(id){
+  var favs = getFavoritos();
+  var i = favs.indexOf(id);
+  var ahoraFavorito;
+  if(i === -1){ favs.push(id); ahoraFavorito = true; }
+  else { favs.splice(i, 1); ahoraFavorito = false; }
+  try{ localStorage.setItem(FAV_KEY, JSON.stringify(favs)); }catch(e){}
+  actualizarContadorFavoritos();
+  return ahoraFavorito;
+}
+function actualizarContadorFavoritos(){
+  var n = getFavoritos().length;
+  var badge = document.getElementById("favCount");
+  if(badge){ badge.textContent = n; badge.style.display = n > 0 ? "flex" : "none"; }
+}
+function renderVistaFavoritos(){
+  var msgEl = document.getElementById("searchResultMsg");
+  var favs = getFavoritos();
+  var favHouses = HOUSES.filter(function(h){ return favs.indexOf(h.id) !== -1; });
+  renderHouseCards(favHouses);
+  if(msgEl){
+    msgEl.textContent = favHouses.length ?
+      "Mostrando tus " + favHouses.length + " casa" + (favHouses.length === 1 ? "" : "s") + " favorita" + (favHouses.length === 1 ? "" : "s") + "." :
+      "Todavía no has guardado ninguna casa como favorita. Pulsa el corazón de una vivienda para guardarla.";
+    msgEl.classList.add("has-results");
+  }
+}
+function toggleVistaFavoritos(){
+  mostrarSoloFavoritos = !mostrarSoloFavoritos;
+  var btn = document.getElementById("favToggleBtn");
+  if(btn) btn.classList.toggle("is-active", mostrarSoloFavoritos);
+  if(mostrarSoloFavoritos){
+    renderVistaFavoritos();
+  } else {
+    renderHouseCards();
+    var msgEl = document.getElementById("searchResultMsg");
+    if(msgEl){ msgEl.textContent = ""; msgEl.classList.remove("has-results"); }
+  }
+  document.getElementById("housesGrid").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+var favToggleBtnEl = document.getElementById("favToggleBtn");
+if(favToggleBtnEl) favToggleBtnEl.addEventListener("click", toggleVistaFavoritos);
+actualizarContadorFavoritos();
+
 function renderHouseCards(list, matchInfo){
   var grid = document.getElementById("housesGrid");
   var houses = list || HOUSES;
@@ -1051,12 +1129,15 @@ function renderHouseCards(list, matchInfo){
     var oferta = isOfferActive(h);
     var diasOferta = oferta ? offerDaysLeft(h) : null;
     var ofertaRibbon = oferta ? '<span class="house-offer-ribbon">-'+h.ofertaDescuento+'% OFERTA</span>' : "";
+    var favActiva = esFavorito(h.id);
+    var favBtn = '<button type="button" class="fav-btn'+(favActiva?' is-fav':'')+'" data-fav-house="'+h.id+'" title="'+(favActiva?'Quitar de favoritos':'Guardar como favorita')+'" aria-label="Guardar como favorita">'+iconSvg("i-heart")+'</button>';
     html += ''+
     '<article class="house-card reveal" style="transition-delay:'+(idx*70)+'ms">'+
       '<div class="house-photo" style="background:linear-gradient(135deg,'+pal[0]+','+pal[1]+')">'+
         (cover ? '<img src="'+cover+'" alt="'+h.name+'" loading="lazy" onerror="this.style.display=\'none\'">' : '')+
         (h.badges[0] ? '<span class="house-badge">'+h.badges[0]+'</span>' : '')+
         ofertaRibbon+
+        favBtn+
         matchTag+
         photoTileHTML()+
       '</div>'+
@@ -1095,6 +1176,19 @@ function renderHouseCards(list, matchInfo){
   if(countStat) countStat.textContent = HOUSES.length;
   grid.querySelectorAll("[data-house]").forEach(function(btn){
     btn.addEventListener("click", function(){ window.location.href = "vivienda.html?id="+encodeURIComponent(btn.getAttribute("data-house")); });
+  });
+  grid.querySelectorAll("[data-fav-house]").forEach(function(btn){
+    btn.addEventListener("click", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var id = btn.getAttribute("data-fav-house");
+      var ahoraFavorito = toggleFavorito(id);
+      btn.classList.toggle("is-fav", ahoraFavorito);
+      btn.title = ahoraFavorito ? "Quitar de favoritos" : "Guardar como favorita";
+      if(mostrarSoloFavoritos && !ahoraFavorito){
+        renderVistaFavoritos();
+      }
+    });
   });
   // observe newly created reveal cards
   if("IntersectionObserver" in window){
@@ -1256,6 +1350,7 @@ async function initHouses(){
         area: row.area,
         minNights: row.noches_minimas || 1,
         ofertaDescuento: row.oferta_descuento || null,
+        ofertaInicio: row.oferta_inicio || null,
         ofertaFin: row.oferta_fin || null,
         checkin: row.checkin || "",
         checkout: row.checkout || "",
@@ -1502,7 +1597,7 @@ function openModal(id){
   }
   thumbs.innerHTML = photoUrls.map(function(url,i){
     return '<div class="gallery-thumb" style="background:linear-gradient(135deg,'+pal[0]+','+pal[1]+')" data-i="'+i+'">'+
-      (url ? '<img src="'+url+'" alt="'+currentHouse.name+'" onerror="this.style.display=\'none\'">' : '')+
+      (url ? '<img src="'+url+'" alt="'+currentHouse.name+'" loading="lazy" onerror="this.style.display=\'none\'">' : '')+
       iconSvg("i-wave")+'</div>';
   }).join("");
   thumbs.style.display = photoUrls.length > 1 ? "" : "none";
@@ -1558,8 +1653,12 @@ function addDays(d, n){ var x = new Date(d); x.setDate(x.getDate()+n); return x;
 // 3) si no hay nada de lo anterior, el precio base de la vivienda
 function isOfferActive(house){
   if(!house.ofertaDescuento || house.ofertaDescuento <= 0) return false;
+  var hoy = new Date(); hoy.setHours(0,0,0,0);
+  if(house.ofertaInicio){
+    var inicio = parseISO(house.ofertaInicio);
+    if(inicio > hoy) return false;
+  }
   if(house.ofertaFin){
-    var hoy = new Date(); hoy.setHours(0,0,0,0);
     var fin = parseISO(house.ofertaFin);
     if(fin < hoy) return false;
   }

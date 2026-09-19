@@ -866,7 +866,7 @@ function openBlogModal(id, esCargaInicial){
   var p = BLOG_POSTS.find(function(x){ return x.id === id; });
   if(!p) return;
   var cover = blogPhotoUrl(p.portada);
-  document.getElementById("blogModalCover").innerHTML = cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'">' : '';
+  document.getElementById("blogModalCover").innerHTML = cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">' : '';
   document.getElementById("blogModalDate").textContent = new Date(p.created_at).toLocaleDateString("es-ES", {day:"numeric", month:"long", year:"numeric"});
   document.getElementById("blogModalTitle").textContent = p.titulo;
   document.getElementById("blogModalContent").innerHTML = p.contenido || "";
