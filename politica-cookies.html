@@ -18,6 +18,8 @@
 <meta name="twitter:image" content="https://conilvacaciones.github.io/og-image.png">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B3D5C">
 <link rel="canonical" href="https://conilvacaciones.github.io/politica-cookies.html">
 <meta name="robots" content="noindex, follow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -740,6 +742,13 @@ function escapeHTML(str){
 }
 
 })();
+</script>
+<script>
+if("serviceWorker" in navigator){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("/sw.js").catch(function(){});
+  });
+}
 </script>
 </body>
 </html>

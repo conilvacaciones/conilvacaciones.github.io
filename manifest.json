@@ -1,0 +1,33 @@
+{
+  "name": "Conil Vacaciones — Casas y apartamentos en Conil de la Frontera",
+  "short_name": "Conil Vacaciones",
+  "description": "Alquiler de casas y apartamentos vacacionales en Conil de la Frontera, Cádiz. Trato directo con el propietario, sin agencias.",
+  "start_url": "/?utm_source=pwa",
+  "id": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F1F2EA",
+  "theme_color": "#0B3D5C",
+  "lang": "es-ES",
+  "dir": "ltr",
+  "categories": ["travel", "lifestyle"],
+  "icons": [
+    { "src": "/icons/icon-any-72.png", "sizes": "72x72", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-any-96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-any-128.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-any-144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-any-152.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-any-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-any-384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-any-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-72.png", "sizes": "72x72", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-96.png", "sizes": "96x96", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-128.png", "sizes": "128x128", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-144.png", "sizes": "144x144", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-152.png", "sizes": "152x152", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-384.png", "sizes": "384x384", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
