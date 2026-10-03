@@ -10,11 +10,11 @@
 <meta property="og:locale" content="es_ES">
 <meta property="og:url" content="https://conilvacaciones.github.io/vivienda.html">
 <meta property="og:title" content="Vivienda en Conil de la Frontera · Conil Vacaciones">
-<meta property="og:description" content="Alquiler de casas vacacionales en Conil de la Frontera. Trato directo, sin intermediarios.">
+<meta property="og:description" content="Vivienda vacacional en Conil de la Frontera. Consulta disponibilidad y contacta directamente con el propietario a través de Conil Vacaciones.">
 <meta property="og:image" content="https://conilvacaciones.github.io/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Vivienda en Conil de la Frontera · Conil Vacaciones">
-<meta name="twitter:description" content="Alquiler de casas vacacionales en Conil de la Frontera. Trato directo, sin intermediarios.">
+<meta name="twitter:description" content="Vivienda vacacional en Conil de la Frontera. Consulta disponibilidad y contacta directamente con el propietario a través de Conil Vacaciones.">
 <meta name="twitter:image" content="https://conilvacaciones.github.io/og-image.png">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -397,6 +397,11 @@ input,textarea{font:inherit;}
 /* ---- calendar (azulejo tile motif) ---- */
 .reviews-section{margin-top:34px;padding-top:26px;border-top:1px solid var(--line);}
 .reviews-section h4{font-family:var(--ff-display);font-weight:600;font-size:19px;color:var(--atlantic);}
+.booking-info-section{margin-top:34px;padding-top:26px;border-top:1px solid var(--line);}
+.booking-info-section h4{font-family:var(--ff-display);font-weight:600;font-size:19px;color:var(--atlantic);margin-bottom:14px;}
+.booking-info-list{list-style:none;padding:0;margin:0;display:grid;gap:10px;}
+.booking-info-list li{position:relative;padding-left:22px;font-size:14px;line-height:1.55;color:var(--ink-soft);}
+.booking-info-list li:before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--sol);}
 .reviews-summary{display:flex;align-items:center;gap:10px;margin:10px 0 6px;}
 .reviews-summary .icon{width:20px;height:20px;color:var(--sol);}
 .reviews-summary b{font-family:var(--ff-mono);font-size:18px;color:var(--ink);}
@@ -445,7 +450,8 @@ input,textarea{font:inherit;}
   border:1px solid transparent;
 }
 .cal-day:hover:not(.is-disabled){background:var(--teal-soft);border-color:var(--teal);}
-.cal-day.is-past,.cal-day.is-empty{background:transparent;color:transparent;cursor:default;pointer-events:none;}
+.cal-day.is-empty{background:transparent;color:transparent;cursor:default;pointer-events:none;}
+.cal-day.is-past{background:transparent;color:var(--ink-faint);cursor:default;pointer-events:none;}
 .cal-day.is-occupied{
   cursor:not-allowed;color:rgba(214,51,108,.55);
   background-image:repeating-linear-gradient(135deg, rgba(214,51,108,.16) 0 4px, rgba(214,51,108,.05) 4px 8px);
@@ -682,9 +688,19 @@ input,textarea{font:inherit;}
                 <svg class="icon" style="width:16px;height:16px"><use href="#i-mail"/></svg>Consultar por Gmail
               </a>
             </div>
-            <p class="booking-note">No se realiza ningún cobro aquí: al consultar, hablarás directamente con nosotros para confirmar y cerrar la reserva.</p>
+            <p class="booking-note">No se realiza ningún cobro aquí: al consultar, te ponemos en contacto con el propietario de esta vivienda, quien confirma la disponibilidad, las condiciones y el pago directamente contigo.</p>
           </div>
         </div>
+      </div>
+
+      <div class="booking-info-section">
+        <span class="eyebrow">Antes de escribir</span>
+        <h4>Información de la reserva</h4>
+        <ul class="booking-info-list">
+          <li>Conil Vacaciones facilita el contacto entre la persona interesada y el propietario de esta vivienda.</li>
+          <li>El pago de la estancia se realiza directamente al propietario, nunca a través de esta web.</li>
+          <li>El propietario es responsable de la prestación del alojamiento (llaves, limpieza y atención durante la estancia).</li>
+        </ul>
       </div>
 
       <div class="reviews-section">
@@ -731,9 +747,9 @@ input,textarea{font:inherit;}
     <div class="hero-text reveal is-visible">
       <span class="eyebrow">Conil de la Frontera · Cádiz</span>
       <h1 id="heroTitulo">Vivienda vacacional en Conil de la Frontera</h1>
-      <p id="heroSubtitulo">Alquilamos casas y apartamentos vacacionales en Conil de la Frontera, pensados para desconectar cerca del mar: playa, pueblo blanco y atardeceres sin prisa. Sin agencias de por medio: hablas directamente con nosotros.</p>
+      <p id="heroSubtitulo">Te ponemos en contacto directamente con propietarios de alojamientos vacacionales en Conil de la Frontera: playa, pueblo blanco y atardeceres sin prisa, sin agencias tradicionales de por medio.</p>
       <div class="hero-cta">
-        <a href="#casas" class="btn btn-primary">Ver nuestras casas</a>
+        <a href="#casas" class="btn btn-primary">Ver alojamientos</a>
         <a href="index.html#contacto" class="btn btn-outline">Hablar por WhatsApp</a>
       </div>
     </div>
@@ -820,6 +836,7 @@ input,textarea{font:inherit;}
       <a href="#casas">Casas</a>
       <a href="blog.html">Blog</a>
       <a href="anunciate.html">Anúnciate con nosotros</a>
+      <a href="aviso-legal.html">Aviso Legal</a>
       <a href="politica-privacidad.html">Política de Privacidad</a>
       <a href="politica-cookies.html">Política de Cookies</a>
       <a href="index.html#contacto">Contacto</a>
@@ -1557,7 +1574,7 @@ function setMetaContent(selector, value){
 }
 function updateViviendaSocialMeta(house){
   var title = house.name + " · Conil Vacaciones";
-  var desc = house.tagline || stripHTML(house.description) || "Alquiler de casas vacacionales en Conil de la Frontera. Trato directo, sin intermediarios.";
+  var desc = house.tagline || stripHTML(house.description) || "Vivienda vacacional en Conil de la Frontera. Consulta disponibilidad y contacta directamente con el propietario a través de Conil Vacaciones.";
   var img = (house.photoUrls && house.photoUrls[0]) || "https://conilvacaciones.github.io/og-image.png";
   var url = window.location.href;
   setMetaContent('meta[property="og:title"]', title);

@@ -3,25 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Política de Privacidad | Conil Vacaciones</title>
-<meta name="description" content="Política de privacidad de Conil Vacaciones: qué datos personales recogemos, para qué los usamos y cómo puedes ejercer tus derechos.">
+<title id="pageTitle">Blog · Conil Vacaciones — Qué hacer y ver en Conil de la Frontera</title>
+<meta name="description" id="pageDescription" content="Ideas, playas y planes en Conil de la Frontera contados por quienes vivimos aquí. Descubre qué ver y hacer en la Costa de la Luz, Cádiz.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Conil Vacaciones">
 <meta property="og:locale" content="es_ES">
-<meta property="og:url" content="https://conilvacaciones.github.io/politica-privacidad.html">
-<meta property="og:title" content="Política de Privacidad | Conil Vacaciones">
-<meta property="og:description" content="Política de privacidad de Conil Vacaciones: qué datos personales recogemos, para qué los usamos y cómo puedes ejercer tus derechos.">
+<meta property="og:url" content="https://conilvacaciones.github.io/blog.html">
+<meta property="og:title" id="ogTitle" content="Blog · Conil Vacaciones — Qué hacer y ver en Conil de la Frontera">
+<meta property="og:description" id="ogDescription" content="Playas, planes y recomendaciones en Conil de la Frontera, contados por quienes vivimos aquí.">
 <meta property="og:image" content="https://conilvacaciones.github.io/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Política de Privacidad | Conil Vacaciones">
-<meta name="twitter:description" content="Política de privacidad de Conil Vacaciones: qué datos personales recogemos, para qué los usamos y cómo puedes ejercer tus derechos.">
+<meta name="twitter:title" id="twitterTitle" content="Blog · Conil Vacaciones — Qué hacer y ver en Conil de la Frontera">
+<meta name="twitter:description" id="twitterDescription" content="Playas, planes y recomendaciones en Conil de la Frontera, contados por quienes vivimos aquí.">
 <meta name="twitter:image" content="https://conilvacaciones.github.io/og-image.png">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0B3D5C">
-<link rel="canonical" href="https://conilvacaciones.github.io/politica-privacidad.html">
-<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="https://conilvacaciones.github.io/blog.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500;1,9..144,600&family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -482,17 +481,55 @@ input,textarea{font:inherit;}
   .cal-shell{grid-template-columns:1fr;}
   .modal-price-box{text-align:left;}
 }
-/* ============ PÁGINA LEGAL ============ */
-.legal-section{padding:56px 0 90px;}
-.legal-wrap{max-width:760px;margin:0 auto;}
-.legal-wrap h1{font-family:var(--ff-display);font-weight:600;font-size:clamp(28px,3.6vw,42px);color:var(--atlantic);margin-bottom:8px;}
-.legal-updated{font-family:var(--ff-mono);font-size:12.5px;color:var(--ink-faint);margin-bottom:38px;}
-.legal-wrap h2{font-family:var(--ff-display);font-weight:600;font-size:21px;color:var(--atlantic);margin:34px 0 12px;}
-.legal-wrap p{font-size:15px;line-height:1.75;color:var(--ink-soft);margin-bottom:14px;}
-.legal-wrap ul{margin:0 0 14px;padding-left:22px;}
-.legal-wrap li{font-size:15px;line-height:1.7;color:var(--ink-soft);margin-bottom:6px;}
-.legal-wrap a{color:var(--atlantic);text-decoration:underline;}
-.legal-note{background:var(--cal-2);border-left:3px solid var(--sol);padding:14px 18px;border-radius:var(--radius-sm);font-size:13.5px;color:var(--ink-soft);margin:22px 0;}
+/* ============ BLOG ============ */
+.blog-section{padding:20px 0 100px;}
+.blog-grid{display:grid;grid-template-columns:1fr;gap:26px;margin-top:38px;align-items:stretch;}
+@media (min-width:641px) and (max-width:1024px){
+  .blog-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (min-width:1025px){
+  .blog-grid{grid-template-columns:repeat(3,1fr);}
+}
+.blog-card{height:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-card);cursor:pointer;transition:transform .2s ease;display:flex;flex-direction:column;}
+.blog-card:hover{transform:translateY(-4px);}
+.blog-card-photo{position:relative;aspect-ratio:4/3;overflow:hidden;background:linear-gradient(135deg,var(--atlantic),var(--teal));flex-shrink:0;}
+.blog-card-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+.blog-card-body{padding:20px 22px 24px;flex:1;display:flex;flex-direction:column;}
+.blog-card-body .blog-date{font-family:var(--ff-mono);font-size:11.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+.blog-card-body h3{font-family:var(--ff-display);font-weight:600;font-size:19px;color:var(--atlantic);margin-bottom:8px;line-height:1.3;}
+.blog-card-body p{color:var(--ink-soft);font-size:14px;line-height:1.55;flex:1;}
+.blog-card-body .blog-readmore{margin-top:14px;font-size:13px;font-weight:700;color:var(--bougain);}
+.blog-empty{grid-column:1/-1;text-align:center;color:var(--ink-soft);padding:40px 0;}
+/* ---- blog modal ---- */
+.blog-modal-backdrop{position:fixed;inset:0;background:var(--cal);display:block;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+.blog-modal-backdrop.open{opacity:1;pointer-events:auto;}
+.blog-modal-panel{background:var(--card);max-width:1100px;width:100%;margin:0 auto;padding:0 0 60px;position:relative;min-height:100%;}
+.blog-modal-close{position:fixed;top:18px;right:18px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.95);border:none;font-size:22px;color:var(--ink);z-index:3;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(8,42,64,.25);cursor:pointer;}
+.blog-modal-cover{width:100%;aspect-ratio:16/8;background:linear-gradient(135deg,var(--atlantic),var(--teal));overflow:hidden;}
+.blog-modal-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+.blog-modal-body{padding:36px 56px 0;}
+.blog-modal-body .blog-date{font-family:var(--ff-mono);font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;}
+.blog-modal-body h2{font-family:var(--ff-display);font-weight:600;font-size:clamp(24px,3vw,32px);color:var(--atlantic);margin-bottom:18px;}
+.blog-modal-content{color:var(--ink);font-size:17.5px;line-height:1.8;}
+.share-buttons{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px;align-items:center;}
+.share-buttons .share-label{font-family:var(--ff-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin-right:2px;}
+.share-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--cal-2);color:var(--ink-soft);transition:background .2s,color .2s,transform .2s;text-decoration:none;border:none;cursor:pointer;}
+.share-btn svg{width:16px;height:16px;}
+.share-btn:hover{background:var(--sol);color:#fff;transform:translateY(-2px);}
+.share-btn.copied{background:#3fb37f;color:#fff;}
+.blog-modal-content img{max-width:100%;border-radius:var(--radius-sm);display:block;margin:14px 0;}
+.blog-modal-content iframe{max-width:100%;border-radius:var(--radius-sm);display:block;margin:14px 0;}
+.blog-modal-content h2{font-family:var(--ff-display);font-size:24px;color:var(--atlantic);margin:20px 0 8px;}
+.blog-modal-content h3{font-family:var(--ff-display);font-size:19px;color:var(--atlantic);margin:16px 0 8px;}
+.blog-modal-content p{margin:0 0 12px;}
+.blog-modal-content ul{margin:0 0 12px;padding-left:22px;}
+.blog-modal-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:26px;}
+.blog-modal-gallery img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:var(--radius-sm);display:block;}
+@media (max-width:600px){
+  .blog-modal-body{padding:24px 20px 0;}
+  .blog-modal-cover{aspect-ratio:4/3;}
+  .blog-modal-close{top:14px;right:14px;width:38px;height:38px;font-size:20px;}
+}
 /* ============ BANNER DE COOKIES ============ */
 .cookie-banner{position:fixed;left:0;right:0;bottom:0;z-index:200;background:var(--atlantic-dark);color:var(--cal);padding:18px 20px;box-shadow:0 -8px 30px rgba(8,42,64,.35);transform:translateY(110%);transition:transform .35s ease;}
 .cookie-banner.is-visible{transform:translateY(0);}
@@ -579,40 +616,36 @@ input,textarea{font:inherit;}
 
 <div style="height:18px"></div>
 
-<section class="legal-section">
-  <div class="wrap legal-wrap">
-    <h1>Política de Privacidad</h1>
-    <p class="legal-updated">Última actualización: 25 de agosto de 2026</p>
-
-    <p>Esta política explica qué datos personales recoge Conil Vacaciones a través de esta web, con qué finalidad, durante cuánto tiempo, y cómo puedes ejercer tus derechos sobre ellos.</p>
-
-    <h2>1. Responsable del tratamiento</h2>
-    <p>El responsable de los datos que se recogen a través de esta web es David García, actuando bajo el nombre comercial "Conil Vacaciones", con actividad en Conil de la Frontera, Cádiz (España). Puedes contactar por email o WhatsApp usando los datos indicados arriba.</p>
-    <p>Conil Vacaciones actúa como intermediario en la promoción y captación de clientes para alojamientos vacacionales de terceros: no es propietario ni explotador de las viviendas publicadas en la web. Esta política de privacidad regula únicamente el tratamiento de datos que realiza Conil Vacaciones a través de sus propios formularios; no cubre el tratamiento de datos que el propietario de cada vivienda pueda realizar una vez contactas directamente con él (por ejemplo, al formalizar la reserva o el pago).</p>
-
-    <h2>2. Qué datos recogemos y con qué finalidad</h2>
-    <p><b>Formulario de contacto general (página de inicio y fichas de vivienda):</b> nombre, vivienda de interés, fechas aproximadas y mensaje. Estos datos <b>no se almacenan en nuestros servidores</b>: el formulario solo prepara un mensaje que se envía directamente por WhatsApp o por email, plataformas que aplican sus propias políticas de privacidad una vez recibido el mensaje.</p>
-    <p><b>Formulario "Anúnciate con nosotros":</b> nombre, teléfono, email, nombre de la vivienda, localidad, tipo de alojamiento, número de huéspedes y dormitorios, enlace externo (opcional), mensaje y fotos (opcional). Estos datos sí se guardan en nuestra base de datos, con la finalidad de valorar tu propuesta y contactar contigo. Solo el titular del negocio tiene acceso a esta información.</p>
-    <p><b>Reseñas de huéspedes:</b> nombre, valoración y comentario que decidas publicar sobre una vivienda. Estos datos se guardan y se muestran públicamente en la web una vez revisados y aprobados por el propietario.</p>
-    <p>En ningún caso se recogen datos de pago: no existe pasarela de pago ni cobro online en esta web.</p>
-
-    <h2>3. Base legal</h2>
-    <p>El tratamiento de tus datos se basa en tu consentimiento expreso, otorgado al marcar la casilla de aceptación correspondiente antes de enviar cualquier formulario, y en el interés legítimo de responder a tu solicitud de información o colaboración.</p>
-
-    <h2>4. Con quién compartimos tus datos</h2>
-    <p>Los datos que se guardan (formulario de propietarios y reseñas) se almacenan mediante <b>Supabase</b>, nuestro proveedor de base de datos, que actúa como encargado del tratamiento. El alojamiento de la web se realiza a través de <b>GitHub Pages</b>. Ambos proveedores pueden implicar transferencias de datos fuera del Espacio Económico Europeo según su configuración; en ambos casos se trata de proveedores de infraestructura reconocidos, sin que nosotros vendamos ni cedamos tus datos a terceros con fines comerciales o publicitarios.</p>
-    <p>Esta web también utiliza contenido incrustado de terceros (mapas de Google Maps y, ocasionalmente, vídeos de YouTube o Vimeo en el blog), que pueden recoger datos técnicos según sus propias políticas de privacidad. Más detalle en nuestra <a href="politica-cookies.html">Política de Cookies</a>.</p>
-
-    <h2>5. Cuánto tiempo conservamos tus datos</h2>
-    <p>Conservamos los datos de solicitudes de propietarios y reseñas mientras sean necesarios para la finalidad indicada, o hasta que solicites su eliminación. Puedes pedir que borremos tus datos en cualquier momento.</p>
-
-    <h2>6. Tus derechos</h2>
-    <p>Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación del tratamiento y portabilidad de tus datos escribiéndonos a <a href="mailto:conilvacaciones.info@gmail.com">conilvacaciones.info@gmail.com</a>. También tienes derecho a presentar una reclamación ante la Agencia Española de Protección de Datos (<a href="https://www.aepd.es" target="_blank" rel="noopener">www.aepd.es</a>) si consideras que no hemos atendido tu solicitud correctamente.</p>
-
-    <h2>7. Cambios en esta política</h2>
-    <p>Podemos actualizar esta política de privacidad para adaptarla a cambios legislativos o en el funcionamiento de la web. La fecha de la última actualización aparece al principio de esta página.</p>
+<!-- ============ BLOG ============ -->
+<section class="blog-section" id="blog">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Blog</span>
+        <h1>Qué hacer y qué ver en Conil de la Frontera</h1>
+        <p>Playas, planes y recomendaciones desde gente que vive aquí, en Conil de la Frontera.</p>
+      </div>
+    </div>
+    <div class="blog-grid" id="blogGrid">
+      <p class="blog-empty">Cargando entradas…</p>
+    </div>
   </div>
 </section>
+
+<!-- ============ BLOG MODAL ============ -->
+<div class="blog-modal-backdrop" id="blogModalBackdrop">
+  <div class="blog-modal-panel">
+    <button class="blog-modal-close" id="blogModalClose">×</button>
+    <div class="blog-modal-cover" id="blogModalCover"></div>
+    <div class="blog-modal-body">
+      <span class="blog-date" id="blogModalDate"></span>
+      <h2 id="blogModalTitle">Blog de Conil Vacaciones</h2>
+      <div class="share-buttons" id="blogShareButtons"></div>
+      <div class="blog-modal-content" id="blogModalContent"></div>
+      <div class="blog-modal-gallery" id="blogModalGallery"></div>
+    </div>
+  </div>
+</div>
 
 <footer class="site-footer">
   <div class="wrap footer-inner">
@@ -715,6 +748,160 @@ function escapeHTML(str){
   div.textContent = str == null ? "" : str;
   return div.innerHTML;
 }
+
+/* ============ BLOG ============ */
+var BLOG_POSTS = [];
+
+function blogPhotoUrl(path){
+  if(!path) return null;
+  return sb.storage.from("fotos-blog").getPublicUrl(path).data.publicUrl;
+}
+
+function blogExcerpt(p){
+  if(p.resumen) return p.resumen;
+  var tmp = document.createElement("div");
+  tmp.innerHTML = p.contenido || "";
+  var text = (tmp.textContent || tmp.innerText || "").trim();
+  return text.length > 160 ? text.slice(0,160) + "…" : text;
+}
+
+function renderBlogGrid(){
+  var grid = document.getElementById("blogGrid");
+  if(BLOG_POSTS.length === 0){
+    grid.innerHTML = '<p class="blog-empty">Todavía no hemos publicado ninguna entrada. ¡Vuelve pronto!</p>';
+    return;
+  }
+  grid.innerHTML = BLOG_POSTS.map(function(p, idx){
+    var cover = blogPhotoUrl(p.portada);
+    return ''+
+    '<article class="blog-card reveal" style="transition-delay:'+(idx*70)+'ms" data-blog-id="'+p.id+'">'+
+      '<div class="blog-card-photo">'+(cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">' : '')+'</div>'+
+      '<div class="blog-card-body">'+
+        '<span class="blog-date">'+new Date(p.created_at).toLocaleDateString("es-ES", {day:"numeric", month:"long", year:"numeric"})+'</span>'+
+        '<h3>'+escapeHTML(p.titulo)+'</h3>'+
+        '<p>'+escapeHTML(blogExcerpt(p))+'</p>'+
+        '<span class="blog-readmore">Leer más →</span>'+
+      '</div>'+
+    '</article>';
+  }).join("");
+  grid.querySelectorAll("[data-blog-id]").forEach(function(card){
+    card.addEventListener("click", function(){ openBlogModal(card.getAttribute("data-blog-id")); });
+  });
+  grid.querySelectorAll(".reveal").forEach(function(el){
+    if(revealIO) revealIO.observe(el); else el.classList.add("is-visible");
+  });
+}
+
+async function initBlog(){
+  var grid = document.getElementById("blogGrid");
+  try{
+    var res = await sb.from("blog_posts").select("*").eq("publicado", true).order("orden", {ascending:true});
+    if(res.error) throw res.error;
+    BLOG_POSTS = res.data || [];
+    renderBlogGrid();
+    var idParam = new URLSearchParams(window.location.search).get("post");
+    if(idParam) openBlogModal(idParam, true);
+  }catch(err){
+    console.error("Error cargando el blog desde Supabase:", err);
+    grid.innerHTML = '<p class="blog-empty">No se han podido cargar las entradas del blog ahora mismo.</p>';
+  }
+}
+/* ============ SEO DEL BLOG (editable desde el admin) ============ */
+async function initBlogSeo(){
+  try{
+    var res = await sb.from("site_settings").select("blog_seo_title, blog_seo_description").eq("id", 1).maybeSingle();
+    if(res.error) throw res.error;
+    var s = res.data || {};
+    if(s.blog_seo_title){
+      document.getElementById("pageTitle").textContent = s.blog_seo_title;
+      document.getElementById("ogTitle").setAttribute("content", s.blog_seo_title);
+      document.getElementById("twitterTitle").setAttribute("content", s.blog_seo_title);
+    }
+    if(s.blog_seo_description){
+      document.getElementById("pageDescription").setAttribute("content", s.blog_seo_description);
+      document.getElementById("ogDescription").setAttribute("content", s.blog_seo_description);
+      document.getElementById("twitterDescription").setAttribute("content", s.blog_seo_description);
+    }
+  }catch(err){
+    console.error("Error cargando el SEO del blog:", err);
+  }
+}
+initBlogSeo();
+
+initBlog();
+
+function renderShareButtons(containerId, url, title, resumen){
+  var cont = document.getElementById(containerId);
+  if(!cont) return;
+  var u = encodeURIComponent(url);
+  var t = encodeURIComponent(title);
+  var texto = encodeURIComponent(title + (resumen ? " — " + resumen : ""));
+  cont.innerHTML =
+    '<span class="share-label">Compartir</span>' +
+    '<a class="share-btn" target="_blank" rel="noopener" href="https://wa.me/?text=' + texto + '%20' + u + '" title="Compartir en WhatsApp" aria-label="Compartir en WhatsApp">' +
+      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.28-1.38a9.9 9.9 0 0 0 4.76 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.13.82.84-3.05-.2-.31a8.19 8.19 0 0 1-1.26-4.32c0-4.53 3.69-8.22 8.24-8.22 2.2 0 4.27.86 5.82 2.42a8.17 8.17 0 0 1 2.41 5.8c0 4.53-3.69 8.19-8.23 8.19zm4.52-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.17.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.04-.38-1.99-1.22-.73-.66-1.23-1.46-1.37-1.71-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.15.16-.25.25-.42.08-.17.04-.31-.02-.44-.06-.12-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.42-.14-.01-.3-.01-.47-.01a.9.9 0 0 0-.65.31c-.22.25-.86.84-.86 2.04 0 1.2.88 2.37 1 2.53.12.17 1.73 2.65 4.2 3.71.59.25 1.05.4 1.4.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z"/></svg>' +
+    '</a>' +
+    '<a class="share-btn" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + u + '" title="Compartir en Facebook" aria-label="Compartir en Facebook">' +
+      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.7h2.6l.4-3h-3v-1.9c0-.87.24-1.46 1.5-1.46h1.6V4.1C15.9 4.03 15.02 4 13.98 4 11.8 4 10.3 5.33 10.3 7.77v2.53H7.7v3h2.6V21h3.2z"/></svg>' +
+    '</a>' +
+    '<a class="share-btn" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=' + u + '&text=' + t + '" title="Compartir en X (Twitter)" aria-label="Compartir en X">' +
+      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.2 8.2L23.3 22h-6.6l-5.2-6.8L5.5 22H2.4l7.7-8.8L1 2h6.8l4.7 6.2L18.9 2zm-1.15 18h1.83L7.35 3.9H5.4L17.75 20z"/></svg>' +
+    '</a>' +
+    '<a class="share-btn" href="mailto:?subject=' + t + '&body=' + texto + '%0A%0A' + u + '" title="Compartir por email" aria-label="Compartir por email">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>' +
+    '</a>' +
+    '<button type="button" class="share-btn" id="' + containerId + 'Copy" title="Copiar enlace" aria-label="Copiar enlace">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>' +
+    '</button>';
+  var copyBtn = document.getElementById(containerId + "Copy");
+  if(copyBtn){
+    copyBtn.addEventListener("click", function(){
+      navigator.clipboard.writeText(url).then(function(){
+        copyBtn.classList.add("copied");
+        setTimeout(function(){ copyBtn.classList.remove("copied"); }, 1800);
+      });
+    });
+  }
+}
+
+var blogBackdrop = document.getElementById("blogModalBackdrop");
+function openBlogModal(id, esCargaInicial){
+  var p = BLOG_POSTS.find(function(x){ return x.id === id; });
+  if(!p) return;
+  var cover = blogPhotoUrl(p.portada);
+  document.getElementById("blogModalCover").innerHTML = cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">' : '';
+  document.getElementById("blogModalDate").textContent = new Date(p.created_at).toLocaleDateString("es-ES", {day:"numeric", month:"long", year:"numeric"});
+  document.getElementById("blogModalTitle").textContent = p.titulo;
+  document.getElementById("blogModalContent").innerHTML = p.contenido || "";
+  var gallery = (p.fotos || []).map(blogPhotoUrl).filter(Boolean);
+  document.getElementById("blogModalGallery").innerHTML = gallery.map(function(url){
+    return '<img src="'+url+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">';
+  }).join("");
+  blogBackdrop.classList.add("open");
+  document.body.style.overflow = "hidden";
+  var postUrl = window.location.origin + window.location.pathname + "?post=" + encodeURIComponent(p.id);
+  if(esCargaInicial){
+    history.replaceState({blogPost: p.id}, "", postUrl);
+  } else {
+    history.pushState({blogPost: p.id}, "", postUrl);
+  }
+  renderShareButtons("blogShareButtons", postUrl, p.titulo, p.resumen || "");
+}
+function closeBlogModal(volverAtras){
+  blogBackdrop.classList.remove("open");
+  document.body.style.overflow = "";
+  if(volverAtras !== false && window.location.search.indexOf("post=") !== -1){
+    history.pushState({}, "", window.location.pathname);
+  }
+}
+document.getElementById("blogModalClose").addEventListener("click", closeBlogModal);
+blogBackdrop.addEventListener("click", function(e){ if(e.target === blogBackdrop) closeBlogModal(); });
+document.addEventListener("keydown", function(e){ if(e.key === "Escape" && blogBackdrop.classList.contains("open")) closeBlogModal(); });
+window.addEventListener("popstate", function(){
+  if(window.location.search.indexOf("post=") === -1 && blogBackdrop.classList.contains("open")){
+    closeBlogModal(false);
+  }
+});
 
 })();
 </script>
