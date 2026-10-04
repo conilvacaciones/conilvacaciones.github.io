@@ -1,0 +1,46 @@
+name: Sincronizar páginas de viviendas
+
+# Genera /viviendas/<slug>/index.html para cada vivienda activa en Supabase,
+# y hace commit/push de los cambios usando el token automático de la Action
+# (GITHUB_TOKEN), que tiene permiso de escritura sobre este repo
+# independientemente de cualquier integración externa conectada.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # Cada día a las 05:00 UTC (≈ 07:00 hora de España en verano, 06:00 en invierno)
+    - cron: "0 5 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generar páginas de viviendas
+        run: node scripts/generate-viviendas.js
+
+      - name: Commit y push si hay cambios
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet && git diff --cached --quiet && [ -z "$(git status --porcelain)" ]; then
+            echo "Sin cambios, nada que subir."
+            exit 0
+          fi
+          git add viviendas/
+          if git diff --cached --quiet; then
+            echo "Sin cambios en viviendas/, nada que subir."
+            exit 0
+          fi
+          git commit -m "Actualizar páginas de /viviendas/ (automático)"
+          git push
