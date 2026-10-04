@@ -1178,7 +1178,11 @@ function renderHouseCards(list, matchInfo){
   var countStat = document.getElementById("housesCountStat");
   if(countStat) countStat.textContent = HOUSES.length;
   grid.querySelectorAll("[data-house]").forEach(function(btn){
-    btn.addEventListener("click", function(){ window.location.href = "vivienda.html?id="+encodeURIComponent(btn.getAttribute("data-house")); });
+    btn.addEventListener("click", function(){
+      var id = btn.getAttribute("data-house");
+      var href = /^[a-z0-9-]+$/i.test(id) ? "/viviendas/"+encodeURIComponent(id)+"/" : "/vivienda.html?id="+encodeURIComponent(id);
+      window.location.href = href;
+    });
   });
   grid.querySelectorAll("[data-fav-house]").forEach(function(btn){
     btn.addEventListener("click", function(e){
