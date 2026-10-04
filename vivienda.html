@@ -1481,7 +1481,17 @@ function openModal(id){
   updateViviendaJsonLd(currentHouse);
   updateViviendaSocialMeta(currentHouse);
   var canonicalEl = document.getElementById("canonicalLink");
-  if(canonicalEl) canonicalEl.setAttribute("href", window.location.href);
+  if(canonicalEl) canonicalEl.setAttribute("href", preferredViviendaUrl(currentHouse));
+}
+
+/* URL "canónica" de una vivienda: la bonita (/viviendas/<id>/) cuando el id
+   tiene un formato válido, para que no cuente como contenido duplicado
+   respecto a vivienda.html?id=... (que sigue funcionando igual que siempre). */
+function preferredViviendaUrl(house){
+  if(house && /^[a-z0-9-]+$/i.test(house.id)){
+    return "https://conilvacaciones.github.io/viviendas/"+encodeURIComponent(house.id)+"/";
+  }
+  return window.location.href;
 }
 
 /* ============ FAVORITOS (localStorage, compartido con la home) ============ */
@@ -1580,7 +1590,7 @@ function updateViviendaSocialMeta(house){
   var title = house.name + " · Conil Vacaciones";
   var desc = house.tagline || stripHTML(house.description) || "Vivienda vacacional en Conil de la Frontera. Consulta disponibilidad y contacta directamente con el propietario a través de Conil Vacaciones.";
   var img = (house.photoUrls && house.photoUrls[0]) || "https://conilvacaciones.github.io/og-image.png";
-  var url = window.location.href;
+  var url = preferredViviendaUrl(house);
   setMetaContent('meta[property="og:title"]', title);
   setMetaContent('meta[property="og:description"]', desc);
   setMetaContent('meta[property="og:image"]', img);
