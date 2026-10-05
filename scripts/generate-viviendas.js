@@ -3,18 +3,23 @@
  *
  * Genera páginas estáticas reales en /viviendas/<slug>/index.html para que
  * cada vivienda activa tenga una URL "bonita" (https://conilvacaciones.github.io/viviendas/<slug>/)
- * además de la ya existente /vivienda.html?id=<slug>.
+ * además de la ya existente /vivienda.html?id=<id interno>.
  *
  * Cómo funciona:
  *  - vivienda.html es una plantilla genérica: carga los datos de la vivienda
- *    en el navegador (vía Supabase) según el id que detecta en la URL
- *    (?id=... o /viviendas/<slug>/).
+ *    en el navegador (vía Supabase) según el id o el slug que detecta en la
+ *    URL (?id=... o /viviendas/<slug>/).
+ *  - Cada vivienda tiene un id interno inmutable (usado para reservas,
+ *    fotos, etc.) y opcionalmente un "slug" editable desde el admin, que es
+ *    lo que se usa en la URL bonita si está puesto. Si no tiene slug, se usa
+ *    el id interno como slug por defecto.
  *  - Este script NO necesita generar HTML distinto por vivienda: solo
- *    necesita saber qué slugs (ids) están activos ahora mismo, y colocar
- *    una copia idéntica de vivienda.html en viviendas/<slug>/index.html
- *    para cada uno.
- *  - Las viviendas que ya no están activas (o que se han borrado) ven su
- *    carpeta eliminada automáticamente, para no dejar páginas huérfanas.
+ *    necesita saber qué slugs están activos ahora mismo, y colocar una
+ *    copia idéntica de vivienda.html en viviendas/<slug>/index.html para
+ *    cada uno.
+ *  - Las viviendas que ya no están activas, que se han borrado, o a las que
+ *    se les ha cambiado el slug, ven su carpeta antigua eliminada
+ *    automáticamente, para no dejar páginas huérfanas.
  *
  * Se ejecuta desde GitHub Actions (ver .github/workflows/sync-viviendas.yml)
  * usando Node 18+ (fetch global ya disponible, sin dependencias externas).
@@ -34,7 +39,7 @@ const OUTPUT_DIR = path.join(REPO_ROOT, "viviendas");
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
 async function fetchActiveSlugs() {
-  const url = `${SUPABASE_URL}/rest/v1/viviendas?select=id&activo=eq.true`;
+  const url = `${SUPABASE_URL}/rest/v1/viviendas?select=id,slug&activo=eq.true`;
   const res = await fetch(url, {
     headers: {
       apikey: SUPABASE_KEY,
@@ -45,15 +50,33 @@ async function fetchActiveSlugs() {
     throw new Error(`Error consultando Supabase: ${res.status} ${res.statusText} - ${await res.text()}`);
   }
   const rows = await res.json();
-  const slugs = rows
-    .map((r) => String(r.id || "").trim())
-    .filter((id) => id.length > 0);
 
-  const invalid = slugs.filter((id) => !SLUG_PATTERN.test(id));
+  const candidates = rows.map((r) => {
+    const id = String(r.id || "").trim();
+    const slug = String(r.slug || "").trim() || id;
+    return { id, slug };
+  }).filter((r) => r.id.length > 0);
+
+  const invalid = candidates.filter((r) => !SLUG_PATTERN.test(r.slug));
   if (invalid.length > 0) {
-    console.warn("Aviso: se ignoran ids con formato inesperado (no [a-z0-9-]+):", invalid);
+    console.warn("Aviso: se ignoran viviendas cuyo slug/id no tiene un formato válido (no [a-z0-9-]+):", invalid);
   }
-  return slugs.filter((id) => SLUG_PATTERN.test(id));
+  const valid = candidates.filter((r) => SLUG_PATTERN.test(r.slug));
+
+  // Si dos viviendas acaban resolviendo al mismo slug (p.ej. alguien puso
+  // como slug personalizado el id de otra vivienda), nos quedamos con la
+  // primera y avisamos, para no pisar una página con la de otra.
+  const seen = new Map();
+  const slugs = [];
+  for (const r of valid) {
+    if (seen.has(r.slug)) {
+      console.warn(`Aviso: el slug "${r.slug}" está repetido (viviendas "${seen.get(r.slug)}" y "${r.id}"). Se usa solo para "${seen.get(r.slug)}".`);
+      continue;
+    }
+    seen.set(r.slug, r.id);
+    slugs.push(r.slug);
+  }
+  return slugs;
 }
 
 function main() {

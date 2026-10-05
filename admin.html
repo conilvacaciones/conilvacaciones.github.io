@@ -418,6 +418,11 @@ main.wrap{padding:40px 24px 90px;}
           <input id="f-id" type="text" placeholder="ej. casitapiscina" pattern="[a-z0-9-]+" required>
           <p class="slug-hint">Solo minúsculas, números y guiones. No se puede cambiar después de crear la vivienda.</p>
         </div>
+        <div class="field full">
+          <label for="f-slug">Texto en el enlace (URL)</label>
+          <input id="f-slug" type="text" placeholder="deja vacío para usar el identificador único" pattern="[a-z0-9-]*">
+          <p class="slug-hint">Es lo que aparece en la dirección de la página de esta vivienda: conilvacaciones.github.io/viviendas/<strong id="f-slug-preview">...</strong>/. A diferencia del identificador único, esto sí lo puedes cambiar cuando quieras. Solo minúsculas, números y guiones; déjalo vacío para que se use el identificador único.</p>
+        </div>
         <div class="field full"><label for="f-nombre">Nombre</label><input id="f-nombre" type="text" required></div>
         <div class="field full"><label for="f-tagline">Frase corta</label><input id="f-tagline" type="text"></div>
         <div class="field"><label for="f-zona">Zona</label><input id="f-zona" type="text"></div>
@@ -1329,6 +1334,8 @@ function openViviendaForm(id){
   document.getElementById("viviendaFormTitle").textContent = v ? "Editar vivienda" : "Nueva vivienda";
   document.getElementById("f-id").value = v ? v.id : "";
   document.getElementById("f-id").disabled = !!v;
+  document.getElementById("f-slug").value = v ? (v.slug||"") : "";
+  updateSlugPreview();
   document.getElementById("f-nombre").value = v ? (v.nombre||"") : "";
   document.getElementById("f-tagline").value = v ? (v.tagline||"") : "";
   document.getElementById("f-zona").value = v ? (v.zona||"") : "";
@@ -1511,6 +1518,14 @@ document.getElementById("btnRecoverPhotos").addEventListener("click", async func
   alert("Se han recuperado " + added + " foto(s). Revisa el orden y guarda la vivienda para confirmarlo.");
 });
 
+function updateSlugPreview(){
+  var idVal = document.getElementById("f-id").value.trim().toLowerCase();
+  var slugVal = document.getElementById("f-slug").value.trim().toLowerCase();
+  document.getElementById("f-slug-preview").textContent = slugVal || idVal || "...";
+}
+document.getElementById("f-id").addEventListener("input", updateSlugPreview);
+document.getElementById("f-slug").addEventListener("input", updateSlugPreview);
+
 document.getElementById("viviendaForm").addEventListener("submit", async function(e){
   e.preventDefault();
   var errEl = document.getElementById("viviendaFormError");
@@ -1523,8 +1538,21 @@ document.getElementById("viviendaForm").addEventListener("submit", async functio
     return;
   }
 
+  var slug = document.getElementById("f-slug").value.trim().toLowerCase();
+  if(slug && !/^[a-z0-9-]+$/.test(slug)){
+    errEl.textContent = "El texto del enlace solo puede tener minúsculas, números y guiones.";
+    errEl.style.display = "block";
+    return;
+  }
+  if(slug && viviendas.some(function(x){ return x.id !== editingId && (x.slug === slug || x.id === slug); })){
+    errEl.textContent = "Ese texto de enlace ya lo usa otra vivienda. Elige uno distinto.";
+    errEl.style.display = "block";
+    return;
+  }
+
   var num = function(elId){ var v = document.getElementById(elId).value; return v === "" ? null : Number(v); };
   var payload = {
+    slug: slug || null,
     nombre: document.getElementById("f-nombre").value.trim(),
     tagline: document.getElementById("f-tagline").value.trim() || null,
     zona: document.getElementById("f-zona").value.trim() || null,

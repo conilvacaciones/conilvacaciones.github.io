@@ -1180,7 +1180,9 @@ function renderHouseCards(list, matchInfo){
   grid.querySelectorAll("[data-house]").forEach(function(btn){
     btn.addEventListener("click", function(){
       var id = btn.getAttribute("data-house");
-      var href = /^[a-z0-9-]+$/i.test(id) ? "/viviendas/"+encodeURIComponent(id)+"/" : "/vivienda.html?id="+encodeURIComponent(id);
+      var house = HOUSES.find(function(h){ return h.id === id; });
+      var slugOrId = (house && house.slug) || id;
+      var href = /^[a-z0-9-]+$/i.test(slugOrId) ? "/viviendas/"+encodeURIComponent(slugOrId)+"/" : "/vivienda.html?id="+encodeURIComponent(id);
       window.location.href = href;
     });
   });
@@ -1346,6 +1348,7 @@ async function initHouses(){
         : (row.valoracion ? { avg: row.valoracion, count: row.opiniones || 0 } : null);
       return {
         id: row.id,
+        slug: row.slug || null,
         name: row.nombre,
         tagline: row.tagline || "",
         zone: row.zona || "",
