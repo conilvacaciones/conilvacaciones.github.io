@@ -1014,7 +1014,11 @@ function renderHouseCards(list, matchInfo){
   var countStat = document.getElementById("housesCountStat");
   if(countStat) countStat.textContent = HOUSES.length;
   grid.querySelectorAll("[data-house]").forEach(function(btn){
-    btn.addEventListener("click", function(){ window.open("/vivienda.html?id="+encodeURIComponent(btn.getAttribute("data-house")), "_blank"); });
+    btn.addEventListener("click", function(){
+      var id = btn.getAttribute("data-house");
+      var house = HOUSES.find(function(h){ return h.id === id; });
+      window.open(preferredViviendaUrl(house || { id: id }), "_blank");
+    });
   });
   // observe newly created reveal cards
   if("IntersectionObserver" in window){
@@ -1169,6 +1173,7 @@ async function initHouses(){
         : null;
       return {
         id: row.id,
+        slug: row.slug || null,
         name: row.nombre,
         tagline: row.tagline || "",
         zone: row.zona || "",
@@ -1207,13 +1212,20 @@ async function initHouses(){
 
     var params = new URLSearchParams(window.location.search);
     var requestedId = params.get("id");
-    if(!requestedId){
+    var found;
+    if(requestedId){
+      // ?id=... siempre se refiere al identificador interno, inmutable.
+      found = HOUSES.find(function(h){ return h.id === requestedId; });
+    } else {
       var pathMatch = window.location.pathname.match(/\/viviendas\/([a-z0-9-]+)\/?$/i);
-      if(pathMatch) requestedId = pathMatch[1];
+      var slugOrId = pathMatch && pathMatch[1];
+      // La URL bonita puede llevar el slug personalizado o, si la vivienda
+      // no tiene uno, el identificador interno (que es lo que usa el
+      // generador de páginas por defecto).
+      found = slugOrId && HOUSES.find(function(h){ return h.slug === slugOrId || h.id === slugOrId; });
     }
-    var found = requestedId && HOUSES.find(function(h){ return h.id === requestedId; });
     if(found){
-      openModal(requestedId);
+      openModal(found.id);
     } else {
       document.querySelector(".modal-body").innerHTML =
         '<div style="padding:60px 20px;text-align:center">'+
@@ -1488,8 +1500,9 @@ function openModal(id){
    tiene un formato válido, para que no cuente como contenido duplicado
    respecto a vivienda.html?id=... (que sigue funcionando igual que siempre). */
 function preferredViviendaUrl(house){
-  if(house && /^[a-z0-9-]+$/i.test(house.id)){
-    return "https://conilvacaciones.github.io/viviendas/"+encodeURIComponent(house.id)+"/";
+  var slugOrId = house && (house.slug || house.id);
+  if(slugOrId && /^[a-z0-9-]+$/i.test(slugOrId)){
+    return "https://conilvacaciones.github.io/viviendas/"+encodeURIComponent(slugOrId)+"/";
   }
   return window.location.href;
 }
