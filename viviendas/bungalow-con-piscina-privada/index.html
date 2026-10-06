@@ -11,13 +11,13 @@
 <meta property="og:url" content="https://conilvacaciones.github.io/vivienda.html">
 <meta property="og:title" content="Vivienda en Conil de la Frontera · Conil Vacaciones">
 <meta property="og:description" content="Vivienda vacacional en Conil de la Frontera. Consulta disponibilidad y contacta directamente con el propietario a través de Conil Vacaciones.">
-<meta property="og:image" content="https://conilvacaciones.github.io/og-image.png">
+<meta property="og:image" content="https://conilvacaciones.github.io/images/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Vivienda en Conil de la Frontera · Conil Vacaciones">
 <meta name="twitter:description" content="Vivienda vacacional en Conil de la Frontera. Consulta disponibilidad y contacta directamente con el propietario a través de Conil Vacaciones.">
-<meta name="twitter:image" content="https://conilvacaciones.github.io/og-image.png">
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="twitter:image" content="https://conilvacaciones.github.io/images/og-image.png">
+<link rel="icon" type="image/png" href="/icons/favicon.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0B3D5C">
 <link rel="canonical" id="canonicalLink" href="https://conilvacaciones.github.io/vivienda.html">
@@ -1602,7 +1602,7 @@ function setMetaContent(selector, value){
 function updateViviendaSocialMeta(house){
   var title = house.name + " · Conil Vacaciones";
   var desc = house.tagline || stripHTML(house.description) || "Vivienda vacacional en Conil de la Frontera. Consulta disponibilidad y contacta directamente con el propietario a través de Conil Vacaciones.";
-  var img = (house.photoUrls && house.photoUrls[0]) || "https://conilvacaciones.github.io/og-image.png";
+  var img = (house.photoUrls && house.photoUrls[0]) || "https://conilvacaciones.github.io/images/og-image.png";
   var url = preferredViviendaUrl(house);
   setMetaContent('meta[property="og:title"]', title);
   setMetaContent('meta[property="og:description"]', desc);
