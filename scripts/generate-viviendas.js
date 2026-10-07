@@ -13,10 +13,15 @@
  *    fotos, etc.) y opcionalmente un "slug" editable desde el admin, que es
  *    lo que se usa en la URL bonita si está puesto. Si no tiene slug, se usa
  *    el id interno como slug por defecto.
- *  - Este script NO necesita generar HTML distinto por vivienda: solo
- *    necesita saber qué slugs están activos ahora mismo, y colocar una
- *    copia idéntica de vivienda.html en viviendas/<slug>/index.html para
- *    cada uno.
+ *  - Las etiquetas <title>, meta description, og: y twitter: (y canonical)
+ *    del <head> se sustituyen por el nombre, descripción y primera foto reales
+ *    de cada vivienda, directamente en el HTML que se sube al repo. Esto es
+ *    necesario porque apps como WhatsApp o Facebook leen esas etiquetas tal
+ *    cual están en el HTML al generar la vista previa al compartir un
+ *    enlace, SIN ejecutar JavaScript — así que el relleno dinámico que hace
+ *    vivienda.html en el navegador (updateViviendaSocialMeta) nunca llega a
+ *    verse en esas vistas previas. El resto de la página (todo el cuerpo,
+ *    el comportamiento, los scripts) es idéntico a vivienda.html.
  *  - Las viviendas que ya no están activas, que se han borrado, o a las que
  *    se les ha cambiado el slug, ven su carpeta antigua eliminada
  *    automáticamente, para no dejar páginas huérfanas.
@@ -31,6 +36,8 @@ const path = require("path");
 const SUPABASE_URL = "https://bjuxswhdktkvlrnuejuz.supabase.co";
 // Misma clave pública ("publishable"/anon) ya embebida en vivienda.html del lado cliente.
 const SUPABASE_KEY = "sb_publishable_Z_Mlw0dn2p9uOOpQn4QL4w_wx74m27G";
+const SITE_URL = "https://conilvacaciones.github.io";
+const FALLBACK_IMAGE = `${SITE_URL}/images/og-image.png`;
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const TEMPLATE_PATH = path.join(REPO_ROOT, "vivienda.html");
@@ -38,8 +45,43 @@ const OUTPUT_DIR = path.join(REPO_ROOT, "viviendas");
 
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
-async function fetchActiveSlugs() {
-  const url = `${SUPABASE_URL}/rest/v1/viviendas?select=id,slug&activo=eq.true`;
+function stripHTML(html) {
+  if (!html) return "";
+  return String(html)
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function truncate(text, max) {
+  if (text.length <= max) return text;
+  return text.slice(0, max - 1).replace(/\s+\S*$/, "") + "…";
+}
+
+// Escapa para insertar de forma segura dentro de un atributo HTML (content="...").
+function escapeAttr(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function publicPhotoUrl(storagePath) {
+  if (!storagePath) return null;
+  // Replica el formato de sb.storage.from("fotos-viviendas").getPublicUrl(path).data.publicUrl
+  const encodedPath = String(storagePath).split("/").map(encodeURIComponent).join("/");
+  return `${SUPABASE_URL}/storage/v1/object/public/fotos-viviendas/${encodedPath}`;
+}
+
+async function fetchActiveViviendas() {
+  const url = `${SUPABASE_URL}/rest/v1/viviendas?select=id,slug,nombre,tagline,descripcion,fotos&activo=eq.true`;
   const res = await fetch(url, {
     headers: {
       apikey: SUPABASE_KEY,
@@ -54,12 +96,20 @@ async function fetchActiveSlugs() {
   const candidates = rows.map((r) => {
     const id = String(r.id || "").trim();
     const slug = String(r.slug || "").trim() || id;
-    return { id, slug };
+    const fotos = Array.isArray(r.fotos) ? r.fotos : [];
+    return {
+      id,
+      slug,
+      nombre: String(r.nombre || "").trim(),
+      tagline: String(r.tagline || "").trim(),
+      descripcion: stripHTML(r.descripcion),
+      imagen: publicPhotoUrl(fotos[0]) || FALLBACK_IMAGE,
+    };
   }).filter((r) => r.id.length > 0);
 
   const invalid = candidates.filter((r) => !SLUG_PATTERN.test(r.slug));
   if (invalid.length > 0) {
-    console.warn("Aviso: se ignoran viviendas cuyo slug/id no tiene un formato válido (no [a-z0-9-]+):", invalid);
+    console.warn("Aviso: se ignoran viviendas cuyo slug/id no tiene un formato válido (no [a-z0-9-]+):", invalid.map((r) => r.id));
   }
   const valid = candidates.filter((r) => SLUG_PATTERN.test(r.slug));
 
@@ -67,22 +117,77 @@ async function fetchActiveSlugs() {
   // como slug personalizado el id de otra vivienda), nos quedamos con la
   // primera y avisamos, para no pisar una página con la de otra.
   const seen = new Map();
-  const slugs = [];
+  const result = [];
   for (const r of valid) {
     if (seen.has(r.slug)) {
       console.warn(`Aviso: el slug "${r.slug}" está repetido (viviendas "${seen.get(r.slug)}" y "${r.id}"). Se usa solo para "${seen.get(r.slug)}".`);
       continue;
     }
     seen.set(r.slug, r.id);
-    slugs.push(r.slug);
+    result.push(r);
   }
-  return slugs;
+  return result;
+}
+
+function buildPageContent(template, vivienda) {
+  const pageUrl = `${SITE_URL}/viviendas/${encodeURIComponent(vivienda.slug)}/`;
+  const title = vivienda.nombre ? `${vivienda.nombre} · Conil Vacaciones` : "Detalle de vivienda · Conil Vacaciones";
+  const description = truncate(
+    vivienda.tagline || vivienda.descripcion || "Vivienda vacacional en Conil de la Frontera, Cádiz. Fotos, precio, servicios y disponibilidad. Consulta y reserva directamente con el propietario.",
+    200
+  );
+  const image = vivienda.imagen;
+
+  let html = template;
+
+  html = html.replace(
+    /<title>Detalle de vivienda · Conil Vacaciones<\/title>/,
+    `<title>${escapeAttr(title)}</title>`
+  );
+  html = html.replace(
+    /<meta name="description" content="Vivienda vacacional en Conil de la Frontera, Cádiz\. Fotos, precio, servicios y disponibilidad\. Consulta y reserva directamente con el propietario\.">/,
+    `<meta name="description" content="${escapeAttr(description)}">`
+  );
+  html = html.replace(
+    /<meta property="og:url" content="https:\/\/conilvacaciones\.github\.io\/vivienda\.html">/,
+    `<meta property="og:url" content="${escapeAttr(pageUrl)}">`
+  );
+  html = html.replace(
+    /<meta property="og:title" content="Vivienda en Conil de la Frontera · Conil Vacaciones">/,
+    `<meta property="og:title" content="${escapeAttr(title)}">`
+  );
+  html = html.replace(
+    /<meta property="og:description" content="Vivienda vacacional en Conil de la Frontera\. Consulta disponibilidad y contacta directamente con el propietario a través de Conil Vacaciones\.">/,
+    `<meta property="og:description" content="${escapeAttr(description)}">`
+  );
+  html = html.replace(
+    /<meta property="og:image" content="https:\/\/conilvacaciones\.github\.io\/images\/og-image\.png">/,
+    `<meta property="og:image" content="${escapeAttr(image)}">`
+  );
+  html = html.replace(
+    /<meta name="twitter:title" content="Vivienda en Conil de la Frontera · Conil Vacaciones">/,
+    `<meta name="twitter:title" content="${escapeAttr(title)}">`
+  );
+  html = html.replace(
+    /<meta name="twitter:description" content="Vivienda vacacional en Conil de la Frontera\. Consulta disponibilidad y contacta directamente con el propietario a través de Conil Vacaciones\.">/,
+    `<meta name="twitter:description" content="${escapeAttr(description)}">`
+  );
+  html = html.replace(
+    /<meta name="twitter:image" content="https:\/\/conilvacaciones\.github\.io\/images\/og-image\.png">/,
+    `<meta name="twitter:image" content="${escapeAttr(image)}">`
+  );
+  html = html.replace(
+    /<link rel="canonical" id="canonicalLink" href="https:\/\/conilvacaciones\.github\.io\/vivienda\.html">/,
+    `<link rel="canonical" id="canonicalLink" href="${escapeAttr(pageUrl)}">`
+  );
+
+  return html;
 }
 
 function main() {
-  fetchActiveSlugs()
-    .then((slugs) => {
-      if (slugs.length === 0) {
+  fetchActiveViviendas()
+    .then((viviendas) => {
+      if (viviendas.length === 0) {
         console.log("No hay viviendas activas en Supabase. No se genera nada (y no se borra nada por seguridad).");
         return;
       }
@@ -98,15 +203,18 @@ function main() {
 
       let created = 0;
       let updated = 0;
-      for (const slug of slugs) {
-        const dir = path.join(OUTPUT_DIR, slug);
+      const slugs = [];
+      for (const vivienda of viviendas) {
+        slugs.push(vivienda.slug);
+        const dir = path.join(OUTPUT_DIR, vivienda.slug);
         const outFile = path.join(dir, "index.html");
         if (!fs.existsSync(dir)) {
           fs.mkdirSync(dir, { recursive: true });
         }
+        const content = buildPageContent(template, vivienda);
         const existing = fs.existsSync(outFile) ? fs.readFileSync(outFile, "utf-8") : null;
-        if (existing !== template) {
-          fs.writeFileSync(outFile, template, "utf-8");
+        if (existing !== content) {
+          fs.writeFileSync(outFile, content, "utf-8");
           if (existing === null) created++; else updated++;
         }
       }
