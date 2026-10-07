@@ -1404,6 +1404,10 @@ async function initApariencia(){
     if(s.hero_titulo) document.getElementById("heroTituloMain").textContent = s.hero_titulo;
     if(s.hero_titulo_sub) document.getElementById("heroTituloSub").textContent = s.hero_titulo_sub;
     if(s.hero_subtitulo) document.getElementById("heroSubtitulo").textContent = s.hero_subtitulo;
+    if(s.hero_image){
+      var heroImg = document.querySelector(".hero-bg");
+      if(heroImg) heroImg.src = sb.storage.from("fotos-blog").getPublicUrl(s.hero_image).data.publicUrl;
+    }
   }catch(err){
     console.error("Error cargando apariencia desde Supabase:", err);
   }

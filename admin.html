@@ -257,6 +257,14 @@ main.wrap{padding:40px 24px 90px;}
           <div class="field full"><label for="ap-titulo">Título del inicio (parte destacada, en color)</label><input id="ap-titulo" type="text" placeholder="Deja en blanco para usar el actual"></div>
           <div class="field full"><label for="ap-titulo-sub">Título del inicio (parte pequeña, debajo)</label><input id="ap-titulo-sub" type="text" placeholder="Deja en blanco para usar el actual"></div>
           <div class="field full"><label for="ap-subtitulo">Subtítulo del inicio (párrafo debajo del título)</label><textarea id="ap-subtitulo" style="min-height:70px" placeholder="Deja en blanco para usar el actual"></textarea></div>
+          <div class="field full">
+            <label>Foto de fondo del inicio</label>
+            <div class="photos-box">
+              <div class="photo-thumbs" id="apHeroThumb"></div>
+              <input type="file" id="ap-hero-foto" accept="image/*">
+              <p class="upload-note">Si no subes ninguna, se usa la foto actual de la portada.</p>
+            </div>
+          </div>
         </div>
         <div class="form-actions" style="width:100%">
           <button type="button" class="btn btn-ghost" id="btnResetApariencia">Restablecer a valores por defecto</button>
@@ -2490,6 +2498,7 @@ loadSolicitudes();
 
 /* ============ APARIENCIA ============ */
 var DEFAULT_APARIENCIA = { hero_color_1:"#0B3D5C", hero_color_2:"#0E4F63" };
+var draftHeroImage = null;
 
 async function loadApariencia(){
   var res = await sb.from("site_settings").select("*").eq("id", 1).maybeSingle();
@@ -2499,7 +2508,30 @@ async function loadApariencia(){
   document.getElementById("ap-titulo").value = s.hero_titulo || "";
   document.getElementById("ap-titulo-sub").value = s.hero_titulo_sub || "";
   document.getElementById("ap-subtitulo").value = s.hero_subtitulo || "";
+  draftHeroImage = s.hero_image || null;
+  renderApHeroThumb();
 }
+
+function renderApHeroThumb(){
+  var box = document.getElementById("apHeroThumb");
+  if(!draftHeroImage){ box.innerHTML = ""; return; }
+  var url = sb.storage.from("fotos-blog").getPublicUrl(draftHeroImage).data.publicUrl;
+  box.innerHTML = '<div class="photo-thumb"><img src="'+url+'" alt="">'+
+    '<div class="p-actions"><button type="button" id="btnRmApHero" title="Quitar">×</button></div></div>';
+  document.getElementById("btnRmApHero").addEventListener("click", function(){ draftHeroImage = null; renderApHeroThumb(); });
+}
+
+document.getElementById("ap-hero-foto").addEventListener("change", async function(e){
+  var file = (e.target.files || [])[0];
+  if(!file) return;
+  var safeName = file.name.replace(/[^a-zA-Z0-9.-]/g,"_");
+  var path = "hero/hero-" + Date.now() + "-" + safeName;
+  var up = await sb.storage.from("fotos-blog").upload(path, file, { upsert:true });
+  e.target.value = "";
+  if(up.error){ alert("Error al subir "+file.name+": "+up.error.message); return; }
+  draftHeroImage = path;
+  renderApHeroThumb();
+});
 
 document.getElementById("btnSaveApariencia").addEventListener("click", async function(){
   var errEl = document.getElementById("aparienciaError");
@@ -2511,6 +2543,7 @@ document.getElementById("btnSaveApariencia").addEventListener("click", async fun
     hero_titulo: document.getElementById("ap-titulo").value.trim() || null,
     hero_titulo_sub: document.getElementById("ap-titulo-sub").value.trim() || null,
     hero_subtitulo: document.getElementById("ap-subtitulo").value.trim() || null,
+    hero_image: draftHeroImage || null,
     updated_at: new Date().toISOString()
   };
   var res = await sb.from("site_settings").upsert(payload);
@@ -2528,6 +2561,8 @@ document.getElementById("btnResetApariencia").addEventListener("click", function
   document.getElementById("ap-titulo").value = "";
   document.getElementById("ap-titulo-sub").value = "";
   document.getElementById("ap-subtitulo").value = "";
+  draftHeroImage = null;
+  renderApHeroThumb();
 });
 
 })();
