@@ -42,6 +42,18 @@ const FALLBACK_IMAGE = `${SITE_URL}/images/og-image.png`;
 const REPO_ROOT = path.resolve(__dirname, "..");
 const TEMPLATE_PATH = path.join(REPO_ROOT, "vivienda.html");
 const OUTPUT_DIR = path.join(REPO_ROOT, "viviendas");
+const SITEMAP_PATH = path.join(REPO_ROOT, "sitemap.xml");
+
+// Páginas estáticas del sitio (además de las fichas de vivienda, que se añaden
+// dinámicamente). cambiar aquí si se añade o se quita alguna página fija.
+const STATIC_PAGES = [
+  { loc: `${SITE_URL}/`, changefreq: "weekly", priority: "1.0" },
+  { loc: `${SITE_URL}/blog/`, changefreq: "weekly", priority: "0.8" },
+  { loc: `${SITE_URL}/anunciate/`, changefreq: "monthly", priority: "0.6" },
+  { loc: `${SITE_URL}/aviso-legal.html`, changefreq: "yearly", priority: "0.2" },
+  { loc: `${SITE_URL}/politica-privacidad.html`, changefreq: "yearly", priority: "0.2" },
+  { loc: `${SITE_URL}/politica-cookies.html`, changefreq: "yearly", priority: "0.2" },
+];
 
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
@@ -184,6 +196,18 @@ function buildPageContent(template, vivienda) {
   return html;
 }
 
+function buildSitemap(viviendas) {
+  const staticEntries = STATIC_PAGES.map(
+    (p) => `  <url>\n    <loc>${escapeAttr(p.loc)}</loc>\n    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`
+  );
+  const viviendaEntries = viviendas.map((v) => {
+    const loc = `${SITE_URL}/viviendas/${encodeURIComponent(v.slug)}/`;
+    return `  <url>\n    <loc>${escapeAttr(loc)}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>`;
+  });
+  const entries = staticEntries.concat(viviendaEntries).join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries}\n</urlset>\n`;
+}
+
 function main() {
   fetchActiveViviendas()
     .then((viviendas) => {
@@ -234,6 +258,16 @@ function main() {
 
       console.log(`Viviendas activas: ${slugs.length}`);
       console.log(`Páginas creadas: ${created}, actualizadas: ${updated}, eliminadas: ${removed}`);
+
+      // Mantiene sitemap.xml sincronizado con las páginas fijas y las viviendas activas.
+      const sitemap = buildSitemap(viviendas);
+      const existingSitemap = fs.existsSync(SITEMAP_PATH) ? fs.readFileSync(SITEMAP_PATH, "utf-8") : null;
+      if (existingSitemap !== sitemap) {
+        fs.writeFileSync(SITEMAP_PATH, sitemap, "utf-8");
+        console.log("sitemap.xml actualizado.");
+      } else {
+        console.log("sitemap.xml ya estaba al día.");
+      }
     })
     .catch((err) => {
       console.error("Error generando páginas de viviendas:", err.message || err);

@@ -7,8 +7,8 @@ Conil Vacaciones gestiona un pequeño número de viviendas turísticas seleccion
 ## Páginas principales
 
 - [Inicio](https://conilvacaciones.github.io/): listado de todas las viviendas disponibles, con buscador por fechas, número de personas y necesidades (piscina, mascotas, aire acondicionado, parking, WiFi, jardín/terraza).
-- [Blog](https://conilvacaciones.github.io/blog.html): artículos sobre qué hacer, playas y planes en Conil de la Frontera.
-- Fichas de vivienda individuales: accesibles desde el inicio, con URL del tipo `https://conilvacaciones.github.io/vivienda.html?id=IDENTIFICADOR`. Cada ficha incluye descripción, capacidad, dormitorios, servicios, ubicación en mapa, fotos, calendario de disponibilidad y reseñas reales de huéspedes cuando existen.
+- [Blog](https://conilvacaciones.github.io/blog/): artículos sobre qué hacer, playas y planes en Conil de la Frontera.
+- Fichas de vivienda individuales: accesibles desde el inicio, con URL del tipo `https://conilvacaciones.github.io/viviendas/NOMBRE-DE-LA-VIVIENDA/`. Cada ficha incluye descripción, capacidad, dormitorios, servicios, ubicación en mapa, fotos, calendario de disponibilidad y reseñas reales de huéspedes cuando existen.
 
 ## Contacto
 
