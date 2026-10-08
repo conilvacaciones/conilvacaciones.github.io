@@ -16,17 +16,17 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://conilvacaciones.github.io/aviso-legal.html</loc>
+    <loc>https://conilvacaciones.github.io/aviso-legal/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://conilvacaciones.github.io/politica-privacidad.html</loc>
+    <loc>https://conilvacaciones.github.io/politica-privacidad/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://conilvacaciones.github.io/politica-cookies.html</loc>
+    <loc>https://conilvacaciones.github.io/politica-cookies/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
