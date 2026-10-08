@@ -50,9 +50,9 @@ const STATIC_PAGES = [
   { loc: `${SITE_URL}/`, changefreq: "weekly", priority: "1.0" },
   { loc: `${SITE_URL}/blog/`, changefreq: "weekly", priority: "0.8" },
   { loc: `${SITE_URL}/anunciate/`, changefreq: "monthly", priority: "0.6" },
-  { loc: `${SITE_URL}/aviso-legal.html`, changefreq: "yearly", priority: "0.2" },
-  { loc: `${SITE_URL}/politica-privacidad.html`, changefreq: "yearly", priority: "0.2" },
-  { loc: `${SITE_URL}/politica-cookies.html`, changefreq: "yearly", priority: "0.2" },
+  { loc: `${SITE_URL}/aviso-legal/`, changefreq: "yearly", priority: "0.2" },
+  { loc: `${SITE_URL}/politica-privacidad/`, changefreq: "yearly", priority: "0.2" },
+  { loc: `${SITE_URL}/politica-cookies/`, changefreq: "yearly", priority: "0.2" },
 ];
 
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
