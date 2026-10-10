@@ -234,6 +234,30 @@ input,textarea{font:inherit;}
   display:flex;flex-direction:column;transition:transform .3s ease, box-shadow .3s ease;
 }
 .house-card:hover{transform:translateY(-6px);box-shadow:0 26px 50px -20px rgba(11,61,92,.42);}
+/* ---- skeleton loaders ---- */
+.skel-card{height:100%;background:var(--card);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-card);border:1px solid rgba(11,61,92,.06);display:flex;flex-direction:column;}
+.skel-photo{aspect-ratio:4/3;flex-shrink:0;}
+.skel-body{padding:20px 22px 22px;display:flex;flex-direction:column;gap:14px;flex:1;}
+.skel-photo,.skel-line{position:relative;overflow:hidden;background:var(--cal-2);}
+.skel-photo::after,.skel-line::after{
+  content:"";position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
+  animation:skel-shimmer 1.5s ease-in-out infinite;
+}
+@keyframes skel-shimmer{100%{transform:translateX(100%);}}
+@media (prefers-reduced-motion:reduce){.skel-photo::after,.skel-line::after{animation:none;}}
+.skel-line{border-radius:6px;}
+.skel-title{width:62%;height:17px;}
+.skel-tagline{width:85%;height:13px;}
+.skel-loc{width:46%;height:13px;}
+.skel-meta-row{display:flex;gap:16px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.skel-meta-row .skel-line{width:58px;height:12px;}
+.skel-chips{display:flex;gap:8px;}
+.skel-chip{width:72px;height:26px;border-radius:999px;}
+.skel-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:6px;}
+.skel-price{width:90px;height:22px;}
+.skel-rating{width:60px;height:20px;}
+.skel-btn{width:100%;height:46px;border-radius:999px;margin-top:14px;}
 .house-photo{position:relative;aspect-ratio:4/3;overflow:hidden;flex-shrink:0;}
 .house-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;}
 .house-photo .fallback-caption{
@@ -969,6 +993,7 @@ function photoTileHTML(big){
 
 function renderHouseCards(list, matchInfo){
   var grid = document.getElementById("housesGrid");
+  grid.removeAttribute("aria-busy");
   var houses = list || HOUSES;
   var html = "";
   houses.forEach(function(h, idx){
@@ -1124,9 +1149,27 @@ document.getElementById("searchClearBtn").addEventListener("click", function(){
 });
 
 /* ============ CARGA DE DATOS DESDE SUPABASE ============ */
+function skeletonCardsHTML(n){
+  var card = '<div class="skel-card" aria-hidden="true">'+
+    '<div class="skel-photo"></div>'+
+    '<div class="skel-body">'+
+      '<div class="skel-line skel-title"></div>'+
+      '<div class="skel-line skel-tagline"></div>'+
+      '<div class="skel-line skel-loc"></div>'+
+      '<div class="skel-meta-row"><div class="skel-line"></div><div class="skel-line"></div><div class="skel-line"></div></div>'+
+      '<div class="skel-chips"><div class="skel-line skel-chip"></div><div class="skel-line skel-chip"></div><div class="skel-line skel-chip"></div></div>'+
+      '<div class="skel-foot"><div class="skel-line skel-rating"></div><div class="skel-line skel-price"></div></div>'+
+      '<div class="skel-line skel-btn"></div>'+
+    '</div>'+
+  '</div>';
+  var html = "";
+  for(var i=0;i<n;i++) html += card;
+  return html;
+}
 async function initHouses(){
   var grid = document.getElementById("housesGrid");
-  grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--ink-soft);padding:50px 0">Cargando casas…</p>';
+  grid.setAttribute("aria-busy","true");
+  grid.innerHTML = skeletonCardsHTML(6);
   try{
     var viviendasRes = await sb.from("viviendas").select("*").eq("activo", true).order("orden", {ascending:true});
     if(viviendasRes.error) throw viviendasRes.error;
@@ -1211,6 +1254,7 @@ async function initHouses(){
     });
 
     if(HOUSES.length === 0){
+      grid.removeAttribute("aria-busy");
       grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--ink-soft);padding:50px 0">Todavía no hay casas publicadas.</p>';
       return;
     }
@@ -1241,6 +1285,7 @@ async function initHouses(){
     }
   }catch(err){
     console.error("Error cargando viviendas desde Supabase:", err);
+    grid.removeAttribute("aria-busy");
     grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--bougain);padding:50px 0">No se han podido cargar las casas ahora mismo. Inténtalo de nuevo en unos minutos.</p>';
   }
 }
