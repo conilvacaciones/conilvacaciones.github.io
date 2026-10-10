@@ -443,6 +443,9 @@ main.wrap{padding:40px 24px 90px;}
         <div class="field"><label for="f-huespedes">Huéspedes</label><input id="f-huespedes" type="number" min="1"></div>
         <div class="field"><label for="f-dormitorios">Dormitorios</label><input id="f-dormitorios" type="number" min="0"></div>
         <div class="field"><label for="f-banos">Baños</label><input id="f-banos" type="number" min="0"></div>
+        <div class="field"><label for="f-sofa-cama">¿Tiene sofá cama?</label>
+          <select id="f-sofa-cama"><option value="no">No</option><option value="si">Sí</option></select>
+        </div>
         <div class="field"><label for="f-area">Metros² (opcional)</label><input id="f-area" type="number" min="0"></div>
         <div class="field"><label for="f-noches-min">Mínimo de noches</label><input id="f-noches-min" type="number" min="1" step="1" value="1"></div>
         <div class="field"><label for="f-checkin">Check-in</label><input id="f-checkin" type="text" placeholder="Ej. 16:00 h"></div>
@@ -1352,6 +1355,7 @@ function openViviendaForm(id){
   document.getElementById("f-huespedes").value = v ? (v.huespedes||"") : "";
   document.getElementById("f-dormitorios").value = v ? (v.dormitorios||"") : "";
   document.getElementById("f-banos").value = v ? (v.banos||"") : "";
+  document.getElementById("f-sofa-cama").value = v && v.sofa_cama ? "si" : "no";
   document.getElementById("f-area").value = v ? (v.area||"") : "";
   document.getElementById("f-noches-min").value = v ? (v.noches_minimas || 1) : 1;
   document.getElementById("f-checkin").value = v ? (v.checkin || "") : "";
@@ -1569,6 +1573,7 @@ document.getElementById("viviendaForm").addEventListener("submit", async functio
     huespedes: num("f-huespedes"),
     dormitorios: num("f-dormitorios"),
     banos: num("f-banos"),
+    sofa_cama: document.getElementById("f-sofa-cama").value === "si",
     area: num("f-area"),
     noches_minimas: Math.max(1, parseInt(document.getElementById("f-noches-min").value, 10) || 1),
     checkin: document.getElementById("f-checkin").value.trim() || null,
