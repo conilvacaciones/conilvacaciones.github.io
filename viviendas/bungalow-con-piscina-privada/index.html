@@ -550,6 +550,7 @@ input,textarea{font:inherit;}
   <symbol id="i-bbq" viewBox="0 0 24 24"><path d="M6 14a6 6 0 0 0 12 0c0-3-2-4-2-7a4 4 0 0 0-8 0c0 3-2 4-2 7Z"/><path d="M9 22h6M12 22v-3"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c1-3.8 3.4-5.6 6.5-5.6s5.5 1.8 6.5 5.6"/><circle cx="17.5" cy="8.5" r="2.4"/><path d="M15.8 14.9c2.4.2 4 1.9 4.8 5.1"/></symbol>
   <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18v3M21 18v3"/><path d="M5 12V8a2 2 0 0 1 2-2h3v6"/><rect x="12" y="10" width="8" height="4" rx="1"/></symbol>
+  <symbol id="i-sofa" viewBox="0 0 24 24"><path d="M5 11V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/><path d="M3 13a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3Z"/><path d="M4 17v2M20 17v2"/></symbol>
   <symbol id="i-expand" viewBox="0 0 24 24"><path d="M9 3H3v6M15 3h6v6M15 21h6v-6M9 21H3v-6"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.8 6.3.7-4.7 4.4 1.2 6.3L12 17l-5.5 3.2 1.2-6.3-4.7-4.4 6.3-.7Z" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7.3 7-12.5A7 7 0 0 0 5 9.5C5 14.7 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.4"/></symbol>
@@ -997,6 +998,7 @@ function renderHouseCards(list, matchInfo){
           '<span>'+iconSvg("i-users")+h.guests+' pers.</span>'+
           '<span>'+iconSvg("i-bed")+h.bedrooms+' dorm.</span>'+
           (h.bathrooms ? '<span>'+iconSvg("i-bath")+h.bathrooms+' baños</span>' : '')+
+          (h.sofaCama ? '<span>'+iconSvg("i-sofa")+'Sofá cama</span>' : '')+
           (h.area ? '<span>'+iconSvg("i-expand")+h.area+' m²</span>' : '')+
         '</div>'+
         '<div class="house-amenities">'+amenitiesHTML+extra+'</div>'+
@@ -1185,6 +1187,7 @@ async function initHouses(){
         guests: row.huespedes,
         bedrooms: row.dormitorios,
         bathrooms: row.banos,
+        sofaCama: !!row.sofa_cama,
         area: row.area,
         minNights: row.noches_minimas || 1,
         ofertaDescuento: row.oferta_descuento || null,
@@ -1422,6 +1425,7 @@ function openModal(id){
     '<span>'+iconSvg("i-users")+currentHouse.guests+' huéspedes</span>'+
     '<span>'+iconSvg("i-bed")+currentHouse.bedrooms+' dormitorios</span>'+
     (currentHouse.bathrooms ? '<span>'+iconSvg("i-bath")+currentHouse.bathrooms+' baños</span>' : '')+
+    (currentHouse.sofaCama ? '<span>'+iconSvg("i-sofa")+'Sofá cama</span>' : '')+
     (currentHouse.area ? '<span>'+iconSvg("i-expand")+currentHouse.area+' m²</span>' : '')+
     '<span>'+iconSvg("i-pin")+currentHouse.distance+'</span>';
 
