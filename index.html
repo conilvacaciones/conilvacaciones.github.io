@@ -294,6 +294,12 @@ input,textarea{font:inherit;}
 .skel-price{width:90px;height:22px;}
 .skel-rating{width:60px;height:20px;}
 .skel-btn{width:100%;height:46px;border-radius:999px;margin-top:14px;}
+.interest-badge{
+  display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+  background:var(--teal-soft);color:var(--teal);font-family:var(--ff-mono);
+  font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:999px;
+}
+.interest-badge svg{width:15px;height:15px;flex-shrink:0;}
 .house-photo{position:relative;aspect-ratio:4/3;overflow:hidden;flex-shrink:0;}
 .house-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;}
 .house-photo .fallback-caption{
@@ -719,6 +725,7 @@ input,textarea{font:inherit;}
         <span class="eyebrow">Alojamientos</span>
         <h2>Viviendas</h2>
         <p>Elige una casa para ver todas las fotos, la información completa y el calendario de disponibilidad.</p>
+        <div class="interest-badge" id="weeklyInterestBadge" style="display:none"></div>
       </div>
     </div>
     <div class="search-widget reveal" id="searchWidget">
@@ -1527,6 +1534,38 @@ async function initFaq(){
 initFaq();
 
 initHouses();
+
+/* ============ INTERÉS SEMANAL (consultas de disponibilidad) ============ */
+function logConsultaDisponibilidad(viviendaId){
+  try{
+    sb.from("consultas_disponibilidad").insert({ vivienda_id: viviendaId || null }).then(function(){});
+  }catch(e){ /* no pasa nada si falla, es solo una métrica */ }
+}
+(function(){
+  var waBtn = document.getElementById("waBtn");
+  var mailBtn = document.getElementById("mailBtn");
+  if(waBtn) waBtn.addEventListener("click", function(){
+    if(!waBtn.hasAttribute("disabled")) logConsultaDisponibilidad(currentHouse && currentHouse.id);
+  });
+  if(mailBtn) mailBtn.addEventListener("click", function(){
+    if(!mailBtn.hasAttribute("disabled")) logConsultaDisponibilidad(currentHouse && currentHouse.id);
+  });
+})();
+async function loadWeeklyInterest(){
+  var badge = document.getElementById("weeklyInterestBadge");
+  if(!badge) return;
+  try{
+    var res = await sb.rpc("contador_consultas_semana");
+    if(res.error) throw res.error;
+    var n = res.data;
+    if(!n || n < 1) return; // no mostramos "0 personas", queda raro
+    badge.innerHTML = iconSvg("i-users") + n + (n === 1 ? " persona ha consultado disponibilidad esta semana" : " personas han consultado disponibilidad esta semana");
+    badge.style.display = "inline-flex";
+  }catch(e){
+    console.error("Error cargando el contador de interés semanal:", e);
+  }
+}
+loadWeeklyInterest();
 
 
 
