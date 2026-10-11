@@ -391,6 +391,7 @@ input,textarea{font:inherit;}
 .modal-head h3{font-family:var(--ff-display);font-weight:600;font-size:26px;color:var(--atlantic);}
 .modal-head .house-tagline{font-size:14px;margin-top:4px;}
 .modal-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.modal-registro{font-family:var(--ff-mono);font-size:11.5px;color:var(--ink-faint);margin-top:8px;}
 .share-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center;}
 .share-buttons .share-label{font-family:var(--ff-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin-right:2px;}
 .share-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--cal-2);color:var(--ink-soft);transition:background .2s,color .2s,transform .2s;text-decoration:none;border:none;cursor:pointer;}
@@ -655,6 +656,7 @@ input,textarea{font:inherit;}
           <p class="house-tagline" id="modalTagline"></p>
           <div id="modalRating" style="margin-top:8px"></div>
           <div class="modal-badges" id="modalBadges"></div>
+          <p class="modal-registro" id="modalRegistro" style="display:none"></p>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             <div class="share-buttons" id="shareButtons" style="margin-top:0"></div>
             <button type="button" class="fav-detail-btn" id="favDetailBtn" title="Guardar como favorita" aria-label="Guardar como favorita"><svg><use href="#i-heart"/></svg></button>
@@ -1254,6 +1256,7 @@ async function initHouses(){
         bedrooms: row.dormitorios,
         bathrooms: row.banos,
         sofaCama: !!row.sofa_cama,
+        numeroRegistro: row.numero_registro || null,
         area: row.area,
         minNights: row.noches_minimas || 1,
         ofertaDescuento: row.oferta_descuento || null,
@@ -1519,6 +1522,13 @@ function openModal(id){
     : "Marca la fecha de entrada y de salida. Los días en rosa rayado ya están ocupados.";
   document.getElementById("modalRating").innerHTML = ratingBadgeHTML(currentHouse.ratingInfo);
   document.getElementById("modalBadges").innerHTML = currentHouse.badges.map(function(b){ return '<span class="badge-pill">'+b+'</span>'; }).join("");
+  var regEl = document.getElementById("modalRegistro");
+  if(currentHouse.numeroRegistro){
+    regEl.textContent = "Nº registro turístico: " + currentHouse.numeroRegistro;
+    regEl.style.display = "block";
+  } else {
+    regEl.style.display = "none";
+  }
   document.getElementById("modalStats").innerHTML =
     '<span>'+iconSvg("i-users")+currentHouse.guests+' huéspedes</span>'+
     '<span>'+iconSvg("i-bed")+currentHouse.bedrooms+' dormitorios</span>'+
