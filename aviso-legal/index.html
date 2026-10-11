@@ -140,9 +140,10 @@ input,textarea{font:inherit;}
 @media (max-width:900px){
   .main-nav{
     position:fixed;inset:0 0 0 auto;top:70px;width:min(78vw,320px);height:calc(100vh - 70px);
-    background:var(--atlantic);padding:36px 28px;transform:translateX(100%);transition:transform .35s ease;
+    background:var(--atlantic);padding:36px 28px;transform:translateX(100%);visibility:hidden;
+    transition:transform .35s ease, visibility 0s linear .35s;
   }
-  .main-nav.open{transform:translateX(0);}
+  .main-nav.open{transform:translateX(0);visibility:visible;transition:transform .35s ease, visibility 0s linear 0s;}
   .nav-backdrop{display:block;position:fixed;inset:70px 0 0 0;background:rgba(8,26,38,.45);opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:55;}
   .nav-backdrop.open{opacity:1;pointer-events:auto;}
   .main-nav ul{flex-direction:column;gap:6px;}
