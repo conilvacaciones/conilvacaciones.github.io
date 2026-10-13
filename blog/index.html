@@ -819,7 +819,10 @@ async function initBlog(){
     BLOG_POSTS = res.data || [];
     renderBlogGrid();
     var idParam = new URLSearchParams(window.location.search).get("post");
-    if(idParam) openBlogModal(idParam, true);
+    if(idParam){
+      var matched = BLOG_POSTS.find(function(x){ return x.slug === idParam; }) || BLOG_POSTS.find(function(x){ return x.id === idParam; });
+      if(matched) openBlogModal(matched.id, true);
+    }
   }catch(err){
     console.error("Error cargando el blog desde Supabase:", err);
     grid.innerHTML = '<p class="blog-empty">No se han podido cargar las entradas del blog ahora mismo.</p>';
@@ -898,7 +901,7 @@ function openBlogModal(id, esCargaInicial){
   }).join("");
   blogBackdrop.classList.add("open");
   document.body.style.overflow = "hidden";
-  var postUrl = window.location.origin + window.location.pathname + "?post=" + encodeURIComponent(p.id);
+  var postUrl = window.location.origin + window.location.pathname + "?post=" + encodeURIComponent(p.slug || p.id);
   if(esCargaInicial){
     history.replaceState({blogPost: p.id}, "", postUrl);
   } else {

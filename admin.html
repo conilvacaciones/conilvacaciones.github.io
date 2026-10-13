@@ -586,6 +586,11 @@ main.wrap{padding:40px 24px 90px;}
           <input id="p-id" type="text" placeholder="ej. mejores-playas-conil" pattern="[a-z0-9-]+" required>
           <p class="slug-hint">Solo minúsculas, números y guiones. No se puede cambiar después de crear la entrada.</p>
         </div>
+        <div class="field full">
+          <label for="p-slug">Texto en el enlace (URL)</label>
+          <input id="p-slug" type="text" placeholder="deja vacío para usar el identificador único" pattern="[a-z0-9-]*">
+          <p class="slug-hint">Es lo que aparece en la dirección de esta entrada: conilvacaciones.github.io/blog/?post=<strong id="p-slug-preview">...</strong>. A diferencia del identificador único, esto sí lo puedes cambiar cuando quieras. Solo minúsculas, números y guiones; déjalo vacío para que se use el identificador único.</p>
+        </div>
         <div class="field full"><label for="p-titulo">Título</label><input id="p-titulo" type="text" required></div>
         <div class="field full"><label for="p-resumen">Resumen corto (aparece en la lista del blog)</label><textarea id="p-resumen" style="min-height:60px"></textarea></div>
         <div class="field full">
@@ -1543,6 +1548,14 @@ function updateSlugPreview(){
 document.getElementById("f-id").addEventListener("input", updateSlugPreview);
 document.getElementById("f-slug").addEventListener("input", updateSlugPreview);
 
+function updatePostSlugPreview(){
+  var idVal = document.getElementById("p-id").value.trim().toLowerCase();
+  var slugVal = document.getElementById("p-slug").value.trim().toLowerCase();
+  document.getElementById("p-slug-preview").textContent = slugVal || idVal || "...";
+}
+document.getElementById("p-id").addEventListener("input", updatePostSlugPreview);
+document.getElementById("p-slug").addEventListener("input", updatePostSlugPreview);
+
 document.getElementById("viviendaForm").addEventListener("submit", async function(e){
   e.preventDefault();
   var errEl = document.getElementById("viviendaFormError");
@@ -1916,6 +1929,8 @@ function openPostForm(p){
 
   document.getElementById("p-id").value = p ? p.id : "";
   document.getElementById("p-id").disabled = !!p;
+  document.getElementById("p-slug").value = p ? (p.slug || "") : "";
+  updatePostSlugPreview();
   document.getElementById("p-titulo").value = p ? p.titulo : "";
   document.getElementById("p-resumen").value = p ? (p.resumen || "") : "";
   document.getElementById("p-contenido").innerHTML = p ? (p.contenido || "") : "";
@@ -2094,7 +2109,15 @@ document.getElementById("postForm").addEventListener("submit", async function(e)
     return;
   }
 
+  var postSlug = document.getElementById("p-slug").value.trim().toLowerCase();
+  if(postSlug && !/^[a-z0-9-]+$/.test(postSlug)){
+    errEl.textContent = "El texto del enlace solo puede tener minúsculas, números y guiones.";
+    errEl.style.display = "block";
+    return;
+  }
+
   var payload = {
+    slug: postSlug || null,
     titulo: document.getElementById("p-titulo").value.trim(),
     resumen: document.getElementById("p-resumen").value.trim() || null,
     contenido: document.getElementById("p-contenido").innerHTML.trim() || null,
