@@ -818,7 +818,10 @@ async function initBlog(){
     if(res.error) throw res.error;
     BLOG_POSTS = res.data || [];
     renderBlogGrid();
-    var idParam = new URLSearchParams(window.location.search).get("post");
+    // La URL bonita (/blog/<slug>/) tiene prioridad; ?post=... se mantiene
+    // como alternativa por compatibilidad con enlaces antiguos.
+    var pathMatch = window.location.pathname.match(/\/blog\/([a-z0-9-]+)\/?$/i);
+    var idParam = (pathMatch && pathMatch[1]) || new URLSearchParams(window.location.search).get("post");
     if(idParam){
       var matched = BLOG_POSTS.find(function(x){ return x.slug === idParam; }) || BLOG_POSTS.find(function(x){ return x.id === idParam; });
       if(matched) openBlogModal(matched.id, true);
@@ -901,7 +904,7 @@ function openBlogModal(id, esCargaInicial){
   }).join("");
   blogBackdrop.classList.add("open");
   document.body.style.overflow = "hidden";
-  var postUrl = window.location.origin + window.location.pathname + "?post=" + encodeURIComponent(p.slug || p.id);
+  var postUrl = window.location.origin + "/blog/" + encodeURIComponent(p.slug || p.id) + "/";
   if(esCargaInicial){
     history.replaceState({blogPost: p.id}, "", postUrl);
   } else {
@@ -909,18 +912,21 @@ function openBlogModal(id, esCargaInicial){
   }
   renderShareButtons("blogShareButtons", postUrl, p.titulo, p.resumen || "");
 }
+function isOnPostUrl(){
+  return window.location.search.indexOf("post=") !== -1 || /\/blog\/[a-z0-9-]+\/?$/i.test(window.location.pathname);
+}
 function closeBlogModal(volverAtras){
   blogBackdrop.classList.remove("open");
   document.body.style.overflow = "";
-  if(volverAtras !== false && window.location.search.indexOf("post=") !== -1){
-    history.pushState({}, "", window.location.pathname);
+  if(volverAtras !== false && isOnPostUrl()){
+    history.pushState({}, "", window.location.origin + "/blog/");
   }
 }
 document.getElementById("blogModalClose").addEventListener("click", closeBlogModal);
 blogBackdrop.addEventListener("click", function(e){ if(e.target === blogBackdrop) closeBlogModal(); });
 document.addEventListener("keydown", function(e){ if(e.key === "Escape" && blogBackdrop.classList.contains("open")) closeBlogModal(); });
 window.addEventListener("popstate", function(){
-  if(window.location.search.indexOf("post=") === -1 && blogBackdrop.classList.contains("open")){
+  if(!isOnPostUrl() && blogBackdrop.classList.contains("open")){
     closeBlogModal(false);
   }
 });

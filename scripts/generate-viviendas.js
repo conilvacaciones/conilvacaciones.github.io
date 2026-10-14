@@ -26,6 +26,12 @@
  *    se les ha cambiado el slug, ven su carpeta antigua eliminada
  *    automáticamente, para no dejar páginas huérfanas.
  *
+ * Además, este mismo script genera /blog/<slug>/index.html para cada
+ * entrada de blog publicada, siguiendo exactamente el mismo patrón que las
+ * viviendas (blog/index.html es la plantilla genérica; cada entrada tiene un
+ * id interno inmutable y opcionalmente un "slug" editable desde el admin).
+ * El sitemap.xml incluye ambos tipos de página.
+ *
  * Se ejecuta desde GitHub Actions (ver .github/workflows/sync-viviendas.yml)
  * usando Node 18+ (fetch global ya disponible, sin dependencias externas).
  */
@@ -42,6 +48,8 @@ const FALLBACK_IMAGE = `${SITE_URL}/images/og-image.png`;
 const REPO_ROOT = path.resolve(__dirname, "..");
 const TEMPLATE_PATH = path.join(REPO_ROOT, "vivienda.html");
 const OUTPUT_DIR = path.join(REPO_ROOT, "viviendas");
+const BLOG_TEMPLATE_PATH = path.join(REPO_ROOT, "blog", "index.html");
+const BLOG_OUTPUT_DIR = path.join(REPO_ROOT, "blog");
 const SITEMAP_PATH = path.join(REPO_ROOT, "sitemap.xml");
 
 // Páginas estáticas del sitio (además de las fichas de vivienda, que se añaden
@@ -85,11 +93,19 @@ function escapeAttr(text) {
     .replace(/>/g, "&gt;");
 }
 
-function publicPhotoUrl(storagePath) {
+function publicStorageUrl(bucket, storagePath) {
   if (!storagePath) return null;
-  // Replica el formato de sb.storage.from("fotos-viviendas").getPublicUrl(path).data.publicUrl
+  // Replica el formato de sb.storage.from(bucket).getPublicUrl(path).data.publicUrl
   const encodedPath = String(storagePath).split("/").map(encodeURIComponent).join("/");
-  return `${SUPABASE_URL}/storage/v1/object/public/fotos-viviendas/${encodedPath}`;
+  return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${encodedPath}`;
+}
+
+function publicPhotoUrl(storagePath) {
+  return publicStorageUrl("fotos-viviendas", storagePath);
+}
+
+function publicBlogPhotoUrl(storagePath) {
+  return publicStorageUrl("fotos-blog", storagePath);
 }
 
 async function fetchActiveViviendas() {
@@ -133,6 +149,50 @@ async function fetchActiveViviendas() {
   for (const r of valid) {
     if (seen.has(r.slug)) {
       console.warn(`Aviso: el slug "${r.slug}" está repetido (viviendas "${seen.get(r.slug)}" y "${r.id}"). Se usa solo para "${seen.get(r.slug)}".`);
+      continue;
+    }
+    seen.set(r.slug, r.id);
+    result.push(r);
+  }
+  return result;
+}
+
+async function fetchPublishedBlogPosts() {
+  const url = `${SUPABASE_URL}/rest/v1/blog_posts?select=id,slug,titulo,resumen,portada&publicado=eq.true`;
+  const res = await fetch(url, {
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Error consultando Supabase (blog_posts): ${res.status} ${res.statusText} - ${await res.text()}`);
+  }
+  const rows = await res.json();
+
+  const candidates = rows.map((r) => {
+    const id = String(r.id || "").trim();
+    const slug = String(r.slug || "").trim() || id;
+    return {
+      id,
+      slug,
+      titulo: String(r.titulo || "").trim(),
+      resumen: stripHTML(r.resumen),
+      imagen: publicBlogPhotoUrl(r.portada) || FALLBACK_IMAGE,
+    };
+  }).filter((r) => r.id.length > 0);
+
+  const invalid = candidates.filter((r) => !SLUG_PATTERN.test(r.slug));
+  if (invalid.length > 0) {
+    console.warn("Aviso: se ignoran entradas de blog cuyo slug/id no tiene un formato válido (no [a-z0-9-]+):", invalid.map((r) => r.id));
+  }
+  const valid = candidates.filter((r) => SLUG_PATTERN.test(r.slug));
+
+  const seen = new Map();
+  const result = [];
+  for (const r of valid) {
+    if (seen.has(r.slug)) {
+      console.warn(`Aviso: el slug de blog "${r.slug}" está repetido (entradas "${seen.get(r.slug)}" y "${r.id}"). Se usa solo para "${seen.get(r.slug)}".`);
       continue;
     }
     seen.set(r.slug, r.id);
@@ -196,7 +256,62 @@ function buildPageContent(template, vivienda) {
   return html;
 }
 
-function buildSitemap(viviendas) {
+function buildBlogPageContent(template, post) {
+  const pageUrl = `${SITE_URL}/blog/${encodeURIComponent(post.slug)}/`;
+  const title = post.titulo ? `${post.titulo} · Conil Vacaciones` : "Blog · Conil Vacaciones — Qué hacer y ver en Conil de la Frontera";
+  const description = truncate(
+    post.resumen || "Ideas, playas y planes en Conil de la Frontera contados por quienes vivimos aquí. Descubre qué ver y hacer en la Costa de la Luz, Cádiz.",
+    200
+  );
+  const image = post.imagen;
+
+  let html = template;
+
+  html = html.replace(
+    /<title id="pageTitle">Blog · Conil Vacaciones — Qué hacer y ver en Conil de la Frontera<\/title>/,
+    `<title id="pageTitle">${escapeAttr(title)}</title>`
+  );
+  html = html.replace(
+    /<meta name="description" id="pageDescription" content="Ideas, playas y planes en Conil de la Frontera contados por quienes vivimos aquí\. Descubre qué ver y hacer en la Costa de la Luz, Cádiz\.">/,
+    `<meta name="description" id="pageDescription" content="${escapeAttr(description)}">`
+  );
+  html = html.replace(
+    /<meta property="og:url" content="https:\/\/conilvacaciones\.github\.io\/blog\/">/,
+    `<meta property="og:url" content="${escapeAttr(pageUrl)}">`
+  );
+  html = html.replace(
+    /<meta property="og:title" id="ogTitle" content="Blog · Conil Vacaciones — Qué hacer y ver en Conil de la Frontera">/,
+    `<meta property="og:title" id="ogTitle" content="${escapeAttr(title)}">`
+  );
+  html = html.replace(
+    /<meta property="og:description" id="ogDescription" content="Playas, planes y recomendaciones en Conil de la Frontera, contados por quienes vivimos aquí\.">/,
+    `<meta property="og:description" id="ogDescription" content="${escapeAttr(description)}">`
+  );
+  html = html.replace(
+    /<meta property="og:image" content="https:\/\/conilvacaciones\.github\.io\/images\/og-image\.png">/,
+    `<meta property="og:image" content="${escapeAttr(image)}">`
+  );
+  html = html.replace(
+    /<meta name="twitter:title" id="twitterTitle" content="Blog · Conil Vacaciones — Qué hacer y ver en Conil de la Frontera">/,
+    `<meta name="twitter:title" id="twitterTitle" content="${escapeAttr(title)}">`
+  );
+  html = html.replace(
+    /<meta name="twitter:description" id="twitterDescription" content="Playas, planes y recomendaciones en Conil de la Frontera, contados por quienes vivimos aquí\.">/,
+    `<meta name="twitter:description" id="twitterDescription" content="${escapeAttr(description)}">`
+  );
+  html = html.replace(
+    /<meta name="twitter:image" content="https:\/\/conilvacaciones\.github\.io\/images\/og-image\.png">/,
+    `<meta name="twitter:image" content="${escapeAttr(image)}">`
+  );
+  html = html.replace(
+    /<link rel="canonical" href="https:\/\/conilvacaciones\.github\.io\/blog\/">/,
+    `<link rel="canonical" href="${escapeAttr(pageUrl)}">`
+  );
+
+  return html;
+}
+
+function buildSitemap(viviendas, blogPosts) {
   const staticEntries = STATIC_PAGES.map(
     (p) => `  <url>\n    <loc>${escapeAttr(p.loc)}</loc>\n    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`
   );
@@ -204,63 +319,88 @@ function buildSitemap(viviendas) {
     const loc = `${SITE_URL}/viviendas/${encodeURIComponent(v.slug)}/`;
     return `  <url>\n    <loc>${escapeAttr(loc)}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>`;
   });
-  const entries = staticEntries.concat(viviendaEntries).join("\n");
+  const blogEntries = (blogPosts || []).map((p) => {
+    const loc = `${SITE_URL}/blog/${encodeURIComponent(p.slug)}/`;
+    return `  <url>\n    <loc>${escapeAttr(loc)}</loc>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>`;
+  });
+  const entries = staticEntries.concat(viviendaEntries).concat(blogEntries).join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries}\n</urlset>\n`;
 }
 
+// Genera páginas /dir/<slug>/index.html a partir de una plantilla, y elimina
+// las carpetas huérfanas que ya no correspondan a ningún elemento activo.
+// Devuelve { slugs, created, updated, removed }.
+function generateStaticPages(items, template, outputDir, buildContentFn) {
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  let created = 0;
+  let updated = 0;
+  const slugs = [];
+  for (const item of items) {
+    slugs.push(item.slug);
+    const dir = path.join(outputDir, item.slug);
+    const outFile = path.join(dir, "index.html");
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const content = buildContentFn(template, item);
+    const existing = fs.existsSync(outFile) ? fs.readFileSync(outFile, "utf-8") : null;
+    if (existing !== content) {
+      fs.writeFileSync(outFile, content, "utf-8");
+      if (existing === null) created++; else updated++;
+    }
+  }
+
+  const existingDirs = fs.readdirSync(outputDir, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name);
+  const activeSet = new Set(slugs);
+  let removed = 0;
+  for (const dirName of existingDirs) {
+    if (!activeSet.has(dirName)) {
+      fs.rmSync(path.join(outputDir, dirName), { recursive: true, force: true });
+      removed++;
+    }
+  }
+
+  return { slugs, created, updated, removed };
+}
+
 function main() {
-  fetchActiveViviendas()
-    .then((viviendas) => {
+  Promise.all([fetchActiveViviendas(), fetchPublishedBlogPosts()])
+    .then(([viviendas, blogPosts]) => {
+      let viviendaStats = { slugs: [], created: 0, updated: 0, removed: 0 };
       if (viviendas.length === 0) {
-        console.log("No hay viviendas activas en Supabase. No se genera nada (y no se borra nada por seguridad).");
-        return;
-      }
-
-      if (!fs.existsSync(TEMPLATE_PATH)) {
-        throw new Error(`No se encuentra la plantilla en ${TEMPLATE_PATH}`);
-      }
-      const template = fs.readFileSync(TEMPLATE_PATH, "utf-8");
-
-      if (!fs.existsSync(OUTPUT_DIR)) {
-        fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-      }
-
-      let created = 0;
-      let updated = 0;
-      const slugs = [];
-      for (const vivienda of viviendas) {
-        slugs.push(vivienda.slug);
-        const dir = path.join(OUTPUT_DIR, vivienda.slug);
-        const outFile = path.join(dir, "index.html");
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true });
+        console.log("No hay viviendas activas en Supabase. No se generan páginas de viviendas (y no se borra nada por seguridad).");
+      } else {
+        if (!fs.existsSync(TEMPLATE_PATH)) {
+          throw new Error(`No se encuentra la plantilla en ${TEMPLATE_PATH}`);
         }
-        const content = buildPageContent(template, vivienda);
-        const existing = fs.existsSync(outFile) ? fs.readFileSync(outFile, "utf-8") : null;
-        if (existing !== content) {
-          fs.writeFileSync(outFile, content, "utf-8");
-          if (existing === null) created++; else updated++;
-        }
+        const template = fs.readFileSync(TEMPLATE_PATH, "utf-8");
+        viviendaStats = generateStaticPages(viviendas, template, OUTPUT_DIR, buildPageContent);
+        console.log(`Viviendas activas: ${viviendaStats.slugs.length}`);
+        console.log(`Páginas de viviendas creadas: ${viviendaStats.created}, actualizadas: ${viviendaStats.updated}, eliminadas: ${viviendaStats.removed}`);
       }
 
-      // Limpieza: elimina carpetas de viviendas que ya no están activas.
-      const existingDirs = fs.readdirSync(OUTPUT_DIR, { withFileTypes: true })
-        .filter((d) => d.isDirectory())
-        .map((d) => d.name);
-      const activeSet = new Set(slugs);
-      let removed = 0;
-      for (const dirName of existingDirs) {
-        if (!activeSet.has(dirName)) {
-          fs.rmSync(path.join(OUTPUT_DIR, dirName), { recursive: true, force: true });
-          removed++;
+      let blogStats = { slugs: [], created: 0, updated: 0, removed: 0 };
+      if (blogPosts.length === 0) {
+        console.log("No hay entradas de blog publicadas en Supabase. No se generan páginas de blog (y no se borra nada por seguridad).");
+      } else {
+        if (!fs.existsSync(BLOG_TEMPLATE_PATH)) {
+          throw new Error(`No se encuentra la plantilla en ${BLOG_TEMPLATE_PATH}`);
         }
+        const blogTemplate = fs.readFileSync(BLOG_TEMPLATE_PATH, "utf-8");
+        // No tocar el index.html genérico de /blog/ como si fuera una "carpeta huérfana":
+        // generateStaticPages solo crea/borra subcarpetas, así que esto es seguro.
+        blogStats = generateStaticPages(blogPosts, blogTemplate, BLOG_OUTPUT_DIR, buildBlogPageContent);
+        console.log(`Entradas de blog publicadas: ${blogStats.slugs.length}`);
+        console.log(`Páginas de blog creadas: ${blogStats.created}, actualizadas: ${blogStats.updated}, eliminadas: ${blogStats.removed}`);
       }
 
-      console.log(`Viviendas activas: ${slugs.length}`);
-      console.log(`Páginas creadas: ${created}, actualizadas: ${updated}, eliminadas: ${removed}`);
-
-      // Mantiene sitemap.xml sincronizado con las páginas fijas y las viviendas activas.
-      const sitemap = buildSitemap(viviendas);
+      // Mantiene sitemap.xml sincronizado con las páginas fijas, las viviendas activas y el blog.
+      const sitemap = buildSitemap(viviendas, blogPosts);
       const existingSitemap = fs.existsSync(SITEMAP_PATH) ? fs.readFileSync(SITEMAP_PATH, "utf-8") : null;
       if (existingSitemap !== sitemap) {
         fs.writeFileSync(SITEMAP_PATH, sitemap, "utf-8");
@@ -270,7 +410,7 @@ function main() {
       }
     })
     .catch((err) => {
-      console.error("Error generando páginas de viviendas:", err.message || err);
+      console.error("Error generando páginas estáticas:", err.message || err);
       process.exit(1);
     });
 }
