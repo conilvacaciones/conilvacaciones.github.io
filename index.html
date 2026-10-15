@@ -335,31 +335,6 @@ input,textarea{font:inherit;}
   .gr-number{font-size:44px;}
   .gr-stars svg{width:22px;height:22px;}
 }
-.hero-stats-mini{
-  display:flex;flex-wrap:wrap;margin-top:28px;padding-top:20px;
-  border-top:1px solid rgba(241,242,234,.2);
-}
-.hsm-stat{
-  display:flex;flex-direction:column;align-items:flex-start;text-align:left;
-  padding:0 22px;border-right:1px solid rgba(241,242,234,.18);
-}
-.hsm-stat:first-child{padding-left:0;}
-.hsm-stat:last-child{border-right:none;}
-.hsm-stat .icon{width:16px;height:16px;color:var(--sol);stroke-width:1.6;margin-bottom:6px;}
-.hsm-number{
-  font-family:var(--ff-display);font-size:22px;font-weight:600;line-height:1;
-  color:var(--cal);display:inline-flex;align-items:baseline;gap:1px;
-}
-.hsm-suffix{font-size:15px;color:var(--sol);}
-.hsm-label{font-size:10.5px;color:rgba(241,242,234,.68);margin-top:4px;font-family:var(--ff-mono);letter-spacing:.01em;}
-@media (max-width:600px){
-  .hero-stats-mini{margin-top:20px;padding-top:16px;}
-  .hsm-stat{flex:1 1 33%;padding:0 10px 0 0;border-right:none;}
-  .hsm-stat:first-child{padding-left:0;}
-  .hsm-number{font-size:18px;}
-  .hsm-suffix{font-size:12px;}
-  .hsm-label{font-size:9px;}
-}
 .house-photo{position:relative;aspect-ratio:4/3;overflow:hidden;flex-shrink:0;}
 .house-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;}
 .house-photo .fallback-caption{
@@ -779,23 +754,6 @@ input,textarea{font:inherit;}
       <div class="hero-cta">
         <a href="#viviendas" class="btn btn-primary">Ver alojamientos</a>
         <a href="#contacto" class="btn btn-outline">Hablar por WhatsApp</a>
-      </div>
-      <div class="hero-stats-mini" id="heroStatsMini">
-        <div class="hsm-stat">
-          <svg class="icon"><use href="#i-cal"/></svg>
-          <span class="hsm-number"><span data-count-to="2">0</span><span class="hsm-suffix">+</span></span>
-          <span class="hsm-label">años alquilando en Conil</span>
-        </div>
-        <div class="hsm-stat">
-          <svg class="icon"><use href="#i-users"/></svg>
-          <span class="hsm-number"><span class="hsm-suffix">+</span><span data-count-to="50">0</span></span>
-          <span class="hsm-label">viajeros alojados</span>
-        </div>
-        <div class="hsm-stat">
-          <svg class="icon"><use href="#i-home"/></svg>
-          <span class="hsm-number"><span data-count-to="5">0</span></span>
-          <span class="hsm-label">viviendas gestionadas</span>
-        </div>
       </div>
     </div>
   </div>
@@ -1240,7 +1198,6 @@ function setupCountUpSection(sectionId, extraClass){
   }
 }
 setupCountUpSection("googleReviews", "gr-in-view");
-setupCountUpSection("heroStatsMini");
 
 /* ============ RENDER HOUSE CARDS ============ */
 function iconSvg(id, cls){ return '<svg class="'+(cls||'icon')+'"><use href="#'+id+'"/></svg>'; }
