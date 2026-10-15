@@ -30,8 +30,8 @@
   --atlantic:#0B3D5C;
   --atlantic-dark:#082A40;
   --atlantic-soft:#12507A;
-  --cal:#F1F2EA;
-  --cal-2:#E7E8DC;
+  --cal:#FAFAF7;
+  --cal-2:#F0F1EC;
   --card:#FFFFFF;
   --ink:#122130;
   --ink-soft:#51606B;
@@ -219,7 +219,8 @@ input,textarea{font:inherit;}
 /* ============ FAQ ============ */
 .faq-section{padding:20px 0 90px;}
 .faq-list{max-width:780px;margin:38px auto 0;display:flex;flex-direction:column;gap:12px;}
-.faq-item{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;}
+.faq-item{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;box-shadow:0 8px 20px -16px rgba(11,61,92,.25);transition:box-shadow .2s ease,transform .2s ease;}
+.faq-item:hover{box-shadow:0 14px 28px -16px rgba(11,61,92,.3);transform:translateY(-1px);}
 .faq-item summary{cursor:pointer;list-style:none;padding:18px 22px;font-family:var(--ff-display);font-weight:600;font-size:16.5px;color:var(--atlantic);display:flex;justify-content:space-between;align-items:center;gap:14px;}
 .faq-item summary::-webkit-details-marker{display:none;}
 .faq-item summary::after{content:"+";font-family:var(--ff-body);font-size:22px;font-weight:400;color:var(--ink-faint);flex-shrink:0;transition:transform .2s ease;}
