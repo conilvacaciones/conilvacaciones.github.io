@@ -335,27 +335,18 @@ input,textarea{font:inherit;}
   .gr-number{font-size:44px;}
   .gr-stars svg{width:22px;height:22px;}
 }
-.stats-section{padding:48px 0;background:var(--card);border-bottom:1px solid var(--line);}
-.stats-row{display:flex;justify-content:center;gap:0;flex-wrap:wrap;}
-.stat-item{
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  padding:0 48px;flex:1 1 180px;max-width:220px;
-  border-right:1px solid var(--line);
+.hero-stats-mini{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;
+  margin-top:26px;padding-top:18px;border-top:1px solid rgba(241,242,234,.2);
 }
-.stat-item:last-child{border-right:none;}
-.stat-item .icon{width:26px;height:26px;color:var(--bougain);stroke-width:1.5;margin-bottom:10px;}
-.stat-number{
-  font-family:var(--ff-display);font-size:40px;font-weight:600;line-height:1;
-  color:var(--atlantic);display:inline-flex;align-items:baseline;gap:1px;
-}
-.stat-suffix{font-size:26px;color:var(--bougain);}
-.stat-prefix{margin-right:1px;}
-.stat-label{font-size:13.5px;color:var(--ink-soft);margin-top:8px;max-width:150px;}
-@media (max-width:700px){
-  .stats-row{gap:18px 0;}
-  .stat-item{flex:1 1 33%;padding:0 10px;border-right:none;}
-  .stat-number{font-size:30px;}
-  .stat-suffix{font-size:20px;}
+.hsm-item{display:inline-flex;align-items:center;gap:6px;font-family:var(--ff-mono);font-size:12.5px;color:rgba(241,242,234,.8);letter-spacing:.01em;white-space:nowrap;}
+.hsm-item .icon{width:14px;height:14px;color:var(--sol);stroke-width:1.8;flex-shrink:0;}
+.hsm-item b{color:var(--cal);font-weight:700;font-size:13.5px;}
+.hsm-sep{color:rgba(241,242,234,.32);font-size:12px;}
+@media (max-width:600px){
+  .hero-stats-mini{gap:7px 10px;margin-top:20px;padding-top:14px;}
+  .hsm-item{font-size:11.5px;}
+  .hsm-sep{display:none;}
 }
 .house-photo{position:relative;aspect-ratio:4/3;overflow:hidden;flex-shrink:0;}
 .house-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;}
@@ -777,34 +768,18 @@ input,textarea{font:inherit;}
         <a href="#viviendas" class="btn btn-primary">Ver alojamientos</a>
         <a href="#contacto" class="btn btn-outline">Hablar por WhatsApp</a>
       </div>
+      <div class="hero-stats-mini" id="heroStatsMini">
+        <span class="hsm-item"><svg class="icon"><use href="#i-cal"/></svg><b data-count-to="2">0</b>+ años alquilando en Conil</span>
+        <span class="hsm-sep">·</span>
+        <span class="hsm-item"><svg class="icon"><use href="#i-users"/></svg>+<b data-count-to="50">0</b> viajeros alojados</span>
+        <span class="hsm-sep">·</span>
+        <span class="hsm-item"><svg class="icon"><use href="#i-home"/></svg><b data-count-to="5">0</b> viviendas gestionadas</span>
+      </div>
     </div>
   </div>
   <svg class="hero-wave" viewBox="0 0 1440 110" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <path fill="#F1F2EA" d="M0,64 C240,108 480,22 720,50 C960,78 1200,92 1440,42 L1440,120 L0,120 Z"></path>
+    <path fill="#FAFAF7" d="M0,64 C240,108 480,22 720,50 C960,78 1200,92 1440,42 L1440,120 L0,120 Z"></path>
   </svg>
-</section>
-
-<!-- ============ ESTADÍSTICAS ============ -->
-<section class="stats-section reveal" id="statsSection">
-  <div class="wrap">
-    <div class="stats-row">
-      <div class="stat-item">
-        <svg class="icon"><use href="#i-cal"/></svg>
-        <span class="stat-number"><span data-count-to="2">0</span><span class="stat-suffix">+</span></span>
-        <span class="stat-label">años alquilando en Conil</span>
-      </div>
-      <div class="stat-item">
-        <svg class="icon"><use href="#i-users"/></svg>
-        <span class="stat-number"><span class="stat-suffix stat-prefix">+</span><span data-count-to="50">0</span></span>
-        <span class="stat-label">viajeros alojados</span>
-      </div>
-      <div class="stat-item">
-        <svg class="icon"><use href="#i-home"/></svg>
-        <span class="stat-number"><span data-count-to="5">0</span></span>
-        <span class="stat-label">viviendas gestionadas</span>
-      </div>
-    </div>
-  </div>
 </section>
 
 <!-- ============ HOUSES ============ -->
@@ -1243,7 +1218,7 @@ function setupCountUpSection(sectionId, extraClass){
   }
 }
 setupCountUpSection("googleReviews", "gr-in-view");
-setupCountUpSection("statsSection");
+setupCountUpSection("heroStatsMini");
 
 /* ============ RENDER HOUSE CARDS ============ */
 function iconSvg(id, cls){ return '<svg class="'+(cls||'icon')+'"><use href="#'+id+'"/></svg>'; }
