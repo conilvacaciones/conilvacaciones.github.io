@@ -334,6 +334,28 @@ input,textarea{font:inherit;}
   .gr-number{font-size:44px;}
   .gr-stars svg{width:22px;height:22px;}
 }
+.stats-section{padding:48px 0;background:var(--card);border-bottom:1px solid var(--line);}
+.stats-row{display:flex;justify-content:center;gap:0;flex-wrap:wrap;}
+.stat-item{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:0 48px;flex:1 1 180px;max-width:220px;
+  border-right:1px solid var(--line);
+}
+.stat-item:last-child{border-right:none;}
+.stat-item .icon{width:26px;height:26px;color:var(--bougain);stroke-width:1.5;margin-bottom:10px;}
+.stat-number{
+  font-family:var(--ff-display);font-size:40px;font-weight:600;line-height:1;
+  color:var(--atlantic);display:inline-flex;align-items:baseline;gap:1px;
+}
+.stat-suffix{font-size:26px;color:var(--bougain);}
+.stat-prefix{margin-right:1px;}
+.stat-label{font-size:13.5px;color:var(--ink-soft);margin-top:8px;max-width:150px;}
+@media (max-width:700px){
+  .stats-row{gap:18px 0;}
+  .stat-item{flex:1 1 33%;padding:0 10px;border-right:none;}
+  .stat-number{font-size:30px;}
+  .stat-suffix{font-size:20px;}
+}
 .house-photo{position:relative;aspect-ratio:4/3;overflow:hidden;flex-shrink:0;}
 .house-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;}
 .house-photo .fallback-caption{
@@ -686,6 +708,7 @@ input,textarea{font:inherit;}
   <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
   <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
   <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 11.5 12 4l8.5 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/><path d="M9.5 20v-6h5v6"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6"/></symbol>
   <symbol id="i-facebook" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M13.8 21v-7.2h2.4l.4-2.8h-2.8v-1.8c0-.8.2-1.4 1.4-1.4h1.5V5.1c-.3 0-1.1-.1-2.1-.1-2.1 0-3.6 1.3-3.6 3.6v2.4H8.6v2.8h2.4V21" fill="none"/></symbol>
   <symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M14 3v10.6a3.4 3.4 0 1 1-2.6-3.3"/><path d="M14 3c.4 2.7 2.1 4.3 4.5 4.6v2.7c-1.7 0-3.2-.5-4.5-1.5"/></symbol>
@@ -758,6 +781,29 @@ input,textarea{font:inherit;}
   <svg class="hero-wave" viewBox="0 0 1440 110" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <path fill="#F1F2EA" d="M0,64 C240,108 480,22 720,50 C960,78 1200,92 1440,42 L1440,120 L0,120 Z"></path>
   </svg>
+</section>
+
+<!-- ============ ESTADÍSTICAS ============ -->
+<section class="stats-section reveal" id="statsSection">
+  <div class="wrap">
+    <div class="stats-row">
+      <div class="stat-item">
+        <svg class="icon"><use href="#i-cal"/></svg>
+        <span class="stat-number"><span data-count-to="2">0</span><span class="stat-suffix">+</span></span>
+        <span class="stat-label">años alquilando en Conil</span>
+      </div>
+      <div class="stat-item">
+        <svg class="icon"><use href="#i-users"/></svg>
+        <span class="stat-number"><span class="stat-suffix stat-prefix">+</span><span data-count-to="50">0</span></span>
+        <span class="stat-label">viajeros alojados</span>
+      </div>
+      <div class="stat-item">
+        <svg class="icon"><use href="#i-home"/></svg>
+        <span class="stat-number"><span data-count-to="5">0</span></span>
+        <span class="stat-label">viviendas gestionadas</span>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ============ HOUSES ============ -->
@@ -1162,39 +1208,41 @@ if("IntersectionObserver" in window){
   revealEls.forEach(function(el){ el.classList.add("is-visible"); });
 }
 
-/* ============ RESEÑAS DE GOOGLE: contador animado + estrellas ============ */
-(function(){
-  var section = document.getElementById("googleReviews");
-  if(!section) return;
-  function animateCount(el){
-    var target = parseFloat(el.getAttribute("data-count-to"));
-    var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
-    if(isNaN(target)) return;
-    var duration = 1100, start = null;
-    function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
-    function step(ts){
-      if(start === null) start = ts;
-      var progress = Math.min((ts - start) / duration, 1);
-      var value = target * easeOutCubic(progress);
-      el.textContent = decimals > 0 ? value.toFixed(decimals).replace(".", ",") : Math.round(value);
-      if(progress < 1) requestAnimationFrame(step);
-      else el.textContent = decimals > 0 ? target.toFixed(decimals).replace(".", ",") : target;
-    }
-    requestAnimationFrame(step);
+/* ============ CONTADORES ANIMADOS (reseñas de Google, estadísticas) ============ */
+function animateCountUp(el){
+  var target = parseFloat(el.getAttribute("data-count-to"));
+  var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
+  if(isNaN(target)) return;
+  var duration = 1100, start = null;
+  function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+  function step(ts){
+    if(start === null) start = ts;
+    var progress = Math.min((ts - start) / duration, 1);
+    var value = target * easeOutCubic(progress);
+    el.textContent = decimals > 0 ? value.toFixed(decimals).replace(".", ",") : Math.round(value);
+    if(progress < 1) requestAnimationFrame(step);
+    else el.textContent = decimals > 0 ? target.toFixed(decimals).replace(".", ",") : target;
   }
-  function runGrAnimation(){
-    section.classList.add("gr-in-view");
-    section.querySelectorAll("[data-count-to]").forEach(animateCount);
+  requestAnimationFrame(step);
+}
+function setupCountUpSection(sectionId, extraClass){
+  var section = document.getElementById(sectionId);
+  if(!section) return;
+  function run(){
+    if(extraClass) section.classList.add(extraClass);
+    section.querySelectorAll("[data-count-to]").forEach(animateCountUp);
   }
   if("IntersectionObserver" in window){
-    var grIo = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){ if(e.isIntersecting){ runGrAnimation(); grIo.unobserve(e.target); } });
+    var io2 = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ run(); io2.unobserve(e.target); } });
     }, {threshold:.35});
-    grIo.observe(section);
+    io2.observe(section);
   } else {
-    runGrAnimation();
+    run();
   }
-})();
+}
+setupCountUpSection("googleReviews", "gr-in-view");
+setupCountUpSection("statsSection");
 
 /* ============ RENDER HOUSE CARDS ============ */
 function iconSvg(id, cls){ return '<svg class="'+(cls||'icon')+'"><use href="#'+id+'"/></svg>'; }
