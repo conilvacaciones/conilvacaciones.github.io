@@ -336,17 +336,29 @@ input,textarea{font:inherit;}
   .gr-stars svg{width:22px;height:22px;}
 }
 .hero-stats-mini{
-  display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;
-  margin-top:26px;padding-top:18px;border-top:1px solid rgba(241,242,234,.2);
+  display:flex;flex-wrap:wrap;margin-top:28px;padding-top:20px;
+  border-top:1px solid rgba(241,242,234,.2);
 }
-.hsm-item{display:inline-flex;align-items:center;gap:6px;font-family:var(--ff-mono);font-size:12.5px;color:rgba(241,242,234,.8);letter-spacing:.01em;white-space:nowrap;}
-.hsm-item .icon{width:14px;height:14px;color:var(--sol);stroke-width:1.8;flex-shrink:0;}
-.hsm-item b{color:var(--cal);font-weight:700;font-size:13.5px;}
-.hsm-sep{color:rgba(241,242,234,.32);font-size:12px;}
+.hsm-stat{
+  display:flex;flex-direction:column;align-items:flex-start;text-align:left;
+  padding:0 22px;border-right:1px solid rgba(241,242,234,.18);
+}
+.hsm-stat:first-child{padding-left:0;}
+.hsm-stat:last-child{border-right:none;}
+.hsm-stat .icon{width:16px;height:16px;color:var(--sol);stroke-width:1.6;margin-bottom:6px;}
+.hsm-number{
+  font-family:var(--ff-display);font-size:22px;font-weight:600;line-height:1;
+  color:var(--cal);display:inline-flex;align-items:baseline;gap:1px;
+}
+.hsm-suffix{font-size:15px;color:var(--sol);}
+.hsm-label{font-size:10.5px;color:rgba(241,242,234,.68);margin-top:4px;font-family:var(--ff-mono);letter-spacing:.01em;}
 @media (max-width:600px){
-  .hero-stats-mini{gap:7px 10px;margin-top:20px;padding-top:14px;}
-  .hsm-item{font-size:11.5px;}
-  .hsm-sep{display:none;}
+  .hero-stats-mini{margin-top:20px;padding-top:16px;}
+  .hsm-stat{flex:1 1 33%;padding:0 10px 0 0;border-right:none;}
+  .hsm-stat:first-child{padding-left:0;}
+  .hsm-number{font-size:18px;}
+  .hsm-suffix{font-size:12px;}
+  .hsm-label{font-size:9px;}
 }
 .house-photo{position:relative;aspect-ratio:4/3;overflow:hidden;flex-shrink:0;}
 .house-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;}
@@ -769,11 +781,21 @@ input,textarea{font:inherit;}
         <a href="#contacto" class="btn btn-outline">Hablar por WhatsApp</a>
       </div>
       <div class="hero-stats-mini" id="heroStatsMini">
-        <span class="hsm-item"><svg class="icon"><use href="#i-cal"/></svg><b data-count-to="2">0</b>+ años alquilando en Conil</span>
-        <span class="hsm-sep">·</span>
-        <span class="hsm-item"><svg class="icon"><use href="#i-users"/></svg>+<b data-count-to="50">0</b> viajeros alojados</span>
-        <span class="hsm-sep">·</span>
-        <span class="hsm-item"><svg class="icon"><use href="#i-home"/></svg><b data-count-to="5">0</b> viviendas gestionadas</span>
+        <div class="hsm-stat">
+          <svg class="icon"><use href="#i-cal"/></svg>
+          <span class="hsm-number"><span data-count-to="2">0</span><span class="hsm-suffix">+</span></span>
+          <span class="hsm-label">años alquilando en Conil</span>
+        </div>
+        <div class="hsm-stat">
+          <svg class="icon"><use href="#i-users"/></svg>
+          <span class="hsm-number"><span class="hsm-suffix">+</span><span data-count-to="50">0</span></span>
+          <span class="hsm-label">viajeros alojados</span>
+        </div>
+        <div class="hsm-stat">
+          <svg class="icon"><use href="#i-home"/></svg>
+          <span class="hsm-number"><span data-count-to="5">0</span></span>
+          <span class="hsm-label">viviendas gestionadas</span>
+        </div>
       </div>
     </div>
   </div>
