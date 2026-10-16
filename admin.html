@@ -266,6 +266,13 @@ main.wrap{padding:40px 24px 90px;}
             </div>
           </div>
         </div>
+        <div class="form-grid" style="width:100%">
+          <div class="field full"><label style="font-size:15px">Blogs destacados en el inicio ("Qué hacer y ver en Conil de la Frontera")</label>
+            <p class="slug-hint" style="margin:0 0 6px">Elige qué 3 entradas del blog aparecen en la portada, debajo de las preguntas frecuentes. Si dejas alguna sin elegir, se rellena con las entradas publicadas más recientes.</p></div>
+          <div class="field"><label for="ap-blog-1">Blog 1</label><select id="ap-blog-1"></select></div>
+          <div class="field"><label for="ap-blog-2">Blog 2</label><select id="ap-blog-2"></select></div>
+          <div class="field"><label for="ap-blog-3">Blog 3</label><select id="ap-blog-3"></select></div>
+        </div>
         <div class="form-actions" style="width:100%">
           <button type="button" class="btn btn-ghost" id="btnResetApariencia">Restablecer a valores por defecto</button>
           <button type="button" class="btn btn-primary" id="btnSaveApariencia">Guardar apariencia</button>
@@ -2544,6 +2551,15 @@ async function loadApariencia(){
   document.getElementById("ap-subtitulo").value = s.hero_subtitulo || "";
   draftHeroImage = s.hero_image || null;
   renderApHeroThumb();
+  var pr = await sb.from("blog_posts").select("id,titulo").eq("publicado", true).order("orden", {ascending:true});
+  var posts = (pr && pr.data) || [];
+  [1,2,3].forEach(function(n){
+    var sel = document.getElementById("ap-blog-"+n);
+    sel.innerHTML = '<option value="">(automático)</option>' + posts.map(function(p){
+      return '<option value="'+p.id+'">'+String(p.titulo||p.id).replace(/</g,"&lt;")+'</option>';
+    }).join("");
+    sel.value = s["inicio_blog_"+n] || "";
+  });
 }
 
 function renderApHeroThumb(){
@@ -2578,6 +2594,9 @@ document.getElementById("btnSaveApariencia").addEventListener("click", async fun
     hero_titulo_sub: document.getElementById("ap-titulo-sub").value.trim() || null,
     hero_subtitulo: document.getElementById("ap-subtitulo").value.trim() || null,
     hero_image: draftHeroImage || null,
+    inicio_blog_1: document.getElementById("ap-blog-1").value || null,
+    inicio_blog_2: document.getElementById("ap-blog-2").value || null,
+    inicio_blog_3: document.getElementById("ap-blog-3").value || null,
     updated_at: new Date().toISOString()
   };
   var res = await sb.from("site_settings").upsert(payload);
@@ -2597,6 +2616,7 @@ document.getElementById("btnResetApariencia").addEventListener("click", function
   document.getElementById("ap-subtitulo").value = "";
   draftHeroImage = null;
   renderApHeroThumb();
+  [1,2,3].forEach(function(n){ document.getElementById("ap-blog-"+n).value = ""; });
 });
 
 })();
