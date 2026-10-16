@@ -306,19 +306,16 @@ input,textarea{font:inherit;}
   font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:999px;
 }
 .interest-badge svg{width:15px;height:15px;flex-shrink:0;}
-.google-reviews-section{position:relative;overflow:hidden;padding:76px 0;background:linear-gradient(135deg,var(--atlantic) 0%,var(--atlantic-dark) 100%);color:#fff;}
-.gr-blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.35;pointer-events:none;}
-.gr-blob-1{width:360px;height:360px;background:var(--bougain);top:-140px;left:-100px;}
-.gr-blob-2{width:300px;height:300px;background:var(--sol);bottom:-120px;right:-80px;}
-.gr-card{position:relative;max-width:600px;margin:0 auto;text-align:center;}
+.google-reviews-section{padding:20px 0 70px;}
+.gr-card{max-width:640px;margin:0 auto;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:44px 32px 40px;}
 .gr-google-badge{
-  display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.1);
-  border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(6px);
-  padding:8px 16px;border-radius:999px;font-family:var(--ff-mono);font-size:12px;
-  letter-spacing:.04em;margin-bottom:26px;color:rgba(255,255,255,.9);
+  display:inline-flex;align-items:center;gap:8px;background:var(--teal-soft);color:var(--teal);
+  padding:8px 14px;border-radius:999px;font-family:var(--ff-mono);font-size:12px;font-weight:600;
+  margin-bottom:24px;
 }
+.gr-google-badge .icon{width:15px;height:15px;}
 .gr-score-row{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:8px;}
-.gr-number{font-family:var(--ff-display);font-size:58px;font-weight:600;line-height:1;}
+.gr-number{font-family:var(--ff-display);font-size:58px;font-weight:600;line-height:1;color:var(--atlantic);}
 .gr-stars{display:flex;gap:5px;}
 .gr-stars svg{width:28px;height:28px;color:var(--sol);fill:var(--sol);opacity:0;transform:scale(.4) rotate(-18deg);animation:grStarPop .55s cubic-bezier(.34,1.56,.64,1) forwards;animation-play-state:paused;}
 .google-reviews-section.gr-in-view .gr-stars svg{animation-play-state:running;}
@@ -328,9 +325,9 @@ input,textarea{font:inherit;}
 .gr-stars svg:nth-child(4){animation-delay:.35s}
 .gr-stars svg:nth-child(5){animation-delay:.45s}
 @keyframes grStarPop{to{opacity:1;transform:scale(1) rotate(0)}}
-.gr-reviews-count{font-family:var(--ff-mono);font-size:14.5px;color:rgba(255,255,255,.72);margin-bottom:22px;}
-.gr-reviews-count b{color:#fff;font-size:16px;}
-.gr-text{font-size:16.5px;line-height:1.65;color:rgba(255,255,255,.88);max-width:460px;margin:0 auto 30px;}
+.gr-reviews-count{font-family:var(--ff-mono);font-size:14.5px;color:var(--ink-soft);margin-bottom:20px;}
+.gr-reviews-count b{color:var(--ink);font-size:16px;}
+.gr-text{font-size:16.5px;line-height:1.65;color:var(--ink-soft);max-width:460px;margin:0 auto 28px;}
 @media (max-width:600px){
   .gr-number{font-size:44px;}
   .gr-stars svg{width:22px;height:22px;}
@@ -810,11 +807,9 @@ input,textarea{font:inherit;}
 
 <!-- ============ RESEÑAS DE GOOGLE ============ -->
 <section class="google-reviews-section reveal" id="googleReviews">
-  <div class="gr-blob gr-blob-1" aria-hidden="true"></div>
-  <div class="gr-blob gr-blob-2" aria-hidden="true"></div>
   <div class="wrap">
     <div class="gr-card">
-      <span class="gr-google-badge"><svg class="icon" style="width:18px;height:18px"><use href="#i-google-g"/></svg>Perfil verificado en Google</span>
+      <span class="gr-google-badge"><svg class="icon"><use href="#i-check"/></svg>Perfil verificado en Google</span>
       <div class="gr-score-row">
         <span class="gr-number" id="grNumber" data-count-to="5.0" data-decimals="1">0.0</span>
         <div class="gr-stars" id="grStars">
