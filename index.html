@@ -418,11 +418,19 @@ input,textarea{font:inherit;}
 /* ============ CONTACT ============ */
 /* ---- Banner "Anúnciate gratis" ---- */
 .anun-banner-section{padding:0 0 60px;}
-.anun-banner{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px 26px;box-shadow:var(--shadow-card);}
-.anun-banner .eyebrow{margin-bottom:2px;}
-.anun-banner h3{font-family:var(--ff-display);font-weight:600;font-size:clamp(18px,2vw,21px);margin:0;color:var(--atlantic);}
-.anun-banner p{font-size:13.5px;color:var(--ink-soft);margin:3px 0 0;}
-.anun-banner .btn{white-space:nowrap;}
+.anun-banner{position:relative;display:flex;align-items:center;gap:22px;flex-wrap:wrap;border-radius:28px;padding:26px 30px;overflow:hidden;
+  background:radial-gradient(120% 160% at 100% 0%,rgba(231,177,92,.28) 0%,rgba(231,177,92,0) 55%),linear-gradient(135deg,var(--teal-soft) 0%,#fff 70%);
+  border:1px solid var(--line);box-shadow:0 22px 44px -28px rgba(11,61,92,.45);transition:transform .3s ease,box-shadow .3s ease;}
+.anun-banner:hover{transform:translateY(-3px);box-shadow:0 28px 52px -26px rgba(11,61,92,.5);}
+.anun-banner-icon{width:58px;height:58px;border-radius:18px;background:var(--atlantic);color:var(--sol);display:grid;place-items:center;flex-shrink:0;box-shadow:0 12px 22px -12px rgba(11,61,92,.7);}
+.anun-banner-icon .icon{width:27px;height:27px;}
+.anun-banner-text{flex:1;min-width:220px;}
+.anun-banner h3{font-family:var(--ff-display);font-weight:600;font-size:clamp(21px,2.4vw,27px);line-height:1.15;margin:0;color:var(--atlantic);}
+.anun-banner h3 em{font-style:normal;color:var(--bougain);}
+.anun-banner-cta{display:inline-flex;align-items:center;gap:10px;background:var(--atlantic);color:#fff;font-weight:700;font-size:14.5px;padding:14px 22px;border-radius:999px;white-space:nowrap;transition:background .2s ease;}
+.anun-banner-cta .icon{width:16px;height:16px;transition:transform .2s ease;}
+.anun-banner-cta:hover{background:var(--atlantic-dark);}
+.anun-banner-cta:hover .icon{transform:translateX(4px);}
 .contact{background:var(--cal);color:var(--ink);padding:30px 0 90px;position:relative;}
 .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
 .contact-grid h2{font-family:var(--ff-display);font-weight:600;font-size:clamp(28px,3.6vw,40px);line-height:1.1;color:var(--atlantic);margin:12px 0 16px;}
@@ -951,12 +959,11 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
 <section class="anun-banner-section reveal" id="anunciateBanner">
   <div class="wrap">
     <div class="anun-banner">
-      <div>
-        <span class="eyebrow">¿Tienes una vivienda en Conil?</span>
-        <h3>Anúnciate con nosotros gratis</h3>
-        <p>Mostramos tu alojamiento en la web y en nuestras redes sociales: Facebook, Instagram y TikTok.</p>
+      <div class="anun-banner-icon"><svg class="icon"><use href="#i-home"/></svg></div>
+      <div class="anun-banner-text">
+        <h3>¿Tienes una casa en Conil? <em>Anúnciate gratis</em></h3>
       </div>
-      <a class="btn btn-dark" href="/anunciate/">Quiero anunciarme<svg class="icon" style="width:16px;height:16px"><use href="#i-chev-r"/></svg></a>
+      <a class="anun-banner-cta" href="/anunciate/">Anúnciate con nosotros<svg class="icon"><use href="#i-chev-r"/></svg></a>
     </div>
   </div>
 </section>
