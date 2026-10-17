@@ -1989,7 +1989,25 @@ function shDibujaMes(ctx, x, y, w, h, year, month, hoyIso){
     shDibujaCelda(ctx, cx2, cy2, cw, ch, shEstadoDia(iso), iso < hoyIso, dnum);
   }
 }
+var shLogoImg = null;
+function shCargaLogo(){
+  return new Promise(function(res){
+    if(shLogoImg) return res(shLogoImg);
+    var im = new Image();
+    im.onload = function(){ shLogoImg = im; res(im); };
+    im.onerror = function(){ res(null); };
+    im.src = "/images/logo-conil-vacaciones.png";
+  });
+}
 function shDibujaLogo(ctx, W, y){
+  if(shLogoImg){
+    var h = 214, w = h * shLogoImg.naturalWidth / shLogoImg.naturalHeight;
+    ctx.drawImage(shLogoImg, (W - w)/2, y - 8, w, h);
+    return;
+  }
+  shDibujaLogoTexto(ctx, W, y);
+}
+function shDibujaLogoTexto(ctx, W, y){
   // sol
   var sx = W/2 + 150, sy = y + 22;
   ctx.save(); ctx.strokeStyle = "#E7B15C"; ctx.fillStyle = "#F2B84B"; ctx.lineWidth = 4; ctx.lineCap = "round";
@@ -2044,6 +2062,7 @@ async function renderOcupacionImagen(){
       document.fonts.load("500 20px Archivo"), document.fonts.load("600 20px Archivo"), document.fonts.load("700 20px Archivo")
     ]);
   }catch(e){}
+  await shCargaLogo();
   if(token !== shRenderToken) return;
   var vertical = document.getElementById("sh-fmt").value === "vt";
   var W = 1080, H = vertical ? 1350 : 1080;
