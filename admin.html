@@ -176,7 +176,7 @@ main.wrap{padding:40px 24px 90px;}
 .reserva-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--cal);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13.5px;}
 .reserva-row b{font-family:var(--ff-mono);font-weight:500;}
 .reserva-row span.nota{color:var(--ink-soft);font-size:12.5px;}
-#reservaForm{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);}
+#reservaForm,#ofertaForm{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 </head>
@@ -566,6 +566,23 @@ main.wrap{padding:40px 24px 90px;}
   </div>
 </div>
 
+<!-- ============ MODAL: OFERTAS POR FECHAS ============ -->
+<div class="modal-backdrop" id="ofertasModalBackdrop">
+  <div class="modal-panel">
+    <button class="modal-close" id="ofertasModalClose">×</button>
+    <h2 id="ofertasTitle">Ofertas por fechas</h2>
+    <p class="slug-hint" style="margin-bottom:12px">Pon un descuento a unas fechas concretas (por ejemplo, si se ha quedado libre una semana). En la web saldrá como "Oferta −20 %: del 4 al 10 septiembre" y el descuento se aplicará a esas noches en el precio estimado. Cuando pasa la fecha, la oferta desaparece sola.</p>
+    <div id="ofertasList"></div>
+    <form id="ofertaForm">
+      <div class="field"><label for="of-inicio">Desde (entrada)</label><input id="of-inicio" type="date" required></div>
+      <div class="field"><label for="of-fin">Hasta (salida)</label><input id="of-fin" type="date" required></div>
+      <div class="field"><label for="of-desc">Descuento (%)</label><input id="of-desc" type="number" min="1" max="90" placeholder="Ej. 20" required></div>
+      <div class="field full" style="text-align:right"><button type="submit" class="btn btn-dark">Añadir oferta</button></div>
+      <p class="form-error" id="ofertaFormError" style="grid-column:1/-1"></p>
+    </form>
+  </div>
+</div>
+
 <!-- ============ MODAL: PRECIOS POR TEMPORADA ============ -->
 <div class="modal-backdrop" id="preciosModalBackdrop">
   <div class="modal-panel">
@@ -820,6 +837,7 @@ async function loadViviendas(){
       '<div class="v-actions">'+
         '<button class="btn btn-ghost btn-sm" data-fechas="'+v.id+'">Fechas</button>'+
         '<button class="btn btn-ghost btn-sm" data-precios="'+v.id+'">Precios</button>'+
+        '<button class="btn btn-ghost btn-sm" data-ofertas="'+v.id+'">Ofertas</button>'+
         '<button class="btn btn-ghost btn-sm" data-editar="'+v.id+'">Editar</button>'+
         '<button class="btn btn-danger btn-sm" data-borrar="'+v.id+'">Eliminar</button>'+
       '</div>'+
@@ -844,6 +862,7 @@ async function loadViviendas(){
 
   list.querySelectorAll("[data-editar]").forEach(function(b){ b.addEventListener("click", function(){ openViviendaForm(b.getAttribute("data-editar")); }); });
   list.querySelectorAll("[data-borrar]").forEach(function(b){ b.addEventListener("click", function(){ borrarVivienda(b.getAttribute("data-borrar")); }); });
+  list.querySelectorAll("[data-ofertas]").forEach(function(b){ b.addEventListener("click", function(){ openOfertas(b.getAttribute("data-ofertas")); }); });
   list.querySelectorAll("[data-fechas]").forEach(function(b){ b.addEventListener("click", function(){ openReservas(b.getAttribute("data-fechas")); }); });
   list.querySelectorAll("[data-precios]").forEach(function(b){ b.addEventListener("click", function(){ openPrecios(b.getAttribute("data-precios")); }); });
   list.querySelectorAll("[data-activo]").forEach(function(chk){
@@ -1728,6 +1747,77 @@ document.getElementById("reservaForm").addEventListener("submit", async function
   }
   document.getElementById("reservaForm").reset();
   loadReservasList();
+});
+
+/* ============ OFERTAS POR FECHAS ============ */
+var ofertasBackdrop = document.getElementById("ofertasModalBackdrop");
+var ofertasViviendaId = null;
+document.getElementById("ofertasModalClose").addEventListener("click", closeOfertas);
+ofertasBackdrop.addEventListener("click", function(e){ if(e.target === ofertasBackdrop) closeOfertas(); });
+function closeOfertas(){
+  ofertasBackdrop.classList.remove("open");
+  document.body.style.overflow = "";
+}
+async function openOfertas(viviendaId){
+  ofertasViviendaId = viviendaId;
+  var v = viviendas.find(function(x){ return x.id === viviendaId; });
+  document.getElementById("ofertasTitle").textContent = "Ofertas por fechas · " + (v ? v.nombre : "");
+  document.getElementById("ofertaForm").reset();
+  document.getElementById("ofertaFormError").style.display = "none";
+  await loadOfertasList();
+  ofertasBackdrop.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function fmtOfertaFecha(iso){
+  var p = iso.split("-");
+  return parseInt(p[2],10) + "/" + parseInt(p[1],10) + "/" + p[0];
+}
+async function loadOfertasList(){
+  var box = document.getElementById("ofertasList");
+  box.innerHTML = '<p class="empty-note">Cargando…</p>';
+  var res = await sb.from("ofertas_fechas").select("*").eq("vivienda_id", ofertasViviendaId).order("fecha_inicio", {ascending:true});
+  if(res.error){
+    box.innerHTML = '<p class="empty-note" style="color:var(--bougain)">Error: '+res.error.message+'</p>';
+    return;
+  }
+  var rows = res.data || [];
+  if(rows.length === 0){
+    box.innerHTML = '<p class="empty-note">No hay ofertas por fechas.</p>';
+    return;
+  }
+  var hoy = new Date().toISOString().slice(0,10);
+  box.innerHTML = rows.map(function(r){
+    var pasada = r.fecha_fin < hoy;
+    return '<div class="reserva-row"><span><b>−'+r.descuento+' %</b> · '+fmtOfertaFecha(r.fecha_inicio)+' → '+fmtOfertaFecha(r.fecha_fin)+(pasada?' <span class="nota">· caducada</span>':'')+'</span>'+
+      '<button type="button" class="btn btn-danger btn-sm" data-del-oferta="'+r.id+'">Eliminar</button></div>';
+  }).join("");
+  box.querySelectorAll("[data-del-oferta]").forEach(function(b){
+    b.addEventListener("click", async function(){
+      if(!confirm("¿Eliminar esta oferta?")) return;
+      await sb.from("ofertas_fechas").delete().eq("id", b.getAttribute("data-del-oferta"));
+      loadOfertasList();
+    });
+  });
+}
+document.getElementById("ofertaForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  var errEl = document.getElementById("ofertaFormError");
+  errEl.style.display = "none";
+  var inicio = document.getElementById("of-inicio").value;
+  var fin = document.getElementById("of-fin").value;
+  var desc = parseInt(document.getElementById("of-desc").value, 10);
+  var msg = "";
+  if(!inicio || !fin || fin <= inicio) msg = "Revisa las fechas: la salida debe ser posterior a la entrada.";
+  else if(!desc || desc < 1 || desc > 90) msg = "El descuento debe estar entre 1 y 90 %.";
+  if(msg){ errEl.textContent = msg; errEl.style.display = "block"; return; }
+  var res = await sb.from("ofertas_fechas").insert({ vivienda_id: ofertasViviendaId, fecha_inicio: inicio, fecha_fin: fin, descuento: desc });
+  if(res.error){
+    errEl.textContent = "Error al guardar: "+res.error.message;
+    errEl.style.display = "block";
+    return;
+  }
+  document.getElementById("ofertaForm").reset();
+  loadOfertasList();
 });
 
 /* ============ PRECIOS POR TEMPORADA ============ */
