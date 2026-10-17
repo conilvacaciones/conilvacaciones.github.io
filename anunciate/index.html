@@ -506,6 +506,8 @@ input,textarea{font:inherit;}
 @media (min-width:641px){ .anun-ventajas-grid{grid-template-columns:repeat(2,1fr);} }
 @media (min-width:1025px){ .anun-ventajas-grid{grid-template-columns:repeat(3,1fr);} }
 .anun-ventaja-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-md);padding:26px 24px;box-shadow:var(--shadow-card);}
+.anun-ventaja-card.reveal{transition:opacity .7s ease, transform .3s ease, box-shadow .3s ease;}
+.anun-ventaja-card.reveal.is-visible:hover{transform:translateY(-6px);box-shadow:0 26px 50px -20px rgba(11,61,92,.42);}
 .anun-ventaja-card .num{font-family:var(--ff-mono);font-size:13px;color:var(--sol-dark);font-weight:700;margin-bottom:10px;}
 .anun-ventaja-card h3{font-family:var(--ff-display);font-weight:600;font-size:18px;color:var(--atlantic);margin-bottom:8px;}
 .anun-ventaja-card p{font-size:14px;line-height:1.6;color:var(--ink-soft);}
