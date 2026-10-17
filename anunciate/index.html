@@ -495,6 +495,8 @@ input,textarea{font:inherit;}
 .anun-hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px;}
 .anun-hero-img{border-radius:var(--radius-lg);overflow:hidden;aspect-ratio:4/3;box-shadow:var(--shadow-card);background:linear-gradient(135deg,var(--atlantic),var(--teal));}
 .anun-hero-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.anun-hero-img{transition:transform .3s ease, box-shadow .3s ease;}
+.anun-hero-img:hover{transform:translateY(-6px);box-shadow:0 26px 50px -20px rgba(11,61,92,.42);}
 @media (max-width:860px){
   .anun-hero-grid{grid-template-columns:1fr;}
   .anun-hero-img{order:-1;aspect-ratio:16/9;}
