@@ -450,6 +450,13 @@ input,textarea{font:inherit;}
 .reviews-section h4{font-family:var(--ff-display);font-weight:600;font-size:19px;color:var(--atlantic);}
 .booking-info-section{margin-top:34px;padding-top:26px;border-top:1px solid var(--line);}
 .booking-info-section h4{font-family:var(--ff-display);font-weight:600;font-size:19px;color:var(--atlantic);margin-bottom:14px;}
+.booking-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.bi-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;}
+.bi-ic{width:36px;height:36px;border-radius:11px;background:#fdeaf0;color:var(--bougain);display:grid;place-items:center;margin-bottom:12px;}
+.bi-ic .icon{width:18px;height:18px;}
+.bi-card b{display:block;color:var(--atlantic);font-size:16px;margin-bottom:6px;}
+.bi-card p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink-soft);}
+@media(max-width:760px){.booking-info-grid{grid-template-columns:1fr;}}
 .booking-info-list{list-style:none;padding:0;margin:0;display:grid;gap:10px;}
 .booking-info-list li{position:relative;padding-left:22px;font-size:14px;line-height:1.55;color:var(--ink-soft);}
 .booking-info-list li:before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--sol);}
@@ -802,11 +809,11 @@ html{scroll-behavior:smooth;}
       <div class="booking-info-section">
         <span class="eyebrow">Antes de escribir</span>
         <h4>Información de la reserva</h4>
-        <ul class="booking-info-list">
-          <li>Conil Vacaciones facilita el contacto entre la persona interesada y el propietario de esta vivienda.</li>
-          <li>El pago de la estancia se realiza directamente al propietario, nunca a través de esta web.</li>
-          <li>El propietario es responsable de la prestación del alojamiento (llaves, limpieza y atención durante la estancia).</li>
-        </ul>
+        <div class="booking-info-grid">
+          <div class="bi-card"><span class="bi-ic"><svg class="icon"><use href="#i-chat"/></svg></span><b>Trato directo</b><p>Conil Vacaciones te pone en contacto con el propietario de esta vivienda.</p></div>
+          <div class="bi-card"><span class="bi-ic"><svg class="icon"><use href="#i-check"/></svg></span><b>Pago al propietario</b><p>El pago de la estancia se hace directamente al propietario, nunca a través de esta web.</p></div>
+          <div class="bi-card"><span class="bi-ic"><svg class="icon"><use href="#i-heart"/></svg></span><b>Llaves y atención</b><p>El propietario es responsable del alojamiento: llaves, limpieza y atención durante la estancia.</p></div>
+        </div>
       </div>
 
       <div class="reviews-section">
