@@ -559,6 +559,8 @@ input,textarea{font:inherit;}
 .cookie-banner-actions{display:flex;gap:12px;flex-wrap:wrap;flex-shrink:0;}
 .cookie-banner-actions .btn{padding:10px 18px;font-size:13.5px;}
 @media (max-width:640px){ .cookie-banner-inner{flex-direction:column;align-items:stretch;} .cookie-banner-actions{justify-content:flex-end;} }
+.date-offers{display:flex;flex-wrap:wrap;gap:6px;margin:0;}
+.date-offer-chip{display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:var(--bougain-dark);background:rgba(214,51,108,.09);border:1px solid rgba(214,51,108,.28);padding:5px 11px;border-radius:999px;line-height:1.3;}
 </style>
 <script type="application/ld+json" id="viviendaJsonLd"></script>
 </head>
@@ -668,6 +670,7 @@ input,textarea{font:inherit;}
           <b id="modalPrice">Consultar precio</b>
           <div><span style="font-size:12px;color:var(--ink-soft)" id="modalPriceUnit">por noche</span></div>
           <p id="modalOfferNote" style="display:none;font-size:12px;font-weight:600;color:var(--bougain-dark);margin-top:4px">⏳ Oferta</p>
+          <div id="modalDateOffers" style="margin-top:6px"></div>
         </div>
       </div>
       <p class="modal-desc" id="modalDesc"></p>
@@ -1206,6 +1209,12 @@ async function initHouses(){
     if(preciosRes.error) throw preciosRes.error;
     var temporadasRes = await sb.from("temporadas_especiales").select("*");
     if(temporadasRes.error) throw temporadasRes.error;
+    var ofertasFechasRes = await sb.from("ofertas_fechas").select("*");
+    var ofertasFechasByVivienda = {};
+    (ofertasFechasRes.data || []).forEach(function(r){
+      if(!ofertasFechasByVivienda[r.vivienda_id]) ofertasFechasByVivienda[r.vivienda_id] = [];
+      ofertasFechasByVivienda[r.vivienda_id].push({ inicio: r.fecha_inicio, fin: r.fecha_fin, descuento: r.descuento });
+    });
 
     var reservasByVivienda = {};
     (reservasRes.data || []).forEach(function(r){
@@ -1268,6 +1277,7 @@ async function initHouses(){
         priceUnit: row.unidad_precio || "noche",
         preciosMensuales: preciosByVivienda[row.id] || {},
         temporadas: temporadasByVivienda[row.id] || [],
+        ofertasFechas: ofertasFechasByVivienda[row.id] || [],
         ratingInfo: ratingInfo,
         realRatingInfo: realRatingInfo,
         badges: row.badges || [],
@@ -1775,6 +1785,42 @@ function applyOfferDiscount(house, price){
   return price * (1 - house.ofertaDescuento / 100);
 }
 
+
+/* ============ OFERTAS POR FECHAS ============ */
+// Ofertas puntuales para unas fechas concretas de estancia (ej. "del 4 al 10 de septiembre -20 %").
+var MESES_LARGOS = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+function upcomingDateOffers(house){
+  var hoy = new Date(); hoy.setHours(0,0,0,0);
+  return (house.ofertasFechas || []).filter(function(o){ return parseISO(o.fin) >= hoy; })
+    .sort(function(a,b){ return a.inicio < b.inicio ? -1 : 1; });
+}
+function formatDateOfferRange(o){
+  var a = parseISO(o.inicio), b = parseISO(o.fin);
+  if(a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear()){
+    return "del " + a.getDate() + " al " + b.getDate() + " " + MESES_LARGOS[b.getMonth()];
+  }
+  return "del " + a.getDate() + " " + MESES_LARGOS[a.getMonth()] + " al " + b.getDate() + " " + MESES_LARGOS[b.getMonth()];
+}
+function dateOfferLabel(o){
+  return "Oferta \u2212" + o.descuento + " %: " + formatDateOfferRange(o);
+}
+function dateOffersHTML(house, max){
+  var list = upcomingDateOffers(house).slice(0, max || 2);
+  if(!list.length) return "";
+  return '<div class="date-offers">' + list.map(function(o){
+    return '<span class="date-offer-chip">' + dateOfferLabel(o) + '</span>';
+  }).join("") + '</div>';
+}
+// % de descuento por oferta de fechas para la NOCHE que empieza en "date" (0 si no hay)
+function dateOfferPctForNight(house, date){
+  var iso = date.getFullYear() + "-" + String(date.getMonth()+1).padStart(2,"0") + "-" + String(date.getDate()).padStart(2,"0");
+  var best = 0;
+  (house.ofertasFechas || []).forEach(function(o){
+    if(iso >= o.inicio && iso < o.fin && o.descuento > best) best = o.descuento;
+  });
+  return best;
+}
+
 function getWeeklyRateForDate(house, date){
   if(house.temporadas){
     for(var i=0;i<house.temporadas.length;i++){
@@ -1831,6 +1877,8 @@ function updateModalPrice(){
   var oldEl = document.getElementById("modalPriceOld");
   var offerNoteEl = document.getElementById("modalOfferNote");
   var oferta = isOfferActive(currentHouse);
+  var dateOffersEl = document.getElementById("modalDateOffers");
+  if(dateOffersEl) dateOffersEl.innerHTML = dateOffersHTML(currentHouse, 4);
 
   if(semanal){
     if(oferta){
@@ -1983,22 +2031,25 @@ function updateSummary(){
       return;
     }
 
-    var total = 0, sinPrecio = false;
+    var total = 0, totalConDescuento = 0, sinPrecio = false, maxPct = 0;
+    var pctGlobal = isOfferActive(currentHouse) ? currentHouse.ofertaDescuento : 0;
     var d = new Date(selStart);
     for(var i=0;i<nights;i++){
       var rate = getNightlyRateForDate(currentHouse, d);
       if(rate == null){ sinPrecio = true; break; }
+      var pct = Math.max(pctGlobal, dateOfferPctForNight(currentHouse, d));
+      if(pct > maxPct) maxPct = pct;
       total += rate;
+      totalConDescuento += rate * (1 - pct / 100);
       d = addDays(d, 1);
     }
-    var oferta = isOfferActive(currentHouse);
-    var totalConDescuento = oferta ? applyOfferDiscount(currentHouse, total) : total;
+    var oferta = maxPct > 0;
     var totalRow;
     if(sinPrecio){
       totalRow = '<p class="summary-placeholder" style="margin-top:6px">Te confirmamos el precio al escribirte.</p>';
     } else if(oferta){
       totalRow = '<div class="summary-total"><span>Total estimado</span><span><s style="font-family:var(--ff-mono);font-size:14px;color:rgba(241,242,234,.5);margin-right:6px">'+Math.round(total)+' €</s><b>'+Math.round(totalConDescuento)+' €</b></span></div>'+
-        '<p style="font-size:11px;color:var(--sol);font-weight:600;margin:-10px 0 4px">⏳ Oferta -'+currentHouse.ofertaDescuento+'% aplicada</p>';
+        '<p style="font-size:11px;color:var(--sol);font-weight:600;margin:-10px 0 4px">⏳ Oferta -'+maxPct+'% aplicada</p>';
     } else {
       totalRow = '<div class="summary-total"><span>Total estimado</span><b>'+Math.round(total)+' €</b></div>'+
         '<p style="font-size:11px;color:rgba(241,242,234,.55);margin:-10px 0 4px">Precio orientativo según temporada · confirmamos el importe exacto por WhatsApp</p>';
@@ -2010,7 +2061,7 @@ function updateSummary(){
       totalRow;
 
     var msg = 'Hola, me interesa reservar "'+currentHouse.name+'" en Conil del '+formatLong(selStart)+' al '+formatLong(selEnd)+' ('+nights+' noches). ¿Está disponible?'+
-      (!sinPrecio && oferta ? ' He visto que tiene la oferta del -'+currentHouse.ofertaDescuento+'% (total aprox. '+Math.round(totalConDescuento)+' €).' : '');
+      (!sinPrecio && oferta ? ' He visto que tiene la oferta del -'+maxPct+'% (total aprox. '+Math.round(totalConDescuento)+' €).' : '');
     waBtn.href = "https://wa.me/34650283373?text=" + encodeURIComponent(msg);
     waBtn.removeAttribute("disabled");
     var mailSubject = "Consulta de reserva - " + currentHouse.name;
