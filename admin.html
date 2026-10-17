@@ -61,16 +61,19 @@ main.wrap{padding:40px 24px 90px;}
 .toolbar h1{font-family:var(--ff-display);font-weight:600;font-size:26px;color:var(--atlantic);}
 
 #viviendasList{display:flex;flex-direction:column;gap:14px;}
-.v-row{background:var(--card);border-radius:var(--radius-md);padding:0;box-shadow:0 8px 22px -16px rgba(11,61,92,.35);overflow:hidden;}
-.v-row.is-hidden .v-main{opacity:.6;}
-.v-main{display:flex;align-items:center;gap:16px;padding:16px 20px;flex-wrap:wrap;}
-.v-thumb{width:84px;height:64px;border-radius:10px;background:var(--cal-2) center/cover no-repeat;flex:none;}
+.v-row{background:var(--card);border-radius:var(--radius-md);padding:16px 20px;display:flex;align-items:center;gap:18px;box-shadow:0 8px 22px -16px rgba(11,61,92,.35);flex-wrap:wrap;}
 .v-row .v-info{flex:1;min-width:200px;}
 .v-row .v-info b{font-family:var(--ff-display);font-size:17px;color:var(--ink);}
 .v-row .v-info span{display:block;font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+.v-row .v-price{font-family:var(--ff-mono);font-size:14px;color:var(--atlantic);min-width:110px;}
+.v-row .v-rating{font-family:var(--ff-mono);font-size:12.5px;color:#9C6B1F;min-width:130px;}
+.v-row .v-actions{display:flex;gap:8px;flex-wrap:wrap;}
+/* Tarjeta de vivienda (solo el listado de viviendas) */
+.v-row.vcard{display:block;padding:0;gap:0;overflow:hidden;}
+.v-row.vcard.is-hidden .v-main{opacity:.6;}
+.v-main{display:flex;align-items:center;gap:16px;padding:16px 20px;flex-wrap:wrap;}
+.v-thumb{width:84px;height:64px;border-radius:10px;background:var(--cal-2) center/cover no-repeat;flex:none;}
 .v-stats{display:flex;gap:18px;align-items:center;}
-.v-row .v-price{font-family:var(--ff-mono);font-size:14px;color:var(--atlantic);}
-.v-row .v-rating{font-family:var(--ff-mono);font-size:12.5px;color:#9C6B1F;}
 .v-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 20px;background:var(--cal);border-top:1px solid var(--line);}
 .v-bar .v-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .v-bar .v-actions-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-family:var(--ff-mono);margin-right:2px;}
@@ -833,7 +836,7 @@ async function loadViviendas(){
       ? "★ " + (votos.reduce(function(a,b){return a+b;},0)/votos.length).toFixed(1).replace(".",",") + "/5 (" + votos.length + ")"
       : "Sin reseñas";
     var thumb = (v.fotos && v.fotos[0]) ? sb.storage.from("fotos-viviendas").getPublicUrl(v.fotos[0]).data.publicUrl : "";
-    return '<div class="v-row'+(v.activo?'':' is-hidden')+'">'+
+    return '<div class="v-row vcard'+(v.activo?'':' is-hidden')+'">'+
       '<div class="v-main">'+
         '<div class="v-order">'+
           (idx>0 ? '<button type="button" class="btn btn-ghost btn-sm" data-mv-v="'+v.id+':up" title="Subir">↑</button>' : '')+
