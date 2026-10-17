@@ -590,6 +590,10 @@ main.wrap{padding:40px 24px 90px;}
           </select>
         </div>
       </div>
+      <div class="share-controls">
+        <div class="field" style="margin:0"><label for="sh-foto-izq">Foto esquina izquierda</label><select id="sh-foto-izq"></select></div>
+        <div class="field" style="margin:0"><label for="sh-foto-der">Foto esquina derecha</label><select id="sh-foto-der"></select></div>
+      </div>
       <canvas id="shCanvas" width="1080" height="1080"></canvas>
       <div style="text-align:right;margin-top:10px"><button type="button" class="btn btn-primary" id="btnShDownload">⬇ Descargar imagen (PNG)</button></div>
     </div>
@@ -1749,6 +1753,7 @@ async function openReservas(viviendaId){
   document.getElementById("reservasTitle").textContent = "Fechas ocupadas · " + (v ? v.nombre : "");
   document.getElementById("reservaForm").reset();
   document.getElementById("reservaFormError").style.display = "none";
+  shPoblarFotos(v);
   await loadReservasList();
   reservasBackdrop.classList.add("open");
   document.body.style.overflow = "hidden";
@@ -1916,6 +1921,38 @@ var SH_DIAS = ["LUN","MAR","MIÉ","JUE","VIE","SÁB","DOM"];
   document.getElementById("sh-fmt").addEventListener("change", renderOcupacionImagen);
 })();
 
+function shPoblarFotos(v){
+  var fotos = (v && v.fotos) || [];
+  ["sh-foto-izq","sh-foto-der"].forEach(function(id, k){
+    var sel = document.getElementById(id);
+    var html = '<option value="">(sin foto)</option>';
+    fotos.forEach(function(p, i){ html += '<option value="'+i+'">Foto '+(i+1)+'</option>'; });
+    sel.innerHTML = html;
+    sel.value = fotos[k] ? String(k) : "";
+    sel.onchange = renderOcupacionImagen;
+  });
+}
+var shFotoCache = {};
+function shCargaFoto(path){
+  return new Promise(function(res){
+    if(!path) return res(null);
+    if(shFotoCache[path]) return res(shFotoCache[path]);
+    var im = new Image();
+    im.crossOrigin = "anonymous";
+    im.onload = function(){ shFotoCache[path] = im; res(im); };
+    im.onerror = function(){ res(null); };
+    im.src = sb.storage.from("fotos-viviendas").getPublicUrl(path).data.publicUrl;
+  });
+}
+function shDibujaFoto(ctx, im, x, y, w, h){
+  ctx.save();
+  shRoundRect(ctx, x, y, w, h, 18); ctx.clip();
+  var r = Math.max(w/im.naturalWidth, h/im.naturalHeight);
+  var iw = im.naturalWidth*r, ih = im.naturalHeight*r;
+  ctx.drawImage(im, x + (w-iw)/2, y + (h-ih)/2, iw, ih);
+  ctx.restore();
+  ctx.save(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 5; shRoundRect(ctx, x, y, w, h, 18); ctx.stroke(); ctx.restore();
+}
 function shIso(y, m, d){ return y + "-" + String(m+1).padStart(2,"0") + "-" + String(d).padStart(2,"0"); }
 // Estado de un día: "libre", "ocupado", "salida" (libre por la tarde) o "entrada" (libre por la mañana)
 function shEstadoDia(iso){
@@ -2074,6 +2111,14 @@ async function renderOcupacionImagen(){
   ctx.fillStyle = "#FAFAF7"; ctx.fillRect(0, 0, W, H);
   var v = viviendas.find(function(x){ return x.id === reservasViviendaId; });
   shDibujaLogo(ctx, W, 24);
+  // fotos de las esquinas superiores
+  var fotosV = (v && v.fotos) || [];
+  var iz = document.getElementById("sh-foto-izq").value, de = document.getElementById("sh-foto-der").value;
+  var imIz = iz !== "" ? await shCargaFoto(fotosV[parseInt(iz,10)]) : null;
+  var imDe = de !== "" ? await shCargaFoto(fotosV[parseInt(de,10)]) : null;
+  if(token !== shRenderToken) return;
+  if(imIz) shDibujaFoto(ctx, imIz, 36, 26, 290, 196);
+  if(imDe) shDibujaFoto(ctx, imDe, W - 36 - 290, 26, 290, 196);
   // nombre de la vivienda
   var nombre = v ? v.nombre : "";
   var fs = 58; ctx.fillStyle = SH_C.navy; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
