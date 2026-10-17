@@ -2039,17 +2039,20 @@ function shDibujaLogoTexto(ctx, W, y){
 function shDibujaLeyenda(ctx, W, y){
   var items = [
     { t:"Disponible", e:"libre" }, { t:"Ocupado", e:"ocupado" },
-    { t:"Salida ese día (libre por la tarde)", e:"salida" }, { t:"Entrada ese día (libre por la mañana)", e:"entrada" }
+    { t:"Salida ese día", e:"salida" }, { t:"Entrada ese día", e:"entrada" }
   ];
-  ctx.font = "500 22px Archivo, Arial, sans-serif"; ctx.textBaseline = "middle"; ctx.textAlign = "left";
-  var colX = [48, 330], rowY = [y, y + 40];
+  ctx.font = "500 23px Archivo, Arial, sans-serif"; ctx.textBaseline = "middle"; ctx.textAlign = "left";
+  var sw = 34, pad = 12, gap = 34, total = 0;
+  var widths = items.map(function(it){ var w = sw + pad + ctx.measureText(it.t).width; total += w; return w; });
+  total += gap * (items.length - 1);
+  var x = (W - total) / 2;
   items.forEach(function(it, i){
-    var cx = i < 2 ? 48 : 48;
-    var x = i % 2 === 0 ? 48 : 330; var yy = i < 2 ? y : y + 42;
-    if(i >= 2){ x = 48; yy = y + 42 + (i-2)*42; }
-    shDibujaCelda(ctx, x, yy - 14, 34, 28, it.e, false, null);
-    ctx.fillStyle = SH_C.ink; ctx.fillText(it.t, x + 46, yy + 1);
+    shDibujaCelda(ctx, x, y - 14, sw, 28, it.e, false, null);
+    ctx.fillStyle = SH_C.ink; ctx.fillText(it.t, x + sw + pad, y + 1);
+    x += widths[i] + gap;
   });
+  ctx.font = "500 19px Archivo, Arial, sans-serif"; ctx.textAlign = "center"; ctx.fillStyle = "#5B6A75";
+  ctx.fillText("Salida: libre por la tarde  ·  Entrada: libre por la mañana", W/2, y + 44);
 }
 var shRenderToken = 0;
 async function renderOcupacionImagen(){
@@ -2080,7 +2083,7 @@ async function renderOcupacionImagen(){
   var parts = document.getElementById("sh-mes").value.split("-");
   var y0 = parseInt(parts[0],10), m0 = parseInt(parts[1],10);
   var n = vertical ? 6 : 4, rows = n/2, mx = 40, gapX = 24, gapY = 22;
-  var gridTop = 296, legendH = 205;
+  var gridTop = 296, legendH = 165;
   var mw = (W - mx*2 - gapX) / 2;
   var mh = (H - gridTop - legendH - gapY*(rows-1)) / rows;
   var hoy = new Date(); var hoyIso = shIso(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
@@ -2089,7 +2092,7 @@ async function renderOcupacionImagen(){
     var col = i % 2, row = Math.floor(i/2);
     shDibujaMes(ctx, mx + col*(mw+gapX), gridTop + row*(mh+gapY), mw, mh, d.getFullYear(), d.getMonth(), hoyIso);
   }
-  shDibujaLeyenda(ctx, W, H - legendH + 38);
+  shDibujaLeyenda(ctx, W, H - legendH + 40);
   ctx.fillStyle = SH_C.navy; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
   ctx.font = "700 26px Archivo, Arial, sans-serif";
   ctx.fillText("Reserva en conilvacaciones.github.io", W/2, H - 22);
