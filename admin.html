@@ -587,6 +587,7 @@ main.wrap{padding:40px 24px 90px;}
           <select id="sh-fmt">
             <option value="sq">Cuadrado · 4 meses (1080×1080)</option>
             <option value="vt">Vertical · 6 meses (1080×1350)</option>
+            <option value="m1">Un solo mes · cuadrado (1080×1080)</option>
           </select>
         </div>
       </div>
@@ -2173,7 +2174,8 @@ async function renderOcupacionImagen(){
   }catch(e){}
   await shCargaLogo();
   if(token !== shRenderToken) return;
-  var vertical = document.getElementById("sh-fmt").value === "vt";
+  var fmt = document.getElementById("sh-fmt").value;
+  var vertical = fmt === "vt";
   var W = 1080, H = vertical ? 1350 : 1080;
   canvas.width = W; canvas.height = H;
   var ctx = canvas.getContext("2d");
@@ -2199,14 +2201,14 @@ async function renderOcupacionImagen(){
   // meses
   var parts = document.getElementById("sh-mes").value.split("-");
   var y0 = parseInt(parts[0],10), m0 = parseInt(parts[1],10);
-  var n = vertical ? 6 : 4, rows = n/2, mx = 40, gapX = 24, gapY = 22;
+  var n = fmt === "m1" ? 1 : (vertical ? 6 : 4), cols = n === 1 ? 1 : 2, rows = Math.ceil(n/cols), mx = 40, gapX = 24, gapY = 22;
   var gridTop = 302, legendH = 150;
-  var mw = (W - mx*2 - gapX) / 2;
+  var mw = (W - mx*2 - gapX*(cols-1)) / cols;
   var mh = (H - gridTop - legendH - gapY*(rows-1)) / rows;
   var hoy = new Date(); var hoyIso = shIso(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
   for(var i=0;i<n;i++){
     var d = new Date(y0, m0 + i, 1);
-    var col = i % 2, row = Math.floor(i/2);
+    var col = i % cols, row = Math.floor(i/cols);
     shDibujaMes(ctx, mx + col*(mw+gapX), gridTop + row*(mh+gapY), mw, mh, d.getFullYear(), d.getMonth(), hoyIso);
   }
   shDibujaLeyenda(ctx, W, H - legendH + 38);
