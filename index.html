@@ -804,7 +804,7 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
     </div>
     <div class="search-widget reveal" id="searchWidget">
       <h3>Encuentra tu casa ideal</h3>
-      <p class="search-sub">Dinos tus fechas, cuántos sois y qué necesitáis, y te recomendamos las casas que mejor encajan.</p>
+      <p class="search-sub">Dinos tus fechas y cuántos sois, y te recomendamos las casas que mejor encajan.</p>
       <div class="search-row">
         <div class="search-field">
           <label for="searchCheckin">Entrada</label>
@@ -818,14 +818,6 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
           <label for="searchGuests">Personas</label>
           <input type="number" id="searchGuests" min="1" max="30" value="2">
         </div>
-      </div>
-      <div class="search-needs" id="searchNeeds">
-        <label><input type="checkbox" data-need="i-pool">Piscina</label>
-        <label><input type="checkbox" data-need="i-pets">Se admiten mascotas</label>
-        <label><input type="checkbox" data-need="i-garden">Jardín / terraza</label>
-        <label><input type="checkbox" data-need="i-snow">Aire acondicionado</label>
-        <label><input type="checkbox" data-need="i-parking">Parking</label>
-        <label><input type="checkbox" data-need="i-wifi">WiFi</label>
       </div>
       <div class="search-actions">
         <button class="btn btn-primary" id="searchBtn">Buscar y recomendar</button>
@@ -861,11 +853,11 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
       </details>
       <details class="faq-item">
         <summary>¿Se admiten mascotas?</summary>
-        <p class="faq-answer">Depende de cada vivienda: algunas de las viviendas publicadas aceptan mascotas y otras no, según las condiciones que fija el propietario. Para no perder tiempo mirando una por una, usa el buscador de la página de inicio. Marca la opción "Se admiten mascotas" junto con tus fechas y número de personas, y verás solo las viviendas compatibles con tu mascota.</p>
+        <p class="faq-answer">Depende de cada vivienda: algunas de las viviendas publicadas aceptan mascotas y otras no, según las condiciones que fija el propietario. Puedes ver las condiciones de cada una en su ficha, o preguntarnos por WhatsApp y te indicamos cuáles admiten mascotas.</p>
       </details>
       <details class="faq-item">
         <summary>¿Las casas tienen piscina, aire acondicionado o parking?</summary>
-        <p class="faq-answer">Los servicios disponibles varían de una vivienda a otra: no todas cuentan con piscina, aire acondicionado o plaza de parking propia. El buscador del inicio te permite filtrar por piscina, aire acondicionado, parking, WiFi y jardín o terraza. Puedes combinarlo además con tus fechas y el número de personas.</p>
+        <p class="faq-answer">Los servicios disponibles varían de una vivienda a otra: no todas cuentan con piscina, aire acondicionado o plaza de parking propia. Puedes ver los servicios de cada una en su ficha, o preguntarnos por WhatsApp y te recomendamos la que mejor encaje.</p>
       </details>
       <details class="faq-item">
         <summary>¿Trabajáis con agencias o centrales de reservas?</summary>
@@ -934,8 +926,8 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
     {"@type":"Question","name":"¿Cómo puedo reservar una vivienda?","acceptedAnswer":{"@type":"Answer","text":"Elige la vivienda que te interese en el listado y abre su ficha completa, donde encontrarás fotos, descripción, servicios y el calendario de disponibilidad en tiempo real. Selecciona tus fechas de entrada y salida y contacta directamente con el propietario por WhatsApp o email a través de nuestro formulario. La disponibilidad, el pago y la confirmación de la reserva se acuerdan siempre directamente con el propietario de la vivienda."}},
     {"@type":"Question","name":"¿Tiene algún coste consultar disponibilidad?","acceptedAnswer":{"@type":"Answer","text":"No, consultar disponibilidad y pedir información es completamente gratis y no supone ningún compromiso por tu parte. Puedes escribirnos tantas veces como necesites para resolver dudas sobre una vivienda, comparar fechas o preguntar por servicios concretos antes de decidirte."}},
     {"@type":"Question","name":"¿La estancia mínima es la misma en todas las viviendas?","acceptedAnswer":{"@type":"Answer","text":"No, cada vivienda tiene su propia estancia mínima, que además puede cambiar según la temporada del año. Este dato se calcula automáticamente y se muestra en el calendario de cada ficha en cuanto seleccionas tus fechas de entrada y salida."}},
-    {"@type":"Question","name":"¿Se admiten mascotas?","acceptedAnswer":{"@type":"Answer","text":"Depende de cada vivienda: algunas de las viviendas publicadas aceptan mascotas y otras no, según las condiciones que fija el propietario. Puedes usar el buscador de la página de inicio y marcar la opción 'Se admiten mascotas' para ver únicamente las viviendas compatibles."}},
-    {"@type":"Question","name":"¿Las casas tienen piscina, aire acondicionado o parking?","acceptedAnswer":{"@type":"Answer","text":"Los servicios disponibles varían de una vivienda a otra: no todas cuentan con piscina, aire acondicionado o plaza de parking propia. El buscador del inicio permite filtrar por piscina, aire acondicionado, parking, WiFi y jardín o terraza."}},
+    {"@type":"Question","name":"¿Se admiten mascotas?","acceptedAnswer":{"@type":"Answer","text":"Depende de cada vivienda: algunas de las viviendas publicadas aceptan mascotas y otras no, según las condiciones que fija el propietario. Puedes ver las condiciones en la ficha de cada vivienda o preguntarnos por WhatsApp."}},
+    {"@type":"Question","name":"¿Las casas tienen piscina, aire acondicionado o parking?","acceptedAnswer":{"@type":"Answer","text":"Los servicios disponibles varían de una vivienda a otra: no todas cuentan con piscina, aire acondicionado o plaza de parking propia. Puedes ver los servicios en la ficha de cada vivienda."}},
     {"@type":"Question","name":"¿Trabajáis con agencias o centrales de reservas?","acceptedAnswer":{"@type":"Answer","text":"Conil Vacaciones no es una agencia de viajes ni una central de reservas: somos un servicio de promoción y captación de clientes para propietarios de alojamientos vacacionales en Conil de la Frontera. No somos propietarios ni gestores de las viviendas publicadas; el propietario de cada vivienda es quien confirma la disponibilidad y cobra directamente por la estancia."}},
     {"@type":"Question","name":"¿Dónde están ubicadas las viviendas?","acceptedAnswer":{"@type":"Answer","text":"Todas las viviendas publicadas en Conil Vacaciones se encuentran en Conil de la Frontera, un pueblo de la Costa de la Luz, en la provincia de Cádiz. Cada ficha incluye un mapa interactivo con la ubicación exacta de la casa."}},
     {"@type":"Question","name":"¿Cómo puedo contactar con vosotros?","acceptedAnswer":{"@type":"Answer","text":"Puedes escribirnos por WhatsApp, por email, o rellenando el formulario de contacto de esta misma página, indicando la vivienda que te interesa y tus fechas aproximadas. Respondemos directamente nosotros, sin pasar por ningún departamento externo."}}
@@ -1428,9 +1420,7 @@ function runSearch(){
   var checkinVal = document.getElementById("searchCheckin").value;
   var checkoutVal = document.getElementById("searchCheckout").value;
   var guests = parseInt(document.getElementById("searchGuests").value, 10) || 1;
-  var needIcons = Array.prototype.slice.call(document.querySelectorAll('#searchNeeds input[type="checkbox"]:checked')).map(function(cb){
-    return cb.getAttribute("data-need");
-  });
+  var needIcons = [];
 
   var start = checkinVal ? parseISO(checkinVal) : null;
   var end = checkoutVal ? parseISO(checkoutVal) : null;
@@ -1487,18 +1477,11 @@ function runSearch(){
   document.getElementById("housesGrid").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-document.querySelectorAll('#searchNeeds input[type="checkbox"]').forEach(function(cb){
-  cb.addEventListener("change", function(){
-    cb.closest("label").classList.toggle("is-active", cb.checked);
-  });
-});
-
 document.getElementById("searchBtn").addEventListener("click", runSearch);
 document.getElementById("searchClearBtn").addEventListener("click", function(){
   document.getElementById("searchCheckin").value = "";
   document.getElementById("searchCheckout").value = "";
   document.getElementById("searchGuests").value = "2";
-  document.querySelectorAll('#searchNeeds input[type="checkbox"]').forEach(function(cb){ cb.checked = false; });
   document.getElementById("searchResultMsg").textContent = "";
   document.getElementById("searchResultMsg").classList.remove("has-results");
   renderHouseCards();
