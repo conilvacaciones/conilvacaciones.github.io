@@ -2008,8 +2008,6 @@ function shDibujaMes(ctx, x, y, w, h, year, month, hoyIso){
   ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
   ctx.font = "800 " + Math.round(headH*0.58) + "px Archivo, Arial, sans-serif";
   ctx.fillText(SH_MESES[month] + " de " + year, x + w/2, y + pad + headH/2 + 1);
-  shChevron(ctx, ix + 26, y + pad + headH/2, -1, 9, "#fff");
-  shChevron(ctx, ix + iw - 26, y + pad + headH/2, 1, 9, "#fff");
   // días de la semana
   var cw = (iw - gap*6) / 7;
   var wy = y + pad + headH + gap;
