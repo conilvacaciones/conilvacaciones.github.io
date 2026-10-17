@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0B3D5C">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500&family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500&family=Archivo:wght@400;500;600;700;800&family=Caveat:wght@700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
   --atlantic:#0B3D5C; --atlantic-dark:#082A40; --cal:#FAFAF7; --cal-2:#F0F1EC;
@@ -1970,7 +1970,7 @@ function shRoundRect(ctx, x, y, w, h, r){
   ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r);
   ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath();
 }
-var SH_C = { libre:"#A9DDA3", ocupado:"#F59BBB", pasado:"#E4E4DF", navy:"#0B3D5C", ink:"#122130" };
+var SH_C = { libre:"#7DEB6A", ocupado:"#FF6FA3", pasado:"#DCDFE3", navy:"#0F3C9A", ink:"#0A2A6B", panel:"#EAF6FD", panelLine:"#8FCBEF", chip:"#BFE3F8", pill:"#D6EEFB" };
 function shDibujaCelda(ctx, x, y, w, h, estado, pasado, num){
   ctx.save();
   shRoundRect(ctx, x, y, w, h, 7); ctx.clip();
@@ -1991,35 +1991,47 @@ function shDibujaCelda(ctx, x, y, w, h, estado, pasado, num){
     ctx.fillText(String(num), x + w/2, y + h/2 + 1);
   }
 }
+function shChevron(ctx, cx, cy, dir, size, color){
+  ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.beginPath(); ctx.moveTo(cx - dir*size*0.4, cy - size); ctx.lineTo(cx + dir*size*0.5, cy); ctx.lineTo(cx - dir*size*0.4, cy + size); ctx.stroke(); ctx.restore();
+}
 function shDibujaMes(ctx, x, y, w, h, year, month, hoyIso){
-  var headH = Math.round(h*0.14), wdH = Math.round(h*0.105), gap = 4;
-  // título del mes
-  ctx.fillStyle = "#E3E8EC"; shRoundRect(ctx, x, y, w, headH, 10); ctx.fill();
-  ctx.fillStyle = SH_C.navy; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.font = "700 " + Math.round(headH*0.55) + "px Archivo, Arial, sans-serif";
-  ctx.fillText(SH_MESES[month] + " de " + year, x + w/2, y + headH/2 + 1);
+  // panel azul claro con borde
+  ctx.fillStyle = SH_C.panel; shRoundRect(ctx, x, y, w, h, 20); ctx.fill();
+  ctx.strokeStyle = SH_C.panelLine; ctx.lineWidth = 2; shRoundRect(ctx, x, y, w, h, 20); ctx.stroke();
+  var pad = 8, gap = 4;
+  var ix = x + pad, iw = w - pad*2;
+  var headH = Math.round(h*0.135), wdH = Math.round(h*0.095);
+  // cabecera azul intenso con flechas
+  ctx.fillStyle = SH_C.navy; shRoundRect(ctx, ix, y + pad, iw, headH, 14); ctx.fill();
+  ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.font = "800 " + Math.round(headH*0.58) + "px Archivo, Arial, sans-serif";
+  ctx.fillText(SH_MESES[month] + " de " + year, x + w/2, y + pad + headH/2 + 1);
+  shChevron(ctx, ix + 26, y + pad + headH/2, -1, 9, "#fff");
+  shChevron(ctx, ix + iw - 26, y + pad + headH/2, 1, 9, "#fff");
   // días de la semana
-  var cw = (w - gap*6) / 7;
-  var wy = y + headH + gap;
-  ctx.font = "700 " + Math.round(wdH*0.5) + "px Archivo, Arial, sans-serif";
+  var cw = (iw - gap*6) / 7;
+  var wy = y + pad + headH + gap;
+  ctx.font = "800 " + Math.round(wdH*0.52) + "px Archivo, Arial, sans-serif";
   for(var c=0;c<7;c++){
-    var cx = x + c*(cw+gap);
-    ctx.fillStyle = SH_C.navy; shRoundRect(ctx, cx, wy, cw, wdH, 7); ctx.fill();
-    ctx.fillStyle = "#fff"; ctx.fillText(SH_DIAS[c], cx + cw/2, wy + wdH/2 + 1);
+    var cx = ix + c*(cw+gap);
+    ctx.fillStyle = SH_C.chip; shRoundRect(ctx, cx, wy, cw, wdH, 8); ctx.fill();
+    ctx.fillStyle = SH_C.navy; ctx.fillText(SH_DIAS[c], cx + cw/2, wy + wdH/2 + 1);
   }
   // celdas
   var gy = wy + wdH + gap;
-  var ch = (y + h - gy - gap*5) / 6;
   var first = new Date(year, month, 1);
   var offset = (first.getDay() + 6) % 7;
   var dias = new Date(year, month+1, 0).getDate();
-  ctx.font = "600 " + Math.round(Math.min(ch, cw)*0.46) + "px Archivo, Arial, sans-serif";
-  for(var i=0;i<42;i++){
+  var nRows = Math.ceil((offset + dias) / 7);
+  var ch = (y + h - pad - gy - gap*(nRows-1)) / nRows;
+  ctx.font = "800 " + Math.round(Math.min(ch, cw)*0.52) + "px Archivo, Arial, sans-serif";
+  for(var i=0;i<nRows*7;i++){
     var col = i % 7, row = Math.floor(i/7);
-    var cx2 = x + col*(cw+gap), cy2 = gy + row*(ch+gap);
+    var cx2 = ix + col*(cw+gap), cy2 = gy + row*(ch+gap);
     var dnum = i - offset + 1;
     if(dnum < 1 || dnum > dias){
-      ctx.save(); ctx.fillStyle = "#EEEEEA"; shRoundRect(ctx, cx2, cy2, cw, ch, 7); ctx.fill(); ctx.restore();
+      { ctx.save(); ctx.fillStyle = "#DCE3E8"; shRoundRect(ctx, cx2, cy2, cw, ch, 8); ctx.fill(); ctx.restore(); }
       continue;
     }
     var iso = shIso(year, month, dnum);
@@ -2074,22 +2086,79 @@ function shDibujaLogoTexto(ctx, W, y){
   ctx.restore();
 }
 function shDibujaLeyenda(ctx, W, y){
+  // franja azul claro con las 4 leyendas en una línea
+  ctx.fillStyle = SH_C.pill; shRoundRect(ctx, 28, y - 34, W - 56, 70, 35); ctx.fill();
+  ctx.strokeStyle = SH_C.panelLine; ctx.lineWidth = 2; shRoundRect(ctx, 28, y - 34, W - 56, 70, 35); ctx.stroke();
   var items = [
     { t:"Disponible", e:"libre" }, { t:"Ocupado", e:"ocupado" },
-    { t:"Salida ese día", e:"salida" }, { t:"Entrada ese día", e:"entrada" }
+    { t:"Salida ese día", s:"libre por la tarde", e:"salida" }, { t:"Entrada ese día", s:"libre por la mañana", e:"entrada" }
   ];
-  ctx.font = "500 23px Archivo, Arial, sans-serif"; ctx.textBaseline = "middle"; ctx.textAlign = "left";
-  var sw = 34, pad = 12, gap = 34, total = 0;
-  var widths = items.map(function(it){ var w = sw + pad + ctx.measureText(it.t).width; total += w; return w; });
+  ctx.textBaseline = "middle"; ctx.textAlign = "left";
+  var sw = 46, pad = 12, gap = 30, total = 0;
+  var widths = items.map(function(it){
+    ctx.font = "800 24px Archivo, Arial, sans-serif"; var w1 = ctx.measureText(it.t).width;
+    var w2 = 0; if(it.s){ ctx.font = "600 18px Archivo, Arial, sans-serif"; w2 = ctx.measureText("(" + it.s + ")").width; }
+    var w = sw + pad + Math.max(w1, w2); total += w; return w;
+  });
   total += gap * (items.length - 1);
   var x = (W - total) / 2;
   items.forEach(function(it, i){
-    shDibujaCelda(ctx, x, y - 14, sw, 28, it.e, false, null);
-    ctx.fillStyle = SH_C.ink; ctx.fillText(it.t, x + sw + pad, y + 1);
+    shDibujaCelda(ctx, x, y - 20, sw, 40, it.e, false, null);
+    ctx.fillStyle = SH_C.navy;
+    ctx.font = "800 24px Archivo, Arial, sans-serif";
+    if(it.s){
+      ctx.fillText(it.t, x + sw + pad, y - 9);
+      ctx.font = "600 18px Archivo, Arial, sans-serif"; ctx.fillText("(" + it.s + ")", x + sw + pad, y + 15);
+    } else ctx.fillText(it.t, x + sw + pad, y + 1);
     x += widths[i] + gap;
   });
-  ctx.font = "500 19px Archivo, Arial, sans-serif"; ctx.textAlign = "center"; ctx.fillStyle = "#5B6A75";
-  ctx.fillText("Salida: libre por la tarde  ·  Entrada: libre por la mañana", W/2, y + 44);
+}
+function shCorazon(ctx, cx, cy, s, color, fill){
+  ctx.save(); ctx.beginPath();
+  ctx.moveTo(cx, cy + s*0.9);
+  ctx.bezierCurveTo(cx - s*1.5, cy - s*0.1, cx - s*0.7, cy - s*1.2, cx, cy - s*0.35);
+  ctx.bezierCurveTo(cx + s*0.7, cy - s*1.2, cx + s*1.5, cy - s*0.1, cx, cy + s*0.9);
+  if(fill){ ctx.fillStyle = color; ctx.fill(); } else { ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.lineJoin = "round"; ctx.stroke(); }
+  ctx.restore();
+}
+function shOla(ctx, x1, x2, y, color){
+  ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.beginPath();
+  for(var t=0;t<=60;t++){ var px = x1 + (x2-x1)*t/60; var py = y + Math.sin(t/60*Math.PI*4)*5; if(t===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); }
+  ctx.stroke(); ctx.restore();
+}
+function shPie(ctx, W, y){
+  ctx.fillStyle = SH_C.navy; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  var txt = "Tu escapada perfecta en la costa de Cádiz";
+  ctx.font = "italic 700 34px Caveat, 'Segoe Script', cursive, Georgia";
+  var tw = ctx.measureText(txt).width;
+  ctx.fillText(txt, W/2 - 22, y);
+  shCorazon(ctx, W/2 + tw/2 + 8, y - 12, 14, SH_C.navy, false);
+  shOla(ctx, 40, W/2 - tw/2 - 30, y - 10, "#4FB6F0");
+  shOla(ctx, W/2 + tw/2 + 50, W - 40, y - 10, "#4FB6F0");
+}
+// Decoraciones por si una esquina no lleva foto
+function shPalma(ctx){
+  ctx.save();
+  var hojas = [[-10,-10,300,40,0.9],[-10,-10,260,150,0.8],[-10,-10,170,230,0.7],[-10,-10,60,250,0.6]];
+  hojas.forEach(function(h, i){
+    var g = ctx.createLinearGradient(0,0,h[2],h[3]); g.addColorStop(0,"#1E7A34"); g.addColorStop(1,"#7ED957");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(h[0], h[1]);
+    ctx.quadraticCurveTo(h[2]*0.55, h[3]*0.15 - 20, h[2], h[3]);
+    ctx.quadraticCurveTo(h[2]*0.35, h[3]*0.75, h[0], h[1]); ctx.fill();
+  });
+  ctx.restore();
+}
+function shPincel(ctx, W){
+  ctx.save();
+  ctx.fillStyle = "rgba(87,185,244,.55)";
+  ctx.beginPath(); ctx.moveTo(W-300, 40); ctx.bezierCurveTo(W-240, 8, W-120, 20, W-20, 14);
+  ctx.bezierCurveTo(W-6, 100, W-28, 170, W-44, 230); ctx.bezierCurveTo(W-140, 206, W-230, 236, W-300, 200);
+  ctx.bezierCurveTo(W-322, 140, W-318, 90, W-300, 40); ctx.fill();
+  ctx.fillStyle = SH_C.navy; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  ctx.font = "italic 700 50px Caveat, 'Segoe Script', cursive, Georgia";
+  ctx.fillText("Disfruta", W-160, 100); ctx.fillText("Conil", W-160, 152);
+  shCorazon(ctx, W-160, 190, 16, SH_C.navy, false);
+  ctx.restore();
 }
 var shRenderToken = 0;
 async function renderOcupacionImagen(){
@@ -2099,7 +2168,7 @@ async function renderOcupacionImagen(){
   try{
     await Promise.all([
       document.fonts.load("italic 500 100px Fraunces"), document.fonts.load("600 40px Fraunces"),
-      document.fonts.load("500 20px Archivo"), document.fonts.load("600 20px Archivo"), document.fonts.load("700 20px Archivo")
+      document.fonts.load("500 20px Archivo"), document.fonts.load("600 20px Archivo"), document.fonts.load("700 20px Archivo"), document.fonts.load("800 20px Archivo"), document.fonts.load("italic 700 34px Caveat")
     ]);
   }catch(e){}
   await shCargaLogo();
@@ -2108,27 +2177,30 @@ async function renderOcupacionImagen(){
   var W = 1080, H = vertical ? 1350 : 1080;
   canvas.width = W; canvas.height = H;
   var ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#FAFAF7"; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, W, H);
   var v = viviendas.find(function(x){ return x.id === reservasViviendaId; });
-  shDibujaLogo(ctx, W, 24);
-  // fotos de las esquinas superiores
+  // fotos de las esquinas superiores (si no hay foto, decoración)
   var fotosV = (v && v.fotos) || [];
   var iz = document.getElementById("sh-foto-izq").value, de = document.getElementById("sh-foto-der").value;
   var imIz = iz !== "" ? await shCargaFoto(fotosV[parseInt(iz,10)]) : null;
   var imDe = de !== "" ? await shCargaFoto(fotosV[parseInt(de,10)]) : null;
   if(token !== shRenderToken) return;
-  if(imIz) shDibujaFoto(ctx, imIz, 36, 26, 290, 196);
-  if(imDe) shDibujaFoto(ctx, imDe, W - 36 - 290, 26, 290, 196);
-  // nombre de la vivienda
+  if(imIz) shDibujaFoto(ctx, imIz, 30, 22, 290, 190); else shPalma(ctx);
+  if(imDe) shDibujaFoto(ctx, imDe, W - 30 - 290, 22, 290, 190); else shPincel(ctx, W);
+  shDibujaLogo(ctx, W, 14);
+  // nombre de la vivienda en pastilla azul claro
   var nombre = v ? v.nombre : "";
-  var fs = 58; ctx.fillStyle = SH_C.navy; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
-  do { ctx.font = "600 " + fs + "px Fraunces, Georgia, serif"; fs -= 2; } while(ctx.measureText(nombre).width > W - 100 && fs > 24);
-  ctx.fillText(nombre, W/2, 268);
+  var fs = 50; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  do { ctx.font = "800 " + fs + "px Archivo, Arial, sans-serif"; fs -= 2; } while(ctx.measureText(nombre).width > W - 200 && fs > 24);
+  var pw = Math.min(W - 80, ctx.measureText(nombre).width + 120);
+  ctx.fillStyle = SH_C.pill; shRoundRect(ctx, (W-pw)/2, 222, pw, 66, 33); ctx.fill();
+  ctx.strokeStyle = SH_C.panelLine; ctx.lineWidth = 2; shRoundRect(ctx, (W-pw)/2, 222, pw, 66, 33); ctx.stroke();
+  ctx.fillStyle = SH_C.navy; ctx.fillText(nombre, W/2, 256);
   // meses
   var parts = document.getElementById("sh-mes").value.split("-");
   var y0 = parseInt(parts[0],10), m0 = parseInt(parts[1],10);
   var n = vertical ? 6 : 4, rows = n/2, mx = 40, gapX = 24, gapY = 22;
-  var gridTop = 296, legendH = 165;
+  var gridTop = 302, legendH = 150;
   var mw = (W - mx*2 - gapX) / 2;
   var mh = (H - gridTop - legendH - gapY*(rows-1)) / rows;
   var hoy = new Date(); var hoyIso = shIso(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
@@ -2137,10 +2209,11 @@ async function renderOcupacionImagen(){
     var col = i % 2, row = Math.floor(i/2);
     shDibujaMes(ctx, mx + col*(mw+gapX), gridTop + row*(mh+gapY), mw, mh, d.getFullYear(), d.getMonth(), hoyIso);
   }
-  shDibujaLeyenda(ctx, W, H - legendH + 40);
+  shDibujaLeyenda(ctx, W, H - legendH + 38);
+  shPie(ctx, W, H - 34);
   ctx.fillStyle = SH_C.navy; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
-  ctx.font = "700 26px Archivo, Arial, sans-serif";
-  ctx.fillText("Reserva en conilvacaciones.github.io", W/2, H - 22);
+  ctx.font = "700 20px Archivo, Arial, sans-serif";
+  ctx.fillText("Reserva en conilvacaciones.github.io", W/2, H - 8);
 }
 document.getElementById("btnShDownload").addEventListener("click", async function(){
   await renderOcupacionImagen();
