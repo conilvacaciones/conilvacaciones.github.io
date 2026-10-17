@@ -423,6 +423,21 @@ input,textarea{font:inherit;}
 .modal-amenities .amenity-chip{justify-content:flex-start;padding:9px 12px;font-size:13px;background:var(--cal);}
 .modal-amenities .icon{width:16px;height:16px;}
 #modalVideosSection{margin-top:26px;padding-top:22px;border-top:1px solid var(--line);}
+.loc-time{display:grid;grid-template-columns:1fr;gap:16px;margin-top:26px;padding-top:22px;border-top:1px solid var(--line);}
+.loc-time.has-map{grid-template-columns:1.6fr 1fr;align-items:stretch;}
+.loc-time:not(.has-map) .time-card{max-width:420px;}
+.loc-map{display:flex;flex-direction:column;}
+.loc-map .modal-map-wrap{flex:1;min-height:240px;aspect-ratio:auto;border-radius:20px;}
+.time-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;}
+.time-list{display:flex;flex-direction:column;gap:10px;margin-top:12px;}
+.time-item{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;background:var(--cal);}
+.time-item .ti-ic{width:36px;height:36px;border-radius:11px;background:var(--teal-soft);color:var(--teal);display:grid;place-items:center;flex:none;}
+.time-item .ti-ic .icon{width:18px;height:18px;}
+.time-item small{display:block;font-size:12px;color:#6b7780;}
+.time-item b{display:block;color:var(--atlantic);font-size:18px;}
+.time-dist{margin:14px 0 0;font-size:13px;color:#6b7780;display:flex;align-items:center;gap:6px;}
+.time-dist .icon{width:14px;height:14px;}
+@media(max-width:760px){.loc-time.has-map{grid-template-columns:1fr;}.loc-time:not(.has-map) .time-card{max-width:none;}}
 .modal-map-wrap{margin-top:14px;border-radius:var(--radius-md);overflow:hidden;aspect-ratio:16/9;}
 .modal-map-wrap iframe{width:100%;height:100%;display:block;border:0;}
 .videos-list{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
@@ -733,14 +748,16 @@ html{scroll-behavior:smooth;}
         <div class="videos-list" id="modalVideos"></div>
       </div>
 
-      <div id="modalMapSection" style="display:none;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)">
-        <span class="eyebrow"><svg class="icon" style="width:14px;height:14px"><use href="#i-pin"/></svg>Ubicación</span>
-        <div class="modal-map-wrap" id="modalMapWrap"></div>
-      </div>
-
-      <div id="modalCheckinoutSection" style="display:none;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)">
-        <span class="eyebrow"><svg class="icon" style="width:14px;height:14px"><use href="#i-cal"/></svg>Horario</span>
-        <div class="modal-stats" id="modalCheckinout" style="margin-top:12px"></div>
+      <div class="loc-time" id="locTime" style="display:none">
+        <div class="loc-map" id="modalMapSection" style="display:none">
+          <span class="eyebrow"><svg class="icon" style="width:14px;height:14px"><use href="#i-pin"/></svg>Ubicación</span>
+          <div class="modal-map-wrap" id="modalMapWrap"></div>
+        </div>
+        <div class="time-card" id="modalCheckinoutSection" style="display:none">
+          <span class="eyebrow"><svg class="icon" style="width:14px;height:14px"><use href="#i-cal"/></svg>Horario</span>
+          <div class="time-list" id="modalCheckinout"></div>
+          <p class="time-dist" id="modalDistance"></p>
+        </div>
       </div>
 
       <div class="booking" id="bookingSection">
@@ -1593,11 +1610,13 @@ function openModal(id){
     '<span>'+iconSvg("i-pin")+currentHouse.distance+'</span>';
 
   var checkinoutSection = document.getElementById("modalCheckinoutSection");
-  if(currentHouse.checkin || currentHouse.checkout){
+  var hasTime = !!(currentHouse.checkin || currentHouse.checkout);
+  if(hasTime){
     checkinoutSection.style.display = "";
     document.getElementById("modalCheckinout").innerHTML =
-      (currentHouse.checkin ? '<span>'+iconSvg("i-cal")+'Check-in: '+escapeHTML(currentHouse.checkin)+'</span>' : '')+
-      (currentHouse.checkout ? '<span>'+iconSvg("i-cal")+'Check-out: '+escapeHTML(currentHouse.checkout)+'</span>' : '');
+      (currentHouse.checkin ? '<div class="time-item"><span class="ti-ic">'+iconSvg("i-cal")+'</span><div><small>Check-in</small><b>'+escapeHTML(currentHouse.checkin)+'</b></div></div>' : '')+
+      (currentHouse.checkout ? '<div class="time-item"><span class="ti-ic">'+iconSvg("i-cal")+'</span><div><small>Check-out</small><b>'+escapeHTML(currentHouse.checkout)+'</b></div></div>' : '');
+    document.getElementById("modalDistance").innerHTML = currentHouse.distance ? iconSvg("i-pin")+escapeHTML(currentHouse.distance) : "";
   } else {
     checkinoutSection.style.display = "none";
   }
@@ -1627,6 +1646,9 @@ function openModal(id){
     mapSection.style.display = "none";
     document.getElementById("modalMapWrap").innerHTML = "";
   }
+  var locTime = document.getElementById("locTime");
+  locTime.style.display = (currentHouse.location || hasTime) ? "" : "none";
+  locTime.classList.toggle("has-map", !!currentHouse.location);
 
   // gallery
   var main = document.getElementById("galleryMain");
