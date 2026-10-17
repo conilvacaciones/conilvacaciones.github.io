@@ -137,7 +137,7 @@ main.wrap{padding:40px 24px 90px;}
 .photo-thumbs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
 .photo-thumb{position:relative;width:90px;height:68px;border-radius:8px;overflow:hidden;background:var(--cal-2);}
 .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-.photo-thumb .p-actions{position:absolute;inset:0;background:rgba(8,26,38,.55);display:flex;align-items:center;justify-content:center;gap:4px;opacity:0;transition:opacity .15s ease;}
+.photo-thumb .p-actions{position:absolute;inset:0;background:rgba(8,26,38,.55);display:flex;flex-wrap:wrap;align-content:center;align-items:center;justify-content:center;gap:4px;opacity:0;transition:opacity .15s ease;}
 .photo-thumb:hover .p-actions{opacity:1;}
 .photo-thumb .p-actions button{width:22px;height:22px;border-radius:50%;border:none;background:#fff;font-size:11px;color:var(--ink);}
 .upload-note{font-size:12px;color:var(--ink-faint);margin-top:4px;}
@@ -1458,9 +1458,13 @@ function renderPhotoThumbs(){
       '<div class="p-actions">'+
         (i>0 ? '<button type="button" data-mv="'+i+':-1" title="Mover a la izquierda">‹</button>' : '')+
         (i<draftFotos.length-1 ? '<button type="button" data-mv="'+i+':1" title="Mover a la derecha">›</button>' : '')+
+        '<button type="button" data-crop="'+i+'" title="Recortar esta foto">✂</button>'+
         '<button type="button" data-rm="'+i+'" title="Quitar">×</button>'+
       '</div></div>';
   }).join("");
+  box.querySelectorAll("[data-crop]").forEach(function(b){
+    b.addEventListener("click", function(){ recortarFotoExistente(parseInt(b.getAttribute("data-crop"),10), b); });
+  });
   box.querySelectorAll("[data-rm]").forEach(function(b){
     b.addEventListener("click", function(){
       draftFotos.splice(parseInt(b.getAttribute("data-rm"),10), 1);
@@ -1569,6 +1573,40 @@ document.getElementById("f-fotos").addEventListener("change", async function(e){
     renderPhotoThumbs();
   });
 });
+
+// Recortar una foto ya subida: se descarga, se abre en el recortador y la versión
+// recortada se sube como foto nueva ocupando el mismo lugar. La original se conserva en Storage.
+async function recortarFotoExistente(i, btn){
+  var id = document.getElementById("f-id").value.trim();
+  var oldPath = draftFotos[i];
+  if(!id || !oldPath) return;
+  var url = sb.storage.from("fotos-viviendas").getPublicUrl(oldPath).data.publicUrl;
+  var prevTxt = btn ? btn.textContent : "";
+  if(btn){ btn.textContent = "…"; btn.disabled = true; }
+  var file;
+  try{
+    var r = await fetch(url, { cache: "no-store" });
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    var blob = await r.blob();
+    var baseName = oldPath.split("/").pop();
+    file = new File([blob], baseName, { type: blob.type || "image/jpeg" });
+  }catch(err){
+    alert("No se ha podido cargar la foto para recortarla: " + err.message);
+    return;
+  }finally{
+    if(btn){ btn.textContent = prevTxt; btn.disabled = false; }
+  }
+  startCropQueue([file], async function(blobOrFile, originalFile){
+    if(blobOrFile === originalFile) return; // "Subir sin recortar": se queda como está
+    var safeName = originalFile.name.replace(/[^a-zA-Z0-9.-]/g,"_").replace(/^\d+-/, "");
+    var path = id + "/" + Date.now() + "-" + safeName;
+    var up = await sb.storage.from("fotos-viviendas").upload(path, blobOrFile, { upsert:true });
+    if(up.error){ alert("Error al subir la foto recortada: " + up.error.message); return; }
+    var idx = draftFotos.indexOf(oldPath);
+    if(idx === -1) draftFotos.push(path); else draftFotos[idx] = path;
+    renderPhotoThumbs();
+  });
+}
 
 document.getElementById("btnRecoverPhotos").addEventListener("click", async function(){
   var id = document.getElementById("f-id").value.trim();
