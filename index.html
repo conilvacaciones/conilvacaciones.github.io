@@ -417,13 +417,12 @@ input,textarea{font:inherit;}
 
 /* ============ CONTACT ============ */
 /* ---- Banner "Anúnciate gratis" ---- */
-.anun-banner-section{padding:0 0 70px;}
-.anun-banner{display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;background:var(--atlantic);color:var(--cal);border-radius:var(--radius-lg);padding:28px 34px;box-shadow:var(--shadow-card);position:relative;overflow:hidden;}
-.anun-banner::after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:var(--sol);opacity:.16;pointer-events:none;}
-.anun-banner .eyebrow{color:var(--sol);}
-.anun-banner h3{font-family:var(--ff-display);font-weight:600;font-size:clamp(20px,2.4vw,26px);margin:6px 0 4px;color:#fff;}
-.anun-banner p{font-size:14.5px;color:rgba(250,250,247,.78);margin:0;max-width:520px;}
-.anun-banner .btn{position:relative;z-index:1;}
+.anun-banner-section{padding:0 0 60px;}
+.anun-banner{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px 26px;box-shadow:var(--shadow-card);}
+.anun-banner .eyebrow{margin-bottom:2px;}
+.anun-banner h3{font-family:var(--ff-display);font-weight:600;font-size:clamp(18px,2vw,21px);margin:0;color:var(--atlantic);}
+.anun-banner p{font-size:13.5px;color:var(--ink-soft);margin:3px 0 0;}
+.anun-banner .btn{white-space:nowrap;}
 .contact{background:var(--cal);color:var(--ink);padding:30px 0 90px;position:relative;}
 .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
 .contact-grid h2{font-family:var(--ff-display);font-weight:600;font-size:clamp(28px,3.6vw,40px);line-height:1.1;color:var(--atlantic);margin:12px 0 16px;}
@@ -957,7 +956,7 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
         <h3>Anúnciate con nosotros gratis</h3>
         <p>Mostramos tu alojamiento en la web y en nuestras redes sociales: Facebook, Instagram y TikTok.</p>
       </div>
-      <a class="btn btn-primary" href="/anunciate/">Quiero anunciarme<svg class="icon" style="width:16px;height:16px"><use href="#i-chev-r"/></svg></a>
+      <a class="btn btn-dark" href="/anunciate/">Quiero anunciarme<svg class="icon" style="width:16px;height:16px"><use href="#i-chev-r"/></svg></a>
     </div>
   </div>
 </section>
