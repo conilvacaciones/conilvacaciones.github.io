@@ -543,8 +543,52 @@ input,textarea{font:inherit;}
 
 @media (max-width:760px){
   .cal-shell{grid-template-columns:1fr;}
-  .modal-price-box{text-align:left;}
 }
+/* ---- Cabecera de la ficha (rediseño) ---- */
+html{scroll-behavior:smooth;}
+#bookingSection{scroll-margin-top:90px;}
+.modal-head{display:grid;grid-template-columns:minmax(0,1fr) 232px;gap:30px;align-items:start;}
+.modal-head h3{font-size:clamp(28px,4vw,40px);line-height:1.05;letter-spacing:-.01em;margin:0;}
+.mh-tags{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+.mh-tags:empty{display:none;}
+.mh-tags .modal-badges{margin:0;}
+.mh-tags #modalRating .badge-pill{background:var(--atlantic);color:#fff;}
+.modal-badges:empty{display:none;}
+.badge-pill{font-weight:700;font-size:12px;padding:6px 12px;background:#FFF1D6;color:#8A5A00;}
+.modal-head .house-tagline{font-size:15.5px;margin-top:12px;display:flex;align-items:center;gap:8px;}
+.modal-head .house-tagline .icon{width:17px;height:17px;color:var(--bougain);flex-shrink:0;}
+.mh-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px;}
+.share-buttons{background:var(--cal-2);border-radius:999px;padding:5px 6px 5px 16px;gap:6px;margin-top:0;}
+.share-btn{background:#fff;box-shadow:0 2px 6px -3px rgba(0,0,0,.25);}
+.fav-detail-btn{width:auto;height:auto;padding:9px 16px;gap:8px;border-radius:999px;background:#fff;border:1.5px solid var(--line);font-family:inherit;font-weight:700;font-size:13.5px;color:var(--ink);}
+.fav-detail-btn svg{stroke:var(--bougain);}
+.fav-detail-btn .fav-t-on{display:none;}
+.fav-detail-btn.is-fav .fav-t-on{display:inline;}
+.fav-detail-btn.is-fav .fav-t-off{display:none;}
+.modal-head .modal-desc{margin-top:16px;font-size:15.5px;line-height:1.7;}
+.modal-price-box{position:relative;text-align:left;background:linear-gradient(160deg,#fff 40%,#FFF4F8);border:1.5px solid #F4C6D7;border-radius:18px;padding:14px 16px;box-shadow:0 18px 34px -24px rgba(214,51,108,.55);margin-top:2px;}
+.price-ribbon{position:absolute;top:-11px;right:14px;background:var(--bougain);color:#fff;font-weight:800;font-size:11.5px;padding:5px 11px;border-radius:999px;box-shadow:0 8px 16px -8px rgba(214,51,108,.8);}
+.modal-price-box .house-price.from{display:block;text-align:left;font-family:var(--ff-mono);font-size:10px;letter-spacing:.1em;}
+.price-row{display:flex;align-items:baseline;gap:10px;margin-top:4px;flex-wrap:wrap;}
+.price-row s{color:var(--ink-faint);font-size:14px;font-family:var(--ff-body, inherit);}
+.price-row b{font-family:var(--ff-display);font-weight:600;font-size:30px;line-height:1;color:var(--atlantic);}
+.price-row s:not([style*="none"]) + b{color:var(--bougain-dark);}
+.price-unit{font-size:12px;color:var(--ink-soft);}
+.price-note{font-size:11.5px;font-weight:600;color:var(--bougain-dark);margin-top:4px;}
+#modalDateOffers{margin-top:9px;}
+#modalDateOffers:empty{margin:0;}
+#modalDateOffers .date-offers{flex-direction:column;gap:6px;}
+#modalDateOffers .date-offer-chip{font-size:11.5px;border-radius:10px;padding:5px 10px;}
+.price-cta{display:block;margin-top:11px;text-align:center;background:var(--bougain);color:#fff;font-weight:800;font-size:13px;padding:9px;border-radius:999px;box-shadow:0 14px 24px -12px rgba(214,51,108,.7);text-decoration:none;}
+.price-cta:hover{background:var(--bougain-dark);}
+.modal-stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding:0;border:none;}
+.modal-stats span{background:var(--cal);border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 7px;gap:8px;font-size:13px;}
+.modal-stats .icon{width:26px;height:26px;padding:6px;border-radius:50%;background:var(--teal-soft);color:var(--teal);}
+@media (max-width:760px){
+  .modal-head{grid-template-columns:1fr;}
+  .modal-price-box{margin-top:6px;}
+}
+
 .hero,.houses-section,.contact{display:none;}
 .detail-page-wrap{max-width:960px;margin:0 auto;padding:28px 20px 70px;}
 .detail-page-wrap .modal{
@@ -654,27 +698,27 @@ input,textarea{font:inherit;}
   <div class="modal" id="modalPanel">
     <div class="modal-body">
       <div class="modal-head">
-        <div>
+        <div class="mh-main">
+          <div class="mh-tags"><div id="modalRating"></div><div class="modal-badges" id="modalBadges"></div></div>
           <h3 id="modalTitle">Vivienda en Conil de la Frontera</h3>
           <p class="house-tagline" id="modalTagline"></p>
-          <div id="modalRating" style="margin-top:8px"></div>
-          <div class="modal-badges" id="modalBadges"></div>
           <p class="modal-registro" id="modalRegistro" style="display:none"></p>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div class="mh-actions">
             <div class="share-buttons" id="shareButtons" style="margin-top:0"></div>
-            <button type="button" class="fav-detail-btn" id="favDetailBtn" title="Guardar como favorita" aria-label="Guardar como favorita"><svg><use href="#i-heart"/></svg></button>
+            <button type="button" class="fav-detail-btn" id="favDetailBtn" title="Guardar como favorita" aria-label="Guardar como favorita"><svg><use href="#i-heart"/></svg><span class="fav-t-off">Guardar</span><span class="fav-t-on">Guardada</span></button>
           </div>
+          <p class="modal-desc" id="modalDesc"></p>
         </div>
-        <div class="modal-price-box">
+        <div class="modal-price-box" id="modalPriceBox">
+          <span class="price-ribbon" id="modalRibbon" style="display:none"></span>
           <span class="house-price from" id="modalPriceFrom">desde</span>
-          <s id="modalPriceOld" style="display:none;font-family:var(--ff-mono);font-size:14px;color:var(--ink-faint);margin-right:6px"></s>
-          <b id="modalPrice">Consultar precio</b>
-          <div><span style="font-size:12px;color:var(--ink-soft)" id="modalPriceUnit">por noche</span></div>
-          <p id="modalOfferNote" style="display:none;font-size:12px;font-weight:600;color:var(--bougain-dark);margin-top:4px">⏳ Oferta</p>
-          <div id="modalDateOffers" style="margin-top:6px"></div>
+          <div class="price-row"><s id="modalPriceOld" style="display:none"></s><b id="modalPrice">Consultar precio</b></div>
+          <div><span class="price-unit" id="modalPriceUnit">por noche</span></div>
+          <p id="modalOfferNote" class="price-note" style="display:none">⏳ Oferta</p>
+          <div id="modalDateOffers"></div>
+          <a class="price-cta" href="#bookingSection">Ver disponibilidad <span aria-hidden="true">→</span></a>
         </div>
       </div>
-      <p class="modal-desc" id="modalDesc"></p>
       <div class="modal-stats" id="modalStats"></div>
 
       <div class="gallery">
@@ -699,7 +743,7 @@ input,textarea{font:inherit;}
         <div class="modal-stats" id="modalCheckinout" style="margin-top:12px"></div>
       </div>
 
-      <div class="booking">
+      <div class="booking" id="bookingSection">
         <span class="eyebrow"><svg class="icon" style="width:14px;height:14px"><use href="#i-cal"/></svg>Disponibilidad</span>
         <h4>Elige tus fechas</h4>
         <p class="booking-sub" id="bookingSub">Marca la fecha de entrada y de salida. Los días en rosa rayado ya están ocupados.</p>
@@ -1526,7 +1570,7 @@ function openModal(id){
 
   var pal = paletteFor(currentHouse.id);
   document.getElementById("modalTitle").textContent = currentHouse.name;
-  document.getElementById("modalTagline").textContent = currentHouse.tagline + " · " + currentHouse.zone;
+  document.getElementById("modalTagline").innerHTML = iconSvg("i-pin") + escapeHTML(currentHouse.tagline + " · " + currentHouse.zone);
   document.getElementById("modalDesc").innerHTML = currentHouse.description;
   document.getElementById("bookingSub").textContent = currentHouse.minNights > 1
     ? "Marca la fecha de entrada y de salida. Los días en rosa rayado ya están ocupados. Estancia mínima: " + currentHouse.minNights + " noches."
@@ -1880,6 +1924,7 @@ function updateModalPrice(){
   var oferta = isOfferActive(currentHouse);
   var dateOffersEl = document.getElementById("modalDateOffers");
   if(dateOffersEl) dateOffersEl.innerHTML = dateOffersHTML(currentHouse, 4);
+  var ribbonEl = document.getElementById("modalRibbon");
 
   if(semanal){
     if(oferta){
@@ -1888,12 +1933,15 @@ function updateModalPrice(){
       oldEl.style.display = "";
       priceEl.textContent = Math.round(conDescuento) + " €";
       var dias = offerDaysLeft(currentHouse);
-      offerNoteEl.textContent = "⏳ Oferta -" + currentHouse.ofertaDescuento + "%" + (dias !== null ? " · termina en " + dias + (dias===1?" día":" días") : "");
-      offerNoteEl.style.display = "";
+      ribbonEl.textContent = "\u2212" + currentHouse.ofertaDescuento + " % OFERTA";
+      ribbonEl.style.display = "";
+      offerNoteEl.textContent = "⏳ Termina en " + dias + (dias===1?" día":" días");
+      offerNoteEl.style.display = dias !== null ? "" : "none";
     } else {
       oldEl.style.display = "none";
       priceEl.textContent = Math.round(semanal) + " €";
       offerNoteEl.style.display = "none";
+      ribbonEl.style.display = "none";
     }
     fromEl.style.display = "";
     unitEl.style.display = "";
@@ -1904,6 +1952,7 @@ function updateModalPrice(){
     unitEl.style.display = "none";
     oldEl.style.display = "none";
     offerNoteEl.style.display = "none";
+    ribbonEl.style.display = "none";
   }
 }
 
