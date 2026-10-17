@@ -183,6 +183,11 @@ main.wrap{padding:40px 24px 90px;}
 .emoji-picker button{width:34px;height:34px;font-size:18px;border:none;background:transparent;border-radius:7px;cursor:pointer;}
 .emoji-picker button:hover{background:var(--cal);}
 
+.share-box{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);}
+.share-box h3{font-family:var(--ff-display);font-size:17px;color:var(--atlantic);margin-bottom:6px;}
+.share-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+#shCanvas{width:100%;max-width:460px;height:auto;display:block;margin:0 auto;border-radius:10px;border:1px solid var(--line);background:#FAFAF7;}
+@media (max-width:560px){.share-controls{grid-template-columns:1fr;}}
 .reserva-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--cal);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13.5px;}
 .reserva-row b{font-family:var(--ff-mono);font-weight:500;}
 .reserva-row span.nota{color:var(--ink-soft);font-size:12.5px;}
@@ -573,6 +578,21 @@ main.wrap{padding:40px 24px 90px;}
       <div class="field full" style="text-align:right"><button type="submit" class="btn btn-dark">Añadir fechas ocupadas</button></div>
       <p class="form-error" id="reservaFormError" style="grid-column:1/-1"></p>
     </form>
+    <div class="share-box">
+      <h3>📸 Imagen de disponibilidad para redes sociales</h3>
+      <p class="slug-hint" style="margin-bottom:10px">Se genera sola con las fechas ocupadas de esta vivienda. Elige desde qué mes y el formato, y descárgala para Instagram, Facebook o TikTok.</p>
+      <div class="share-controls">
+        <div class="field" style="margin:0"><label for="sh-mes">Desde el mes</label><select id="sh-mes"></select></div>
+        <div class="field" style="margin:0"><label for="sh-fmt">Formato</label>
+          <select id="sh-fmt">
+            <option value="sq">Cuadrado · 4 meses (1080×1080)</option>
+            <option value="vt">Vertical · 6 meses (1080×1350)</option>
+          </select>
+        </div>
+      </div>
+      <canvas id="shCanvas" width="1080" height="1080"></canvas>
+      <div style="text-align:right;margin-top:10px"><button type="button" class="btn btn-primary" id="btnShDownload">⬇ Descargar imagen (PNG)</button></div>
+    </div>
   </div>
 </div>
 
@@ -1744,6 +1764,7 @@ async function loadReservasList(){
   }
   var rows = res.data || [];
   reservasActuales = rows;
+  renderOcupacionImagen();
   if(rows.length === 0){
     box.innerHTML = '<p class="empty-note">No hay fechas ocupadas registradas.</p>';
     return;
@@ -1876,6 +1897,194 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
   }
   document.getElementById("ofertaForm").reset();
   loadOfertasList();
+});
+
+
+/* ============ IMAGEN DE DISPONIBILIDAD PARA REDES ============ */
+var SH_MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+var SH_DIAS = ["LUN","MAR","MIÉ","JUE","VIE","SÁB","DOM"];
+(function initShMes(){
+  var sel = document.getElementById("sh-mes");
+  var hoy = new Date();
+  var html = "";
+  for(var i=0;i<18;i++){
+    var d = new Date(hoy.getFullYear(), hoy.getMonth()+i, 1);
+    html += '<option value="'+d.getFullYear()+'-'+d.getMonth()+'">'+SH_MESES[d.getMonth()]+' '+d.getFullYear()+'</option>';
+  }
+  sel.innerHTML = html;
+  sel.addEventListener("change", renderOcupacionImagen);
+  document.getElementById("sh-fmt").addEventListener("change", renderOcupacionImagen);
+})();
+
+function shIso(y, m, d){ return y + "-" + String(m+1).padStart(2,"0") + "-" + String(d).padStart(2,"0"); }
+// Estado de un día: "libre", "ocupado", "salida" (libre por la tarde) o "entrada" (libre por la mañana)
+function shEstadoDia(iso){
+  var ocupado = false, esInicio = false, esFin = false;
+  for(var i=0;i<reservasActuales.length;i++){
+    var r = reservasActuales[i];
+    if(iso >= r.fecha_inicio && iso < r.fecha_fin){ ocupado = true; if(iso === r.fecha_inicio) esInicio = true; }
+    if(iso === r.fecha_fin) esFin = true;
+  }
+  if(ocupado) return (esInicio && !esFin) ? "entrada" : "ocupado";
+  return esFin ? "salida" : "libre";
+}
+function shRoundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath();
+}
+var SH_C = { libre:"#A9DDA3", ocupado:"#F59BBB", pasado:"#E4E4DF", navy:"#0B3D5C", ink:"#122130" };
+function shDibujaCelda(ctx, x, y, w, h, estado, pasado, num){
+  ctx.save();
+  shRoundRect(ctx, x, y, w, h, 7); ctx.clip();
+  if(pasado){ ctx.fillStyle = SH_C.pasado; ctx.fillRect(x, y, w, h); }
+  else if(estado === "libre"){ ctx.fillStyle = SH_C.libre; ctx.fillRect(x, y, w, h); }
+  else if(estado === "ocupado"){ ctx.fillStyle = SH_C.ocupado; ctx.fillRect(x, y, w, h); }
+  else {
+    // diagonal: salida = rosa arriba-izq / verde abajo-der ; entrada = verde arriba-izq / rosa abajo-der
+    var a = estado === "salida" ? SH_C.ocupado : SH_C.libre;
+    var b = estado === "salida" ? SH_C.libre : SH_C.ocupado;
+    ctx.fillStyle = b; ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = a; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x+w, y); ctx.lineTo(x, y+h); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+  if(num){
+    ctx.fillStyle = pasado ? "#A5A59F" : SH_C.ink;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(String(num), x + w/2, y + h/2 + 1);
+  }
+}
+function shDibujaMes(ctx, x, y, w, h, year, month, hoyIso){
+  var headH = Math.round(h*0.14), wdH = Math.round(h*0.105), gap = 4;
+  // título del mes
+  ctx.fillStyle = "#E3E8EC"; shRoundRect(ctx, x, y, w, headH, 10); ctx.fill();
+  ctx.fillStyle = SH_C.navy; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.font = "700 " + Math.round(headH*0.55) + "px Archivo, Arial, sans-serif";
+  ctx.fillText(SH_MESES[month] + " de " + year, x + w/2, y + headH/2 + 1);
+  // días de la semana
+  var cw = (w - gap*6) / 7;
+  var wy = y + headH + gap;
+  ctx.font = "700 " + Math.round(wdH*0.5) + "px Archivo, Arial, sans-serif";
+  for(var c=0;c<7;c++){
+    var cx = x + c*(cw+gap);
+    ctx.fillStyle = SH_C.navy; shRoundRect(ctx, cx, wy, cw, wdH, 7); ctx.fill();
+    ctx.fillStyle = "#fff"; ctx.fillText(SH_DIAS[c], cx + cw/2, wy + wdH/2 + 1);
+  }
+  // celdas
+  var gy = wy + wdH + gap;
+  var ch = (y + h - gy - gap*5) / 6;
+  var first = new Date(year, month, 1);
+  var offset = (first.getDay() + 6) % 7;
+  var dias = new Date(year, month+1, 0).getDate();
+  ctx.font = "600 " + Math.round(Math.min(ch, cw)*0.46) + "px Archivo, Arial, sans-serif";
+  for(var i=0;i<42;i++){
+    var col = i % 7, row = Math.floor(i/7);
+    var cx2 = x + col*(cw+gap), cy2 = gy + row*(ch+gap);
+    var dnum = i - offset + 1;
+    if(dnum < 1 || dnum > dias){
+      ctx.save(); ctx.fillStyle = "#EEEEEA"; shRoundRect(ctx, cx2, cy2, cw, ch, 7); ctx.fill(); ctx.restore();
+      continue;
+    }
+    var iso = shIso(year, month, dnum);
+    shDibujaCelda(ctx, cx2, cy2, cw, ch, shEstadoDia(iso), iso < hoyIso, dnum);
+  }
+}
+function shDibujaLogo(ctx, W, y){
+  // sol
+  var sx = W/2 + 150, sy = y + 22;
+  ctx.save(); ctx.strokeStyle = "#E7B15C"; ctx.fillStyle = "#F2B84B"; ctx.lineWidth = 4; ctx.lineCap = "round";
+  ctx.beginPath(); ctx.arc(sx, sy, 17, 0, Math.PI*2); ctx.fill();
+  for(var k=0;k<12;k++){
+    var an = k*Math.PI/6;
+    ctx.beginPath(); ctx.moveTo(sx+Math.cos(an)*26, sy+Math.sin(an)*26); ctx.lineTo(sx+Math.cos(an)*36, sy+Math.sin(an)*36); ctx.stroke();
+  }
+  ctx.restore();
+  ctx.fillStyle = SH_C.navy; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  ctx.font = "italic 500 104px Fraunces, Georgia, serif";
+  ctx.fillText("Conil", W/2, y + 118);
+  ctx.save();
+  ctx.font = "600 31px Archivo, Arial, sans-serif";
+  try{ ctx.letterSpacing = "9px"; }catch(e){}
+  ctx.fillText("VACACIONES", W/2 + 4, y + 162);
+  ctx.restore();
+  // olas
+  ctx.save(); ctx.strokeStyle = "#8EC5E6"; ctx.lineWidth = 3; ctx.lineCap = "round";
+  [-1,1].forEach(function(sg){
+    ctx.beginPath();
+    for(var t=0;t<=60;t++){ var px = W/2 + sg*(30 + t); var py = y + 184 + Math.sin(t/60*Math.PI*3)*3.5; if(t===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); }
+    ctx.stroke();
+  });
+  ctx.fillStyle = "#F2B84B"; ctx.beginPath();
+  ctx.moveTo(W/2, y+196); ctx.bezierCurveTo(W/2-18, y+180, W/2-6, y+170, W/2, y+181); ctx.bezierCurveTo(W/2+6, y+170, W/2+18, y+180, W/2, y+196); ctx.fill();
+  ctx.restore();
+}
+function shDibujaLeyenda(ctx, W, y){
+  var items = [
+    { t:"Disponible", e:"libre" }, { t:"Ocupado", e:"ocupado" },
+    { t:"Salida ese día (libre por la tarde)", e:"salida" }, { t:"Entrada ese día (libre por la mañana)", e:"entrada" }
+  ];
+  ctx.font = "500 22px Archivo, Arial, sans-serif"; ctx.textBaseline = "middle"; ctx.textAlign = "left";
+  var colX = [48, 330], rowY = [y, y + 40];
+  items.forEach(function(it, i){
+    var cx = i < 2 ? 48 : 48;
+    var x = i % 2 === 0 ? 48 : 330; var yy = i < 2 ? y : y + 42;
+    if(i >= 2){ x = 48; yy = y + 42 + (i-2)*42; }
+    shDibujaCelda(ctx, x, yy - 14, 34, 28, it.e, false, null);
+    ctx.fillStyle = SH_C.ink; ctx.fillText(it.t, x + 46, yy + 1);
+  });
+}
+var shRenderToken = 0;
+async function renderOcupacionImagen(){
+  var canvas = document.getElementById("shCanvas");
+  if(!canvas) return;
+  var token = ++shRenderToken;
+  try{
+    await Promise.all([
+      document.fonts.load("italic 500 100px Fraunces"), document.fonts.load("600 40px Fraunces"),
+      document.fonts.load("500 20px Archivo"), document.fonts.load("600 20px Archivo"), document.fonts.load("700 20px Archivo")
+    ]);
+  }catch(e){}
+  if(token !== shRenderToken) return;
+  var vertical = document.getElementById("sh-fmt").value === "vt";
+  var W = 1080, H = vertical ? 1350 : 1080;
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#FAFAF7"; ctx.fillRect(0, 0, W, H);
+  var v = viviendas.find(function(x){ return x.id === reservasViviendaId; });
+  shDibujaLogo(ctx, W, 24);
+  // nombre de la vivienda
+  var nombre = v ? v.nombre : "";
+  var fs = 58; ctx.fillStyle = SH_C.navy; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  do { ctx.font = "600 " + fs + "px Fraunces, Georgia, serif"; fs -= 2; } while(ctx.measureText(nombre).width > W - 100 && fs > 24);
+  ctx.fillText(nombre, W/2, 268);
+  // meses
+  var parts = document.getElementById("sh-mes").value.split("-");
+  var y0 = parseInt(parts[0],10), m0 = parseInt(parts[1],10);
+  var n = vertical ? 6 : 4, rows = n/2, mx = 40, gapX = 24, gapY = 22;
+  var gridTop = 296, legendH = 205;
+  var mw = (W - mx*2 - gapX) / 2;
+  var mh = (H - gridTop - legendH - gapY*(rows-1)) / rows;
+  var hoy = new Date(); var hoyIso = shIso(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+  for(var i=0;i<n;i++){
+    var d = new Date(y0, m0 + i, 1);
+    var col = i % 2, row = Math.floor(i/2);
+    shDibujaMes(ctx, mx + col*(mw+gapX), gridTop + row*(mh+gapY), mw, mh, d.getFullYear(), d.getMonth(), hoyIso);
+  }
+  shDibujaLeyenda(ctx, W, H - legendH + 38);
+  ctx.fillStyle = SH_C.navy; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  ctx.font = "700 26px Archivo, Arial, sans-serif";
+  ctx.fillText("Reserva en conilvacaciones.github.io", W/2, H - 22);
+}
+document.getElementById("btnShDownload").addEventListener("click", async function(){
+  await renderOcupacionImagen();
+  var canvas = document.getElementById("shCanvas");
+  canvas.toBlob(function(blob){
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "disponibilidad-" + (reservasViviendaId || "vivienda") + "-" + document.getElementById("sh-mes").value + ".png";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+  }, "image/png");
 });
 
 /* ============ PRECIOS POR TEMPORADA ============ */
