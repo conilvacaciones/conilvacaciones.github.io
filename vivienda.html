@@ -459,6 +459,13 @@ input,textarea{font:inherit;}
 .bi-card b{display:block;color:var(--atlantic);font-size:16px;margin-bottom:6px;}
 .bi-card p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink-soft);}
 @media(max-width:760px){.booking-info-grid{grid-template-columns:1fr;}}
+.pol-grid{display:block;column-count:2;column-gap:14px;}
+.pol-grid .bi-card{break-inside:avoid;margin-bottom:14px;}
+.pol-list{list-style:none;margin:0;padding:0;display:grid;gap:8px;}
+.pol-list li{position:relative;padding-left:16px;font-size:13.5px;line-height:1.5;color:var(--ink-soft);}
+.pol-list li:before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--sol);}
+.pol-list li b{display:inline;font-size:inherit;margin:0;color:var(--atlantic);}
+@media(max-width:760px){.pol-grid{column-count:1;}}
 .booking-info-list{list-style:none;padding:0;margin:0;display:grid;gap:10px;}
 .booking-info-list li{position:relative;padding-left:22px;font-size:14px;line-height:1.55;color:var(--ink-soft);}
 .booking-info-list li:before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--sol);}
@@ -814,6 +821,17 @@ html{scroll-behavior:smooth;}
           <div class="bi-card"><span class="bi-ic">💬</span><b>Trato directo</b><p>Conil Vacaciones te pone en contacto con el propietario de esta vivienda.</p></div>
           <div class="bi-card"><span class="bi-ic">🤝</span><b>Reserva con el propietario</b><p>El primer pago, para reservar, se hace directamente al propietario, nunca a través de esta web.</p></div>
           <div class="bi-card"><span class="bi-ic">🔑</span><b>Llaves y atención</b><p>El propietario es responsable del alojamiento: llaves, limpieza y atención durante la estancia.</p></div>
+        </div>
+      </div>
+
+      <div class="booking-info-section policies-section">
+        <span class="eyebrow">Condiciones</span>
+        <h4>Confianza, normas y cancelación</h4>
+        <div class="booking-info-grid pol-grid">
+          <div class="bi-card"><span class="bi-ic">🛡️</span><b>Confianza</b><ul class="pol-list"><li>Propietarios particulares.</li><li>Dirección verificada.</li><li>Fotos y vídeo hechos por nosotros, para que lo que ves sea lo que hay.</li><li>Limpieza a cargo del propietario.</li></ul></div>
+          <div class="bi-card"><span class="bi-ic">📋</span><b>Normas</b><ul class="pol-list"><li>No se admiten fiestas.</li><li>Si la vivienda no admite mascotas, tampoco se admiten en visitas.</li><li>Música baja a partir de las 00:00 h.</li><li>La vivienda debe entregarse en las mismas condiciones en que se recibió.</li><li>Si vienes con coche eléctrico, avísalo con antelación.</li><li>No se puede superar el número máximo de huéspedes indicado en la ficha.</li><li>No se permite fumar dentro de la vivienda.</li><li>Cualquier daño o desperfecto lo asume el huésped.</li><li>Respeta a los vecinos y las zonas comunes, si las hay.</li></ul></div>
+          <div class="bi-card"><span class="bi-ic">💶</span><b>Depósito y pago</b><ul class="pol-list"><li>Para reservar se abona un depósito o señal directamente al propietario, nunca a través de esta web.</li><li>La reserva queda confirmada cuando el propietario recibe el depósito.</li><li>El resto del alquiler se paga a la llegada.</li></ul></div>
+          <div class="bi-card"><span class="bi-ic">📅</span><b>Política de cancelación</b><ul class="pol-list"><li><b>Más de 90 días antes de la llegada:</b> se devuelve el 100 % del depósito.</li><li><b>Entre 90 y 30 días:</b> no se devuelve, pero sirve como crédito durante 2 años en la misma vivienda.</li><li><b>Menos de 30 días:</b> no se devuelve.</li><li>Para cancelar, escribe al propietario o por WhatsApp.</li></ul></div>
         </div>
       </div>
 
