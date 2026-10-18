@@ -217,6 +217,30 @@ input,textarea{font:inherit;}
 .section-head h2{font-family:var(--ff-display);font-weight:600;font-size:clamp(28px,3.4vw,40px);color:var(--atlantic);margin-top:14px;}
 .section-head p{color:var(--ink-soft);font-size:15px;max-width:420px;}
 /* ============ FAQ ============ */
+/* ============ CÓMO RESERVAR ============ */
+.how-section{padding:90px 0 40px;}
+.how-top{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:46px;}
+.how-top h2{font-family:var(--ff-display);font-weight:600;font-size:clamp(28px,3.4vw,40px);color:var(--atlantic);margin-top:14px;line-height:1.1;letter-spacing:-.5px;}
+.how-top h2 em{color:var(--bougain);}
+.how-cta{background:var(--atlantic);color:#fff;padding:13px 24px;border-radius:99px;font-weight:600;font-size:14px;transition:background .2s,transform .2s;}
+.how-cta:hover{background:var(--atlantic-soft);transform:translateY(-2px);}
+.how-row{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;position:relative;}
+.how-row:before{content:"";position:absolute;left:8%;right:8%;top:30px;border-top:2px dashed #cfd3c4;z-index:0;}
+.how-card{display:flex;position:relative;z-index:1;background:#fff;border:1px solid var(--line);border-radius:26px;padding:8px;box-shadow:0 14px 30px rgba(11,61,92,.07);transition:transform .25s,box-shadow .25s;}
+.how-card:hover{transform:translateY(-4px);box-shadow:0 20px 38px rgba(11,61,92,.12);}
+.how-in{flex:1;text-align:center;border-radius:19px;padding:0 14px 24px;min-height:150px;display:flex;flex-direction:column;align-items:center;}
+.how-pin{width:44px;height:44px;border-radius:50%;margin:-14px auto 8px;background:var(--cal);box-shadow:0 0 0 6px var(--cal);display:grid;place-items:center;}
+.how-pin span{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 16px var(--ff-display);}
+.how-in h3{font-family:var(--ff-display);font-weight:600;font-size:16.5px;color:var(--atlantic);margin:16px 0 6px;white-space:nowrap;}
+.how-in p{margin:0;font-size:13.5px;line-height:1.55;color:#55626d;}
+.how-1{background:#fdeaf0;}.how-1 .how-pin span{background:var(--bougain);}
+.how-2{background:#fdf1dc;}.how-2 .how-pin span{background:#d99a2b;}
+.how-3{background:#e4f1ee;}.how-3 .how-pin span{background:var(--teal);}
+.how-4{background:#e6eef7;}.how-4 .how-pin span{background:var(--atlantic);}
+.how-foot{margin-top:34px;text-align:center;font-size:14px;color:var(--ink-soft);}
+.how-foot a{color:var(--atlantic);text-decoration:underline;margin-left:6px;}
+@media(max-width:1000px){.how-row{grid-template-columns:repeat(2,1fr);gap:34px 20px;}.how-row:before{display:none;}.how-in h3{white-space:normal;}}
+@media(max-width:560px){.how-row{grid-template-columns:1fr;}.how-section{padding-top:60px;}}
 .faq-section{padding:20px 0 90px;}
 .faq-list{max-width:780px;margin:38px auto 0;display:flex;flex-direction:column;gap:12px;}
 .faq-item{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;box-shadow:0 8px 20px -16px rgba(11,61,92,.25);transition:box-shadow .2s ease,transform .2s ease;}
@@ -862,6 +886,25 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
 </section>
 
 <!-- ============ FAQ ============ -->
+<section class="how-section reveal" id="como-reservar">
+  <div class="wrap">
+    <div class="how-top">
+      <div>
+        <span class="eyebrow">Cómo reservar</span>
+        <h2>Reserva tu casa en Conil<br><em>en 4 pasos</em></h2>
+      </div>
+      <a class="how-cta" href="#viviendas">Ver viviendas →</a>
+    </div>
+    <div class="how-row">
+      <div class="how-card"><div class="how-in how-1"><div class="how-pin"><span>1</span></div><h3>Elige tus fechas 📅</h3><p>Selecciona entrada y salida en nuestro buscador y mira las casas libres.</p></div></div>
+      <div class="how-card"><div class="how-in how-2"><div class="how-pin"><span>2</span></div><h3>Consúltanos 💬</h3><p>Por WhatsApp o Gmail desde la ficha de la casa, sin compromiso.</p></div></div>
+      <div class="how-card"><div class="how-in how-3"><div class="how-pin"><span>3</span></div><h3>El propietario confirma ✅</h3><p>Te confirma la disponibilidad y las condiciones directamente contigo.</p></div></div>
+      <div class="how-card"><div class="how-in how-4"><div class="how-pin"><span>4</span></div><h3>Reserva con el depósito 💶</h3><p>Pagas la señal al propietario y el resto a tu llegada.</p></div></div>
+    </div>
+    <p class="how-foot">¿Dudas con la cancelación?<a href="/politica-de-cancelacion/">Ver política de cancelación</a></p>
+  </div>
+</section>
+
 <section class="faq-section" id="faq">
   <div class="wrap">
     <div class="section-head" style="justify-content:center;text-align:center">
