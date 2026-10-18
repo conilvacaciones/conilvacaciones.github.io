@@ -765,7 +765,6 @@ html{scroll-behavior:smooth;}
         <div class="time-card" id="modalCheckinoutSection" style="display:none">
           <span class="eyebrow"><svg class="icon" style="width:14px;height:14px"><use href="#i-cal"/></svg>Horario</span>
           <div class="time-list" id="modalCheckinout"></div>
-          <p class="time-dist" id="modalDistance"></p>
         </div>
       </div>
 
@@ -1645,7 +1644,6 @@ function openModal(id){
     document.getElementById("modalCheckinout").innerHTML =
       (currentHouse.checkin ? '<div class="time-item"><span class="ti-ic">'+iconSvg("i-cal")+'</span><div><small>Check-in</small><b>'+escapeHTML(currentHouse.checkin)+'</b></div></div>' : '')+
       (currentHouse.checkout ? '<div class="time-item"><span class="ti-ic">'+iconSvg("i-cal")+'</span><div><small>Check-out</small><b>'+escapeHTML(currentHouse.checkout)+'</b></div></div>' : '');
-    document.getElementById("modalDistance").innerHTML = currentHouse.distance ? iconSvg("i-pin")+escapeHTML(currentHouse.distance) : "";
   } else {
     checkinoutSection.style.display = "none";
   }
