@@ -1538,6 +1538,7 @@ var AMENITY_EMOJI = {
 var AMENITY_EMOJI_KEYS = [["piscina","🏊"],["jard","🌳"],["terraza","☀️"],["playa","🏖️"],["mar","🌊"],["wifi","📶"],["tv","📺"],["aire","❄️"],["calef","🌡️"],["parking","🅿️"],["garaje","🅿️"],["mascota","🐾"],["barbac","🍖"],["cocina","🍳"],["lavad","🧺"],["cafe","☕"],["cama","🛏️"],["baño","🛁"],["ducha","🚿"],["bici","🚲"],["juego","🎲"],["niñ","🧸"],["cuna","🍼"]];
 function amenityEmoji(a){
   if(AMENITY_EMOJI[a.label]) return AMENITY_EMOJI[a.label];
+  for(var k in AMENITY_EMOJI){ if(k.toLowerCase() === (a.label||"").toLowerCase()) return AMENITY_EMOJI[k]; }
   var l = (a.label||"").toLowerCase();
   for(var i=0;i<AMENITY_EMOJI_KEYS.length;i++){ if(l.indexOf(AMENITY_EMOJI_KEYS[i][0])>-1) return AMENITY_EMOJI_KEYS[i][1]; }
   return "✨";
@@ -1555,7 +1556,7 @@ var AMENITY_CATEGORIES = {
 };
 function amenityCategoryFor(label){
   for(var cat in AMENITY_CATEGORIES){
-    if(AMENITY_CATEGORIES[cat].indexOf(label) > -1) return cat;
+    if(AMENITY_CATEGORIES[cat].some(function(x){ return x.toLowerCase() === String(label).toLowerCase(); })) return cat;
   }
   return "Otros";
 }
@@ -1593,7 +1594,8 @@ function renderAmenitiesGrouped(amenities){
     if(!grouped[cat]) grouped[cat] = [];
     grouped[cat].push(a);
   });
-  var order = Object.keys(AMENITY_CATEGORIES).concat(["Otros"]);
+  var order = Object.keys(AMENITY_CATEGORIES);
+  if(order.indexOf("Otros") < 0) order.push("Otros");
   var html = order.filter(function(cat){ return grouped[cat] && grouped[cat].length; }).map(function(cat){
     var items = grouped[cat].map(function(a){
       return '<span class="amenity-chip">'+'<span class="em">'+amenityEmoji(a)+'</span>'+escapeHTML(a.label)+'</span>';
