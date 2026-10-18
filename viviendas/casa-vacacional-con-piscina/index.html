@@ -296,6 +296,8 @@ input,textarea{font:inherit;}
   font-size:11.5px;color:var(--ink-soft);font-weight:500;
 }
 .amenity-chip .icon{width:13px;height:13px;color:var(--bougain);}
+.amenity-chip .em{font-size:15px;line-height:1;flex:none;}
+
 .house-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:6px;gap:12px;}
 .rating-pill{display:flex;align-items:center;gap:8px;}
 .rating-score{background:var(--teal);color:#fff;font-family:var(--ff-mono);font-weight:600;font-size:13px;padding:4px 8px;border-radius:7px;}
@@ -1097,7 +1099,7 @@ function renderHouseCards(list, matchInfo){
     var pal = paletteFor(h.id);
     var cover = h.photoUrls && h.photoUrls[0];
     var amenitiesHTML = h.amenities.slice(0,4).map(function(a){
-      return '<span class="amenity-chip">'+iconSvg(a.icon || "i-check")+escapeHTML(a.label)+'</span>';
+      return '<span class="amenity-chip">'+'<span class="em">'+amenityEmoji(a)+'</span>'+escapeHTML(a.label)+'</span>';
     }).join("");
     var extra = h.amenities.length > 4 ? '<span class="amenity-chip">+'+(h.amenities.length-4)+'</span>' : "";
     var match = matchInfo && matchInfo[h.id];
@@ -1522,6 +1524,24 @@ function updateViviendaJsonLd(house){
   tag.textContent = JSON.stringify(buildViviendaJsonLd(house));
 }
 
+var AMENITY_EMOJI = {
+  "Secador de pelo":"💨","Productos de limpieza":"🧴","Champú":"🧴","Gel de ducha":"🧼","Agua caliente":"🚿","Toallas":"🧺","Papel higiénico":"🧻","Bañera":"🛁","Bidé":"🚽",
+  "Lavadora":"🧺","Secadora":"♨️","Perchas":"👔","Ropa de cama":"🛏️","Almohadas y mantas adicionales":"🛌","Persianas o cortinas opacas":"🌙","Plancha":"👕","Armario":"🚪",
+  "Cocina totalmente equipada":"🍳","Nevera":"🧊","Microondas":"🍲","Horno":"🥘","Placa de cocina":"🔥","Lavavajillas":"🍽️","Cafetera":"☕","Tostadora":"🍞","Hervidor eléctrico":"🫖","Utensilios de cocina":"🥄","Mesa de comedor":"🍴",
+  "Aire acondicionado":"❄️","Calefacción":"🌡️","Chimenea":"🔥","Ventilador":"🌀","Insonorización":"🔇","Mosquitera":"🦟",
+  "Piscina privada":"🏊","Jardín privado":"🌳","Terraza / solárium":"☀️","Barbacoa":"🍖","Zona de comedor exterior":"🍷","Mobiliario exterior":"⛱️","Entrada privada":"🔑",
+  "Vistas al mar":"🌊","Vistas a la piscina":"🏊","Vistas al jardín":"🌿",
+  "WiFi gratuito":"📶","WiFi":"📶","TV":"📺","Zona de estar":"🛋️","Escritorio":"💻",
+  "Detector de humo":"🚨","Extintor":"🧯","Botiquín de primeros auxilios":"🩹","Cámaras de seguridad exteriores":"📹",
+  "Se admiten mascotas":"🐾","Parking privado":"🅿️","Ascensor":"🛗","Accesible en silla de ruedas":"♿"
+};
+var AMENITY_EMOJI_KEYS = [["piscina","🏊"],["jard","🌳"],["terraza","☀️"],["playa","🏖️"],["mar","🌊"],["wifi","📶"],["tv","📺"],["aire","❄️"],["calef","🌡️"],["parking","🅿️"],["garaje","🅿️"],["mascota","🐾"],["barbac","🍖"],["cocina","🍳"],["lavad","🧺"],["cafe","☕"],["cama","🛏️"],["baño","🛁"],["ducha","🚿"],["bici","🚲"],["juego","🎲"],["niñ","🧸"],["cuna","🍼"]];
+function amenityEmoji(a){
+  if(AMENITY_EMOJI[a.label]) return AMENITY_EMOJI[a.label];
+  var l = (a.label||"").toLowerCase();
+  for(var i=0;i<AMENITY_EMOJI_KEYS.length;i++){ if(l.indexOf(AMENITY_EMOJI_KEYS[i][0])>-1) return AMENITY_EMOJI_KEYS[i][1]; }
+  return "✨";
+}
 var AMENITY_CATEGORIES = {
   "Baño": ["Secador de pelo","Productos de limpieza","Champú","Gel de ducha","Agua caliente","Toallas","Papel higiénico","Bañera","Bidé"],
   "Dormitorio y lavandería": ["Lavadora","Secadora","Perchas","Ropa de cama","Almohadas y mantas adicionales","Persianas o cortinas opacas","Plancha","Armario"],
@@ -1544,7 +1564,7 @@ function renderAmenitiesCompact(amenities){
   var LIMIT = 8;
   var shown = amenities.slice(0, LIMIT);
   var chipsHTML = shown.map(function(a){
-    return '<span class="amenity-chip">'+iconSvg(a.icon || "i-check")+escapeHTML(a.label)+'</span>';
+    return '<span class="amenity-chip">'+'<span class="em">'+amenityEmoji(a)+'</span>'+escapeHTML(a.label)+'</span>';
   }).join("");
   var moreBtn = amenities.length > LIMIT
     ? '<button type="button" class="btn btn-ghost btn-sm" id="btnToggleAmenities" style="margin-top:10px">Ver todos los servicios ('+amenities.length+')</button>'
@@ -1576,7 +1596,7 @@ function renderAmenitiesGrouped(amenities){
   var order = Object.keys(AMENITY_CATEGORIES).concat(["Otros"]);
   var html = order.filter(function(cat){ return grouped[cat] && grouped[cat].length; }).map(function(cat){
     var items = grouped[cat].map(function(a){
-      return '<span class="amenity-chip">'+iconSvg(a.icon || "i-check")+escapeHTML(a.label)+'</span>';
+      return '<span class="amenity-chip">'+'<span class="em">'+amenityEmoji(a)+'</span>'+escapeHTML(a.label)+'</span>';
     }).join("");
     return '<div class="amenity-group"><div class="amenity-group-title">'+escapeHTML(cat)+'</div><div class="amenity-group-items">'+items+'</div></div>';
   }).join("");
