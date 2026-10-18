@@ -61,6 +61,7 @@ const STATIC_PAGES = [
   { loc: `${SITE_URL}/aviso-legal/`, changefreq: "yearly", priority: "0.2" },
   { loc: `${SITE_URL}/politica-privacidad/`, changefreq: "yearly", priority: "0.2" },
   { loc: `${SITE_URL}/politica-cookies/`, changefreq: "yearly", priority: "0.2" },
+  { loc: `${SITE_URL}/politica-de-cancelacion/`, changefreq: "yearly", priority: "0.3" },
 ];
 
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
