@@ -58,9 +58,6 @@ const STATIC_PAGES = [
   { loc: `${SITE_URL}/`, changefreq: "weekly", priority: "1.0" },
   { loc: `${SITE_URL}/blog/`, changefreq: "weekly", priority: "0.8" },
   { loc: `${SITE_URL}/anunciate-con-nosotros/`, changefreq: "monthly", priority: "0.6" },
-  { loc: `${SITE_URL}/aviso-legal/`, changefreq: "yearly", priority: "0.2" },
-  { loc: `${SITE_URL}/politica-privacidad/`, changefreq: "yearly", priority: "0.2" },
-  { loc: `${SITE_URL}/politica-cookies/`, changefreq: "yearly", priority: "0.2" },
   { loc: `${SITE_URL}/politica-de-cancelacion/`, changefreq: "yearly", priority: "0.3" },
 ];
 
@@ -83,6 +80,32 @@ function stripHTML(html) {
 function truncate(text, max) {
   if (text.length <= max) return text;
   return text.slice(0, max - 1).replace(/\s+\S*$/, "") + "…";
+}
+
+function escapeText(text) {
+  return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// Limpia HTML de contenido (por ejemplo pegado desde otras apps) dejando solo
+// etiquetas de texto simples y sin atributos (salvo href en enlaces).
+function sanitizeContentHtml(html) {
+  if (!html) return "";
+  const allowed = new Set(["p", "br", "h2", "h3", "h4", "ul", "ol", "li", "strong", "b", "em", "i", "a", "blockquote"]);
+  let s = String(html)
+    .replace(/<(script|style)[\s\S]*?<\/\1>/gi, "")
+    .replace(/<!--[\s\S]*?-->/g, "");
+  s = s.replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b([^>]*)>/g, (m, tag, attrs) => {
+    const t = tag.toLowerCase();
+    const closing = m.startsWith("</");
+    if (!allowed.has(t)) return t === "div" || t === "section" ? (closing ? "\n" : "") : "";
+    if (closing) return `</${t}>`;
+    if (t === "a") {
+      const h = /href\s*=\s*"(https?:\/\/[^"]*|\/[^"]*)"/i.exec(attrs);
+      return h ? `<a href="${h[1]}">` : "<a>";
+    }
+    return `<${t}>`;
+  });
+  return s.replace(/\n{2,}/g, "\n").trim();
 }
 
 // Escapa para insertar de forma segura dentro de un atributo HTML (content="...").
@@ -132,6 +155,7 @@ async function fetchActiveViviendas() {
       nombre: String(r.nombre || "").trim(),
       tagline: String(r.tagline || "").trim(),
       descripcion: stripHTML(r.descripcion),
+      descripcionHtml: sanitizeContentHtml(r.descripcion),
       imagen: publicPhotoUrl(fotos[0]) || FALLBACK_IMAGE,
     };
   }).filter((r) => r.id.length > 0);
@@ -159,7 +183,7 @@ async function fetchActiveViviendas() {
 }
 
 async function fetchPublishedBlogPosts() {
-  const url = `${SUPABASE_URL}/rest/v1/blog_posts?select=id,slug,titulo,resumen,portada&publicado=eq.true`;
+  const url = `${SUPABASE_URL}/rest/v1/blog_posts?select=id,slug,titulo,resumen,portada,contenido,created_at&publicado=eq.true`;
   const res = await fetch(url, {
     headers: {
       apikey: SUPABASE_KEY,
@@ -179,6 +203,9 @@ async function fetchPublishedBlogPosts() {
       slug,
       titulo: String(r.titulo || "").trim(),
       resumen: stripHTML(r.resumen),
+      contenidoHtml: sanitizeContentHtml(r.contenido),
+      portadaUrl: publicBlogPhotoUrl(r.portada) || "",
+      fecha: r.created_at || "",
       imagen: publicBlogPhotoUrl(r.portada) || FALLBACK_IMAGE,
     };
   }).filter((r) => r.id.length > 0);
@@ -249,6 +276,27 @@ function buildPageContent(template, vivienda) {
     /<meta name="twitter:image" content="https:\/\/conilvacaciones\.github\.io\/images\/og-image\.png">/,
     `<meta name="twitter:image" content="${escapeAttr(image)}">`
   );
+  // Contenido real dentro del HTML (para buscadores que no ejecutan JavaScript).
+  // El JavaScript de la página lo sustituye al cargar, así que el visitante no nota diferencia.
+  if (vivienda.nombre) {
+    html = html.replace(
+      '<h3 id="modalTitle">Vivienda en Conil de la Frontera</h3>',
+      () => `<h3 id="modalTitle">${escapeText(vivienda.nombre)}</h3>`
+    );
+  }
+  if (vivienda.tagline) {
+    html = html.replace(
+      '<p class="house-tagline" id="modalTagline"></p>',
+      () => `<p class="house-tagline" id="modalTagline">${escapeText(vivienda.tagline)}</p>`
+    );
+  }
+  if (vivienda.descripcionHtml) {
+    html = html.replace(
+      '<div class="modal-desc" id="modalDesc"></div>',
+      () => `<div class="modal-desc" id="modalDesc">${vivienda.descripcionHtml}</div>`
+    );
+  }
+
   html = html.replace(
     /<link rel="canonical" id="canonicalLink" href="https:\/\/conilvacaciones\.github\.io\/vivienda\.html">/,
     `<link rel="canonical" id="canonicalLink" href="${escapeAttr(pageUrl)}">`
@@ -304,6 +352,25 @@ function buildBlogPageContent(template, post) {
     /<meta name="twitter:image" content="https:\/\/conilvacaciones\.github\.io\/images\/og-image\.png">/,
     `<meta name="twitter:image" content="${escapeAttr(image)}">`
   );
+  // Texto real de la entrada dentro del HTML (para buscadores que no ejecutan JavaScript).
+  // El JavaScript de la página sustituye este bloque al cargar el listado.
+  if (post.titulo && post.contenidoHtml) {
+    const fechaTxt = post.fecha
+      ? new Date(post.fecha).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Madrid" })
+      : "";
+    const portada = post.portadaUrl
+      ? `<img src="${escapeAttr(post.portadaUrl)}" alt="${escapeAttr(post.titulo)}" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0">`
+      : "";
+    const articulo =
+      `<article class="blog-static-post" style="grid-column:1/-1;max-width:760px">` +
+      (fechaTxt ? `<p class="blog-date">${escapeText(fechaTxt)}</p>` : "") +
+      `<h2>${escapeText(post.titulo)}</h2>` +
+      portada +
+      `<div class="blog-modal-content">${post.contenidoHtml}</div>` +
+      `</article>`;
+    html = html.replace('<p class="blog-empty">Cargando entradas…</p>', () => articulo);
+  }
+
   html = html.replace(
     /<link rel="canonical" href="https:\/\/conilvacaciones\.github\.io\/blog\/">/,
     `<link rel="canonical" href="${escapeAttr(pageUrl)}">`
