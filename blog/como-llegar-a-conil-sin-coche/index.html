@@ -538,6 +538,22 @@ input,textarea{font:inherit;}
 .blog-modal-content h3{font-family:var(--ff-display);font-size:19px;color:var(--atlantic);margin:16px 0 8px;}
 .blog-modal-content p{margin:0 0 12px;}
 .blog-modal-content ul{margin:0 0 12px;padding-left:22px;}
+.blog-houses{margin:40px 0 44px;padding-top:30px;border-top:1px solid var(--line);}
+.blog-houses-title{font-family:var(--ff-display);font-weight:600;font-size:22px;color:var(--atlantic);margin:0 0 4px;}
+.blog-houses-sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px;}
+.blog-houses-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.bh-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;color:inherit;text-decoration:none;transition:transform .25s,box-shadow .25s;}
+.bh-card:hover{transform:translateY(-4px);box-shadow:0 16px 30px -14px rgba(11,61,92,.35);}
+.bh-photo{aspect-ratio:4/3;background:var(--cal-2);overflow:hidden;}
+.bh-photo img{width:100%;height:100%;object-fit:cover;display:block;margin:0;border-radius:0;transition:transform .4s;}
+.bh-card:hover .bh-photo img{transform:scale(1.05);}
+.bh-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px;flex:1;}
+.bh-name{font-family:var(--ff-display);font-weight:600;font-size:17px;color:var(--atlantic);line-height:1.2;}
+.bh-meta{font-size:12.5px;color:var(--ink-soft);}
+.bh-price{margin-top:auto;padding-top:8px;font-size:13px;color:var(--ink-soft);}
+.bh-price b{font-family:var(--ff-display);font-size:18px;color:var(--bougain);}
+.blog-houses-all{display:inline-block;margin-top:18px;font-weight:600;font-size:14px;color:var(--atlantic);text-decoration:underline;}
+@media(max-width:760px){.blog-houses-grid{grid-template-columns:1fr;}.bh-card{flex-direction:row;}.bh-photo{aspect-ratio:auto;width:120px;flex:none;}}
 .blog-modal-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:26px;}
 .blog-modal-gallery img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:var(--radius-sm);display:block;}
 @media (max-width:600px){
@@ -662,6 +678,7 @@ input,textarea{font:inherit;}
       <div class="share-buttons" id="blogShareButtons"></div>
       <div class="blog-modal-content" id="blogModalContent"></div>
       <div class="blog-modal-gallery" id="blogModalGallery"></div>
+      <div class="blog-houses" id="blogHouses"></div>
     </div>
   </div>
 </div>
@@ -905,6 +922,50 @@ function renderShareButtons(containerId, url, title, resumen){
   }
 }
 
+var BLOG_HOUSES = null;
+async function loadBlogHouses(){
+  try{
+    var res = await sb.from("viviendas").select("id,slug,nombre,distancia,huespedes,dormitorios,precio,unidad_precio,fotos,orden").eq("activo", true).order("orden", {ascending:true});
+    if(res.error) throw res.error;
+    BLOG_HOUSES = res.data || [];
+  }catch(err){
+    console.error("Error cargando viviendas para el blog:", err);
+    BLOG_HOUSES = [];
+  }
+}
+var blogHousesPromise = loadBlogHouses();
+async function renderBlogHouses(postId){
+  var cont = document.getElementById("blogHouses");
+  if(!cont) return;
+  cont.innerHTML = "";
+  await blogHousesPromise;
+  if(!BLOG_HOUSES || !BLOG_HOUSES.length) return;
+  // Reparto: cada entrada empieza en una vivienda distinta para que no salgan siempre las mismas.
+  var idx = Math.max(0, BLOG_POSTS.findIndex(function(x){ return x.id === postId; }));
+  var n = Math.min(3, BLOG_HOUSES.length);
+  var list = [];
+  for(var k=0; k<n; k++){ list.push(BLOG_HOUSES[(idx + k) % BLOG_HOUSES.length]); }
+  var cards = list.map(function(h){
+    var foto = (h.fotos && h.fotos[0]) ? sb.storage.from("fotos-viviendas").getPublicUrl(h.fotos[0]).data.publicUrl : "";
+    var meta = [];
+    if(h.huespedes) meta.push(h.huespedes + " huéspedes");
+    if(h.dormitorios) meta.push(h.dormitorios + " dorm.");
+    if(h.distancia) meta.push(h.distancia);
+    var url = "/viviendas/" + encodeURIComponent(h.slug || h.id) + "/";
+    var unidad = h.unidad_precio === "semana" ? "semana" : "noche";
+    return '<a class="bh-card" href="'+url+'">'+
+      '<div class="bh-photo">'+(foto ? '<img src="'+foto+'" alt="'+escapeHTML(h.nombre)+'" loading="lazy">' : '')+'</div>'+
+      '<div class="bh-body"><span class="bh-name">'+escapeHTML(h.nombre)+'</span>'+
+      '<span class="bh-meta">'+escapeHTML(meta.join(" · "))+'</span>'+
+      (h.precio ? '<span class="bh-price">desde <b>'+escapeHTML(String(h.precio))+' €</b> / '+unidad+'</span>' : '')+
+      '</div></a>';
+  }).join("");
+  cont.innerHTML = '<h3 class="blog-houses-title">¿Te apetece conocer Conil? Mira dónde alojarte</h3>'+
+    '<p class="blog-houses-sub">Casas y apartamentos de gente de aquí, con trato directo.</p>'+
+    '<div class="blog-houses-grid">'+cards+'</div>'+
+    '<a class="blog-houses-all" href="/#viviendas">Ver todas las viviendas →</a>';
+}
+
 var blogBackdrop = document.getElementById("blogModalBackdrop");
 function openBlogModal(id, esCargaInicial){
   var p = BLOG_POSTS.find(function(x){ return x.id === id; });
@@ -927,6 +988,7 @@ function openBlogModal(id, esCargaInicial){
     history.pushState({blogPost: p.id}, "", postUrl);
   }
   renderShareButtons("blogShareButtons", postUrl, p.titulo, p.resumen || "");
+  renderBlogHouses(p.id);
 }
 function isOnPostUrl(){
   return window.location.search.indexOf("post=") !== -1 || /\/blog\/[a-z0-9-]+\/?$/i.test(window.location.pathname);
