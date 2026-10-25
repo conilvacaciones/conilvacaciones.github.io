@@ -133,7 +133,7 @@ function publicBlogPhotoUrl(storagePath) {
 }
 
 async function fetchActiveViviendas() {
-  const url = `${SUPABASE_URL}/rest/v1/viviendas?select=id,slug,nombre,tagline,descripcion,fotos&activo=eq.true`;
+  const url = `${SUPABASE_URL}/rest/v1/viviendas?select=id,slug,nombre,tagline,descripcion,fotos,huespedes,dormitorios,banos,zona,amenities&activo=eq.true`;
   const res = await fetch(url, {
     headers: {
       apikey: SUPABASE_KEY,
@@ -157,6 +157,13 @@ async function fetchActiveViviendas() {
       descripcion: stripHTML(r.descripcion),
       descripcionHtml: sanitizeContentHtml(r.descripcion),
       imagen: publicPhotoUrl(fotos[0]) || FALLBACK_IMAGE,
+      fotosUrls: fotos.map((f) => publicPhotoUrl(f)).filter(Boolean).slice(0, 10),
+      huespedes: Number(r.huespedes) || 0,
+      dormitorios: Number(r.dormitorios) || 0,
+      banos: Number(r.banos) || 0,
+      amenities: Array.isArray(r.amenities)
+        ? [...new Set(r.amenities.map((a) => String((a && a.label) || "").trim()).filter(Boolean))]
+        : [],
     };
   }).filter((r) => r.id.length > 0);
 
@@ -227,6 +234,84 @@ async function fetchPublishedBlogPosts() {
     result.push(r);
   }
   return result;
+}
+
+// ---------- Datos estructurados (JSON-LD) ----------
+const ORG_ID = `${SITE_URL}/#organization`;
+
+function jsonLdScript(obj, id) {
+  // "<" escapado para que ningún texto pueda cerrar la etiqueta <script>
+  const json = JSON.stringify(obj).replace(/</g, "\\u003c");
+  return `<script type="application/ld+json"${id ? ` id="${id}"` : ""}>${json}</script>`;
+}
+
+function breadcrumbLd(items) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((it, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: it.name,
+      item: it.url,
+    })),
+  };
+}
+
+function viviendaLd(v, pageUrl) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "LodgingBusiness",
+    "@id": `${pageUrl}#alojamiento`,
+    name: v.nombre,
+    url: pageUrl,
+    parentOrganization: { "@id": ORG_ID },
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Conil de la Frontera",
+      addressRegion: "Cádiz",
+      addressCountry: "ES",
+    },
+  };
+  const desc = v.descripcion || v.tagline;
+  if (desc) data.description = truncate(desc, 500);
+  if (v.fotosUrls && v.fotosUrls.length) data.image = v.fotosUrls;
+  if (v.huespedes) data.occupancy = { "@type": "QuantitativeValue", maxValue: v.huespedes };
+  if (v.dormitorios) data.numberOfRooms = v.dormitorios;
+  const place = { "@type": "Accommodation" };
+  if (v.huespedes) place.occupancy = { "@type": "QuantitativeValue", maxValue: v.huespedes };
+  if (v.dormitorios) place.numberOfBedrooms = v.dormitorios;
+  if (v.banos) place.numberOfBathroomsTotal = v.banos;
+  if (Object.keys(place).length > 1) data.containsPlace = place;
+  if (v.amenities && v.amenities.length) {
+    data.amenityFeature = v.amenities.map((name) => ({
+      "@type": "LocationFeatureSpecification",
+      name,
+      value: true,
+    }));
+  }
+  // Sin aggregateRating aquí: solo se añade en el navegador cuando hay reseñas reales aprobadas.
+  return data;
+}
+
+function blogPostLd(post, pageUrl) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${pageUrl}#articulo`,
+    mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+    headline: truncate(post.titulo, 110),
+    inLanguage: "es-ES",
+    author: { "@id": ORG_ID },
+    publisher: { "@id": ORG_ID },
+  };
+  if (post.resumen) data.description = truncate(post.resumen, 300);
+  if (post.imagen) data.image = [post.imagen];
+  if (post.fecha) {
+    const d = new Date(post.fecha);
+    if (!isNaN(d.getTime())) data.datePublished = d.toISOString();
+  }
+  return data;
 }
 
 function buildPageContent(template, vivienda) {
@@ -302,6 +387,23 @@ function buildPageContent(template, vivienda) {
     `<link rel="canonical" id="canonicalLink" href="${escapeAttr(pageUrl)}">`
   );
 
+  // Datos estructurados ya dentro del HTML (el navegador los vuelve a generar al cargar, con reseñas reales).
+  if (vivienda.nombre) {
+    html = html.replace(
+      '<script type="application/ld+json" id="viviendaJsonLd"></script>',
+      () =>
+        jsonLdScript(viviendaLd(vivienda, pageUrl), "viviendaJsonLd") +
+        "\n" +
+        jsonLdScript(
+          breadcrumbLd([
+            { name: "Inicio", url: `${SITE_URL}/` },
+            { name: vivienda.nombre, url: pageUrl },
+          ]),
+          "breadcrumbJsonLd"
+        )
+    );
+  }
+
   return html;
 }
 
@@ -375,6 +477,22 @@ function buildBlogPageContent(template, post) {
     /<link rel="canonical" href="https:\/\/conilvacaciones\.github\.io\/blog\/">/,
     `<link rel="canonical" href="${escapeAttr(pageUrl)}">`
   );
+
+  // Datos estructurados del artículo (BlogPosting + migas de pan)
+  if (post.titulo) {
+    const ld =
+      jsonLdScript(blogPostLd(post, pageUrl), "blogPostJsonLd") +
+      "\n" +
+      jsonLdScript(
+        breadcrumbLd([
+          { name: "Inicio", url: `${SITE_URL}/` },
+          { name: "Blog", url: `${SITE_URL}/blog/` },
+          { name: post.titulo, url: pageUrl },
+        ]),
+        "breadcrumbJsonLd"
+      );
+    html = html.replace("</head>", () => ld + "\n</head>");
+  }
 
   return html;
 }

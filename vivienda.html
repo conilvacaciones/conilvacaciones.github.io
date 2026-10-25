@@ -1529,6 +1529,12 @@ function buildViviendaJsonLd(house){
   if(house.bedrooms){
     data.numberOfRooms = house.bedrooms;
   }
+  data.parentOrganization = { "@id": "https://conilvacaciones.github.io/#organization" };
+  var place = { "@type": "Accommodation" };
+  if(house.guests) place.occupancy = { "@type": "QuantitativeValue", "maxValue": house.guests };
+  if(house.bedrooms) place.numberOfBedrooms = house.bedrooms;
+  if(house.bathrooms) place.numberOfBathroomsTotal = house.bathrooms;
+  if(Object.keys(place).length > 1) data.containsPlace = place;
   if(house.amenities && house.amenities.length){
     data.amenityFeature = house.amenities.map(function(a){
       return { "@type": "LocationFeatureSpecification", "name": a.label, "value": true };
