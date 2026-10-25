@@ -36,11 +36,6 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://conilvacaciones.github.io/blog/entre-ramas-conil/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://conilvacaciones.github.io/blog/que-hacer-en-conil-ruta-guiada/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -72,6 +67,11 @@
   </url>
   <url>
     <loc>https://conilvacaciones.github.io/blog/puerto-de-conil-de-la-frontera/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://conilvacaciones.github.io/blog/entre-ramas-conil/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
