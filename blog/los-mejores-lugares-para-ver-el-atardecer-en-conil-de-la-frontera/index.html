@@ -667,7 +667,7 @@ input,textarea{font:inherit;}
       </div>
     </div>
     <div class="blog-grid" id="blogGrid">
-      <article class="blog-static-post" style="grid-column:1/-1;max-width:760px"><p class="blog-date">17 de agosto de 2026</p><h2>🌅 Los mejores lugares para ver el atardecer en Conil de la Frontera</h2><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejoreslugaresatardecer/portada-1793220053391-Atardecer_dorado_en_Conil_de_la_Frontera.png" alt="🌅 Los mejores lugares para ver el atardecer en Conil de la Frontera" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0"><div class="blog-modal-content"><h2>🌅 ¿Dónde ver el mejor atardecer en Conil?</h2><p>Conil tiene una ubicación privilegiada frente al océano Atlántico, lo que hace que sus playas sean escenarios fantásticos para disfrutar de la puesta de sol.</p><p>Entre los lugares que no deberías perderte están:</p><p>🏖️ <strong>Playa de La Fontanilla</strong><br>🌊 <strong>Playa de Fuente del Gallo</strong><br>🏝️ <strong>Playa de Los Bateles</strong><br>🌅 <strong>Mirador de El Jabiguero</strong><br>🌴 <strong>Mirador del Río Salado</strong><br>🚢 <strong>Faro de Cabo Roche</strong></p><p>Cada lugar ofrece una experiencia diferente. Algunos son perfectos para sentarse tranquilamente en la arena, mientras que otros permiten disfrutar de unas vistas más panorámicas de la costa.</p>
+      <article class="blog-static-post" style="grid-column:1/-1;max-width:760px"><p class="blog-date">17 de agosto de 2026</p><h2>🌅 Los mejores lugares para ver el atardecer en Conil de la Frontera</h2><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejoreslugaresatardecer/portada-1793220053391-Atardecer_dorado_en_Conil_de_la_Frontera.png" alt="🌅 Los mejores lugares para ver el atardecer en Conil de la Frontera" title="🌅 Los mejores lugares para ver el atardecer en Conil de la Frontera" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0"><div class="blog-modal-content"><h2>🌅 ¿Dónde ver el mejor atardecer en Conil?</h2><p>Conil tiene una ubicación privilegiada frente al océano Atlántico, lo que hace que sus playas sean escenarios fantásticos para disfrutar de la puesta de sol.</p><p>Entre los lugares que no deberías perderte están:</p><p>🏖️ <strong>Playa de La Fontanilla</strong><br>🌊 <strong>Playa de Fuente del Gallo</strong><br>🏝️ <strong>Playa de Los Bateles</strong><br>🌅 <strong>Mirador de El Jabiguero</strong><br>🌴 <strong>Mirador del Río Salado</strong><br>🚢 <strong>Faro de Cabo Roche</strong></p><p>Cada lugar ofrece una experiencia diferente. Algunos son perfectos para sentarse tranquilamente en la arena, mientras que otros permiten disfrutar de unas vistas más panorámicas de la costa.</p>
 <h2>🥇 1. Playa de Fuente del Gallo</h2><p>Si buscas un lugar donde disfrutar de un <strong>atardecer espectacular en Conil</strong>, Fuente del Gallo es una de las primeras opciones que deberías tener en cuenta. ❤️</p><p>Su principal atractivo son los <strong>acantilados que rodean la playa</strong>, que adquieren tonalidades especialmente bonitas cuando reciben la luz de las últimas horas del día.</p><p>🌊 El sonido del mar<br>🏖️ La arena dorada<br>🪨 Los acantilados<br>🌅 La luz del atardecer</p><p>Todo se combina para crear uno de los paisajes más característicos de la costa de Conil.</p><h3>📸 Consejo</h3><p>Llega un poco antes de la puesta de sol y aprovecha para caminar por la playa. La luz cambia rápidamente durante los últimos minutos y ofrece diferentes perspectivas para hacer fotografías.</p><p></p><p><br></p>
 <h2>🥈 2. Playa de La Fontanilla</h2><p>La <strong>Playa de La Fontanilla</strong> es otra de las mejores opciones para ver el atardecer en Conil.</p><p>Esta amplia playa de arena dorada se encuentra muy cerca del centro y cuenta con restaurantes y chiringuitos en sus alrededores.</p><p>Esto permite disfrutar de un plan muy completo:</p><p>🏖️ Día de playa → 🚶 paseo por la orilla → 🍤 cena o bebida → 🌅 puesta de sol.</p><p>La Fontanilla es especialmente recomendable si quieres <strong>ver el atardecer en Conil sin complicarte demasiado</strong>.</p><p>Puedes sentarte en la arena, caminar por la orilla o buscar un lugar donde tomar algo mientras el cielo cambia de color.</p><p>👉 Si quieres conocer más sobre esta playa, puedes consultar nuestra guía sobre <strong>la Playa de La Fontanilla</strong>, una de las playas más populares de Conil.</p><p></p>
 <h2>🥉 3. Playa de Los Bateles</h2><p>Los Bateles es una de las playas más conocidas de Conil y también un lugar estupendo para terminar el día.</p><p>Su proximidad al centro hace que sea muy fácil llegar andando después de visitar las calles de Conil. 👣</p><p>Una de las mejores opciones es dar un paseo por la orilla cuando empieza a caer el sol.</p><p>Durante la puesta de sol, la playa se transforma y ofrece una panorámica abierta del océano.</p><p>💡 <strong>Idea para un plan perfecto:</strong> recorre el centro histórico de Conil por la tarde, baja hacia Los Bateles y termina el paseo viendo cómo desaparece el sol por el horizonte.</p><p></p>
@@ -846,7 +846,7 @@ function renderBlogGrid(){
     var cover = blogPhotoUrl(p.portada);
     return ''+
     '<article class="blog-card reveal" style="transition-delay:'+(idx*70)+'ms" data-blog-id="'+p.id+'">'+
-      '<div class="blog-card-photo">'+(cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">' : '')+'</div>'+
+      '<div class="blog-card-photo">'+(cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" title="'+escapeHTML(p.titulo)+'" loading="lazy">' : '')+'</div>'+
       '<div class="blog-card-body">'+
         '<span class="blog-date">'+new Date(p.created_at).toLocaleDateString("es-ES", {day:"numeric", month:"long", year:"numeric"})+'</span>'+
         '<h3>'+escapeHTML(p.titulo)+'</h3>'+
@@ -990,13 +990,18 @@ function openBlogModal(id, esCargaInicial){
   var p = BLOG_POSTS.find(function(x){ return x.id === id; });
   if(!p) return;
   var cover = blogPhotoUrl(p.portada);
-  document.getElementById("blogModalCover").innerHTML = cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">' : '';
+  document.getElementById("blogModalCover").innerHTML = cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" title="'+escapeHTML(p.titulo)+'" loading="lazy">' : '';
   document.getElementById("blogModalDate").textContent = new Date(p.created_at).toLocaleDateString("es-ES", {day:"numeric", month:"long", year:"numeric"});
   document.getElementById("blogModalTitle").textContent = p.titulo;
   document.getElementById("blogModalContent").innerHTML = p.contenido || "";
+  document.querySelectorAll("#blogModalContent img").forEach(function(im, ii){
+    if(!im.getAttribute("alt")) im.setAttribute("alt", p.titulo + " – imagen " + (ii+1));
+    if(!im.getAttribute("title")) im.setAttribute("title", im.getAttribute("alt"));
+  });
   var gallery = (p.fotos || []).map(blogPhotoUrl).filter(Boolean);
-  document.getElementById("blogModalGallery").innerHTML = gallery.map(function(url){
-    return '<img src="'+url+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">';
+  document.getElementById("blogModalGallery").innerHTML = gallery.map(function(url, gi){
+    var t = escapeHTML(p.titulo) + " – foto " + (gi+1);
+    return '<img src="'+url+'" alt="'+t+'" title="'+t+'" loading="lazy">';
   }).join("");
   blogBackdrop.classList.add("open");
   document.body.style.overflow = "hidden";

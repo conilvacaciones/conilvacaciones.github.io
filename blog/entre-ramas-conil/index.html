@@ -667,7 +667,7 @@ input,textarea{font:inherit;}
       </div>
     </div>
     <div class="blog-grid" id="blogGrid">
-      <article class="blog-static-post" style="grid-column:1/-1;max-width:760px"><p class="blog-date">19 de agosto de 2026</p><h2>🌳 Entre Ramas Conil: aventura en los árboles para toda la familia</h2><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/entreramas/portada-1793218334049-Aventura_entre_ramas_en_Conil.png" alt="🌳 Entre Ramas Conil: aventura en los árboles para toda la familia" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0"><div class="blog-modal-content"><h2>🌿 ¿Qué es Entre Ramas?</h2>
+      <article class="blog-static-post" style="grid-column:1/-1;max-width:760px"><p class="blog-date">19 de agosto de 2026</p><h2>🌳 Entre Ramas Conil: aventura en los árboles para toda la familia</h2><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/entreramas/portada-1793218334049-Aventura_entre_ramas_en_Conil.png" alt="🌳 Entre Ramas Conil: aventura en los árboles para toda la familia" title="🌳 Entre Ramas Conil: aventura en los árboles para toda la familia" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0"><div class="blog-modal-content"><h2>🌿 ¿Qué es Entre Ramas?</h2>
 <p>Entre Ramas es un espacio de aventura pensado para disfrutar de la naturaleza de una forma diferente.</p>
 <p>En lugar de limitarte a pasear por el bosque, aquí puedes recorrer diferentes circuitos instalados entre los árboles, superar obstáculos y poner a prueba tu equilibrio y habilidad.</p>
 <p>🌳 Circuitos entre árboles<br>
@@ -975,7 +975,7 @@ function renderBlogGrid(){
     var cover = blogPhotoUrl(p.portada);
     return ''+
     '<article class="blog-card reveal" style="transition-delay:'+(idx*70)+'ms" data-blog-id="'+p.id+'">'+
-      '<div class="blog-card-photo">'+(cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">' : '')+'</div>'+
+      '<div class="blog-card-photo">'+(cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" title="'+escapeHTML(p.titulo)+'" loading="lazy">' : '')+'</div>'+
       '<div class="blog-card-body">'+
         '<span class="blog-date">'+new Date(p.created_at).toLocaleDateString("es-ES", {day:"numeric", month:"long", year:"numeric"})+'</span>'+
         '<h3>'+escapeHTML(p.titulo)+'</h3>'+
@@ -1119,13 +1119,18 @@ function openBlogModal(id, esCargaInicial){
   var p = BLOG_POSTS.find(function(x){ return x.id === id; });
   if(!p) return;
   var cover = blogPhotoUrl(p.portada);
-  document.getElementById("blogModalCover").innerHTML = cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">' : '';
+  document.getElementById("blogModalCover").innerHTML = cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" title="'+escapeHTML(p.titulo)+'" loading="lazy">' : '';
   document.getElementById("blogModalDate").textContent = new Date(p.created_at).toLocaleDateString("es-ES", {day:"numeric", month:"long", year:"numeric"});
   document.getElementById("blogModalTitle").textContent = p.titulo;
   document.getElementById("blogModalContent").innerHTML = p.contenido || "";
+  document.querySelectorAll("#blogModalContent img").forEach(function(im, ii){
+    if(!im.getAttribute("alt")) im.setAttribute("alt", p.titulo + " – imagen " + (ii+1));
+    if(!im.getAttribute("title")) im.setAttribute("title", im.getAttribute("alt"));
+  });
   var gallery = (p.fotos || []).map(blogPhotoUrl).filter(Boolean);
-  document.getElementById("blogModalGallery").innerHTML = gallery.map(function(url){
-    return '<img src="'+url+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">';
+  document.getElementById("blogModalGallery").innerHTML = gallery.map(function(url, gi){
+    var t = escapeHTML(p.titulo) + " – foto " + (gi+1);
+    return '<img src="'+url+'" alt="'+t+'" title="'+t+'" loading="lazy">';
   }).join("");
   blogBackdrop.classList.add("open");
   document.body.style.overflow = "hidden";

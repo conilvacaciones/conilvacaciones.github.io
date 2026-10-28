@@ -667,7 +667,7 @@ input,textarea{font:inherit;}
       </div>
     </div>
     <div class="blog-grid" id="blogGrid">
-      <article class="blog-static-post" style="grid-column:1/-1;max-width:760px"><p class="blog-date">24 de agosto de 2026</p><h2>⚓Puerto de Conil: qué ver y qué hacer | Barcos, motos de agua y más</h2><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/puertodeconil/portada-1793218494648-Puerto_de_Conil__Mar_y_tradici_n.png" alt="⚓Puerto de Conil: qué ver y qué hacer | Barcos, motos de agua y más" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0"><div class="blog-modal-content"><h2>⚓ Puerto de Conil: qué ver y qué hacer</h2>
+      <article class="blog-static-post" style="grid-column:1/-1;max-width:760px"><p class="blog-date">24 de agosto de 2026</p><h2>⚓Puerto de Conil: qué ver y qué hacer | Barcos, motos de agua y más</h2><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/puertodeconil/portada-1793218494648-Puerto_de_Conil__Mar_y_tradici_n.png" alt="⚓Puerto de Conil: qué ver y qué hacer | Barcos, motos de agua y más" title="⚓Puerto de Conil: qué ver y qué hacer | Barcos, motos de agua y más" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0"><div class="blog-modal-content"><h2>⚓ Puerto de Conil: qué ver y qué hacer</h2>
 <p>Cuando pensamos en Conil de la Frontera, normalmente pensamos en sus playas, sus calles blancas y sus atardeceres frente al Atlántico. Pero hay otro lugar que merece una visita, especialmente si quieres conocer una parte diferente del municipio: <strong>el Puerto de Conil</strong>.</p>
 <p>Situado junto a Cabo Roche, a unos 8 kilómetros del centro de Conil, el puerto combina la actividad <strong>pesquera y náutico-deportiva</strong> en un entorno con unas vistas espectaculares de la costa gaditana. </p>
 <p>Y además de pasear y disfrutar del paisaje, desde el puerto puedes encontrar diferentes actividades para disfrutar del mar: <strong>rutas en barco, excursiones de pesca, turismo marinero y motos de agua</strong>. 🌊🚤</p>
@@ -957,7 +957,7 @@ function renderBlogGrid(){
     var cover = blogPhotoUrl(p.portada);
     return ''+
     '<article class="blog-card reveal" style="transition-delay:'+(idx*70)+'ms" data-blog-id="'+p.id+'">'+
-      '<div class="blog-card-photo">'+(cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">' : '')+'</div>'+
+      '<div class="blog-card-photo">'+(cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" title="'+escapeHTML(p.titulo)+'" loading="lazy">' : '')+'</div>'+
       '<div class="blog-card-body">'+
         '<span class="blog-date">'+new Date(p.created_at).toLocaleDateString("es-ES", {day:"numeric", month:"long", year:"numeric"})+'</span>'+
         '<h3>'+escapeHTML(p.titulo)+'</h3>'+
@@ -1101,13 +1101,18 @@ function openBlogModal(id, esCargaInicial){
   var p = BLOG_POSTS.find(function(x){ return x.id === id; });
   if(!p) return;
   var cover = blogPhotoUrl(p.portada);
-  document.getElementById("blogModalCover").innerHTML = cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">' : '';
+  document.getElementById("blogModalCover").innerHTML = cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" title="'+escapeHTML(p.titulo)+'" loading="lazy">' : '';
   document.getElementById("blogModalDate").textContent = new Date(p.created_at).toLocaleDateString("es-ES", {day:"numeric", month:"long", year:"numeric"});
   document.getElementById("blogModalTitle").textContent = p.titulo;
   document.getElementById("blogModalContent").innerHTML = p.contenido || "";
+  document.querySelectorAll("#blogModalContent img").forEach(function(im, ii){
+    if(!im.getAttribute("alt")) im.setAttribute("alt", p.titulo + " – imagen " + (ii+1));
+    if(!im.getAttribute("title")) im.setAttribute("title", im.getAttribute("alt"));
+  });
   var gallery = (p.fotos || []).map(blogPhotoUrl).filter(Boolean);
-  document.getElementById("blogModalGallery").innerHTML = gallery.map(function(url){
-    return '<img src="'+url+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">';
+  document.getElementById("blogModalGallery").innerHTML = gallery.map(function(url, gi){
+    var t = escapeHTML(p.titulo) + " – foto " + (gi+1);
+    return '<img src="'+url+'" alt="'+t+'" title="'+t+'" loading="lazy">';
   }).join("");
   blogBackdrop.classList.add("open");
   document.body.style.overflow = "hidden";

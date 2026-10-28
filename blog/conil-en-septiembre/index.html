@@ -667,7 +667,7 @@ input,textarea{font:inherit;}
       </div>
     </div>
     <div class="blog-grid" id="blogGrid">
-      <article class="blog-static-post" style="grid-column:1/-1;max-width:760px"><p class="blog-date">24 de agosto de 2026</p><h2>Conil en septiembre: qué hacer y por qué viajar | Conil Vacaciones</h2><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/conilseptiembre/portada-1793219790238-Conil_en_septiembre_junto_al_mar.png" alt="Conil en septiembre: qué hacer y por qué viajar | Conil Vacaciones" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0"><div class="blog-modal-content"><h2>🌅 Conil en septiembre: por qué es una de las mejores épocas para viajar</h2>
+      <article class="blog-static-post" style="grid-column:1/-1;max-width:760px"><p class="blog-date">24 de agosto de 2026</p><h2>Conil en septiembre: qué hacer y por qué viajar | Conil Vacaciones</h2><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/conilseptiembre/portada-1793219790238-Conil_en_septiembre_junto_al_mar.png" alt="Conil en septiembre: qué hacer y por qué viajar | Conil Vacaciones" title="Conil en septiembre: qué hacer y por qué viajar | Conil Vacaciones" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0"><div class="blog-modal-content"><h2>🌅 Conil en septiembre: por qué es una de las mejores épocas para viajar</h2>
 <p><strong>¿Estás pensando en viajar a Conil en septiembre?</strong> Después de los meses de verano, Conil de la Frontera recupera un ritmo más tranquilo sin perder el encanto de sus playas, sus calles blancas y el ambiente de la Costa de la Luz.</p>
 <p>Septiembre es un mes perfecto para quienes buscan <strong>unas vacaciones en Conil</strong> disfrutando del mar, el buen tiempo y actividades al aire libre, pero prefieren evitar parte de la masificación de julio y agosto.</p>
 <p>En esta guía te contamos <strong>qué hacer en Conil en septiembre, cómo es el tiempo, qué playas visitar, qué actividades puedes disfrutar y por qué alojarte con Conil Vacaciones puede ser una buena opción para tu escapada.</strong> 🏖️☀️</p>
@@ -1001,7 +1001,7 @@ function renderBlogGrid(){
     var cover = blogPhotoUrl(p.portada);
     return ''+
     '<article class="blog-card reveal" style="transition-delay:'+(idx*70)+'ms" data-blog-id="'+p.id+'">'+
-      '<div class="blog-card-photo">'+(cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">' : '')+'</div>'+
+      '<div class="blog-card-photo">'+(cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" title="'+escapeHTML(p.titulo)+'" loading="lazy">' : '')+'</div>'+
       '<div class="blog-card-body">'+
         '<span class="blog-date">'+new Date(p.created_at).toLocaleDateString("es-ES", {day:"numeric", month:"long", year:"numeric"})+'</span>'+
         '<h3>'+escapeHTML(p.titulo)+'</h3>'+
@@ -1145,13 +1145,18 @@ function openBlogModal(id, esCargaInicial){
   var p = BLOG_POSTS.find(function(x){ return x.id === id; });
   if(!p) return;
   var cover = blogPhotoUrl(p.portada);
-  document.getElementById("blogModalCover").innerHTML = cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">' : '';
+  document.getElementById("blogModalCover").innerHTML = cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" title="'+escapeHTML(p.titulo)+'" loading="lazy">' : '';
   document.getElementById("blogModalDate").textContent = new Date(p.created_at).toLocaleDateString("es-ES", {day:"numeric", month:"long", year:"numeric"});
   document.getElementById("blogModalTitle").textContent = p.titulo;
   document.getElementById("blogModalContent").innerHTML = p.contenido || "";
+  document.querySelectorAll("#blogModalContent img").forEach(function(im, ii){
+    if(!im.getAttribute("alt")) im.setAttribute("alt", p.titulo + " – imagen " + (ii+1));
+    if(!im.getAttribute("title")) im.setAttribute("title", im.getAttribute("alt"));
+  });
   var gallery = (p.fotos || []).map(blogPhotoUrl).filter(Boolean);
-  document.getElementById("blogModalGallery").innerHTML = gallery.map(function(url){
-    return '<img src="'+url+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">';
+  document.getElementById("blogModalGallery").innerHTML = gallery.map(function(url, gi){
+    var t = escapeHTML(p.titulo) + " – foto " + (gi+1);
+    return '<img src="'+url+'" alt="'+t+'" title="'+t+'" loading="lazy">';
   }).join("");
   blogBackdrop.classList.add("open");
   document.body.style.overflow = "hidden";
