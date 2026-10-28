@@ -2609,7 +2609,8 @@ document.getElementById("rteImgInput").addEventListener("change", async function
   if(up.error){ alert("Error al subir "+file.name+": "+up.error.message); return; }
   var url = sb.storage.from("fotos-blog").getPublicUrl(path).data.publicUrl;
   rteFocusEditor();
-  document.execCommand("insertHTML", false, '<img src="'+url+'" alt="">');
+  var altTxt = (prompt("Describe la imagen (texto alternativo y título, ayuda al SEO):", file.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ")) || "").replace(/"/g, "&quot;").replace(/</g, "");
+  document.execCommand("insertHTML", false, '<img src="'+url+'" alt="'+altTxt+'" title="'+altTxt+'">');
 });
 
 document.getElementById("rteVideoBtn").addEventListener("click", function(){

@@ -461,7 +461,7 @@ function buildBlogPageContent(template, post) {
       ? new Date(post.fecha).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Madrid" })
       : "";
     const portada = post.portadaUrl
-      ? `<img src="${escapeAttr(post.portadaUrl)}" alt="${escapeAttr(post.titulo)}" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0">`
+      ? `<img src="${escapeAttr(post.portadaUrl)}" alt="${escapeAttr(post.titulo)}" title="${escapeAttr(post.titulo)}" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0">`
       : "";
     const articulo =
       `<article class="blog-static-post" style="grid-column:1/-1;max-width:760px">` +
