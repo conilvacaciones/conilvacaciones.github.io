@@ -289,6 +289,12 @@ main.wrap{padding:40px 24px 90px;}
           <div class="field"><label for="ap-blog-3">Blog 3</label><select id="ap-blog-3"></select></div>
         </div>
         <div class="form-actions" style="width:100%">
+          <div style="margin:0 0 14px;padding:12px;border:1px solid #dde3ea;border-radius:10px;background:#f7f9fb">
+            <strong>⚡ Optimizar imágenes existentes</strong>
+            <p style="margin:6px 0 8px;font-size:.9rem">Reduce el peso de las fotos ya subidas (viviendas y blog) para que la web cargue más rápido. Mantiene el mismo nombre y enlace, así que no cambia nada más. No se tocan las que ya son ligeras. Déjalo abierto hasta que termine.</p>
+            <button type="button" class="btn btn-primary btn-sm" id="btnOptimizarImgs">Optimizar ahora</button>
+            <pre id="optimLog" style="margin:8px 0 0;max-height:220px;overflow:auto;font-size:.8rem;white-space:pre-wrap"></pre>
+          </div>
           <button type="button" class="btn btn-ghost" id="btnResetApariencia">Restablecer a valores por defecto</button>
           <button type="button" class="btn btn-primary" id="btnSaveApariencia">Guardar apariencia</button>
         </div>
@@ -1563,13 +1569,69 @@ document.querySelectorAll(".crop-ratio-btn").forEach(function(b){
   });
 });
 
+
+// ---- Compresión de imágenes antes de subir (mejora el tiempo de carga de la web) ----
+async function loadImgBitmap(blob){
+  if(window.createImageBitmap){
+    try{ return await createImageBitmap(blob, { imageOrientation: "from-image" }); }catch(e){}
+  }
+  return await new Promise(function(res, rej){
+    var u = URL.createObjectURL(blob), im = new Image();
+    im.onload = function(){ URL.revokeObjectURL(u); res(im); };
+    im.onerror = function(){ URL.revokeObjectURL(u); rej(new Error("imagen no válida")); };
+    im.src = u;
+  });
+}
+function hasAlpha(ctx, w, h){
+  try{
+    var d = ctx.getImageData(0, 0, w, h).data;
+    for(var i=3;i<d.length;i+=4*7){ if(d[i] < 250) return true; }
+  }catch(e){}
+  return false;
+}
+// Devuelve { blob, ext }. Si no mejora el tamaño (o falla) devuelve el original.
+async function compressImage(blob, maxSide, quality){
+  maxSide = maxSide || 1920; quality = quality || 0.82;
+  var origExt = ((blob.name || "").split(".").pop() || "jpg").toLowerCase();
+  var orig = { blob: blob, ext: origExt };
+  try{
+    if(blob.type === "image/gif" || blob.type === "image/svg+xml") return orig;
+    var bmp = await loadImgBitmap(blob);
+    var w = bmp.width, h = bmp.height, k = Math.min(1, maxSide / Math.max(w, h));
+    var cw = Math.max(1, Math.round(w*k)), ch = Math.max(1, Math.round(h*k));
+    var c = document.createElement("canvas"); c.width = cw; c.height = ch;
+    var ctx = c.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(bmp, 0, 0, cw, ch);
+    if(bmp.close) bmp.close();
+    var alpha = blob.type === "image/png" && hasAlpha(ctx, cw, ch);
+    var out;
+    if(alpha){
+      out = await new Promise(function(r){ c.toBlob(r, "image/png"); });
+      if(out) out = { blob: out, ext: "png" };
+    }else{
+      // fondo blanco por si acaso y JPEG (compatible con redes sociales y Bing/Google)
+      var c2 = document.createElement("canvas"); c2.width = cw; c2.height = ch;
+      var x2 = c2.getContext("2d"); x2.fillStyle = "#fff"; x2.fillRect(0,0,cw,ch); x2.drawImage(c, 0, 0);
+      var jb = await new Promise(function(r){ c2.toBlob(r, "image/jpeg", quality); });
+      out = jb ? { blob: jb, ext: "jpg" } : null;
+    }
+    if(out && out.blob && (out.blob.size < blob.size || k < 1)) return out;
+  }catch(e){ console.warn("compressImage", e); }
+  return orig;
+}
+function nameWithExt(name, ext){ return name.replace(/\.[^.]+$/, "") + "." + ext; }
+async function prepUpload(file, maxSide){
+  var r = await compressImage(file, maxSide || 1920, 0.82);
+  return { blob: r.blob, name: nameWithExt(file.name || "foto.jpg", r.ext), type: r.blob.type || undefined };
+}
+
 document.getElementById("btnCropConfirm").addEventListener("click", function(){
   if(!cropperInstance || !cropCurrentFile){ processNextInQueue(); return; }
   var file = cropCurrentFile;
-  cropperInstance.getCroppedCanvas({ maxWidth: 2400, maxHeight: 2400 }).toBlob(function(blob){
+  cropperInstance.getCroppedCanvas({ maxWidth: 1920, maxHeight: 1920 }).toBlob(function(blob){
     if(cropOnDone) cropOnDone(blob, file);
     processNextInQueue();
-  }, file.type && file.type.indexOf("png") === -1 ? "image/jpeg" : "image/jpeg", 0.9);
+  }, file.type && file.type.indexOf("png") === -1 ? "image/jpeg" : "image/jpeg", 0.82);
 });
 
 document.getElementById("btnCropSkip").addEventListener("click", function(){
@@ -1587,9 +1649,10 @@ document.getElementById("f-fotos").addEventListener("change", async function(e){
   if(!id || files.length === 0) return;
   e.target.value = "";
   startCropQueue(files, async function(blobOrFile, originalFile){
-    var safeName = originalFile.name.replace(/[^a-zA-Z0-9.-]/g,"_");
+    var pu = await prepUpload(blobOrFile === originalFile ? originalFile : new File([blobOrFile], originalFile.name, {type: blobOrFile.type}), 1920);
+    var safeName = pu.name.replace(/[^a-zA-Z0-9.-]/g,"_");
     var path = id + "/" + Date.now() + "-" + safeName;
-    var up = await sb.storage.from("fotos-viviendas").upload(path, blobOrFile, { upsert:true });
+    var up = await sb.storage.from("fotos-viviendas").upload(path, pu.blob, { upsert:true, contentType: pu.type });
     if(up.error){
       alert("Error al subir "+originalFile.name+": "+up.error.message);
       return;
@@ -1623,9 +1686,10 @@ async function recortarFotoExistente(i, btn){
   }
   startCropQueue([file], async function(blobOrFile, originalFile){
     if(blobOrFile === originalFile) return; // "Subir sin recortar": se queda como está
-    var safeName = originalFile.name.replace(/[^a-zA-Z0-9.-]/g,"_").replace(/^\d+-/, "");
+    var pu = await prepUpload(new File([blobOrFile], originalFile.name, {type: blobOrFile.type}), 1920);
+    var safeName = pu.name.replace(/[^a-zA-Z0-9.-]/g,"_").replace(/^\d+-/, "");
     var path = id + "/" + Date.now() + "-" + safeName;
-    var up = await sb.storage.from("fotos-viviendas").upload(path, blobOrFile, { upsert:true });
+    var up = await sb.storage.from("fotos-viviendas").upload(path, pu.blob, { upsert:true, contentType: pu.type });
     if(up.error){ alert("Error al subir la foto recortada: " + up.error.message); return; }
     var idx = draftFotos.indexOf(oldPath);
     if(idx === -1) draftFotos.push(path); else draftFotos[idx] = path;
@@ -2537,9 +2601,10 @@ document.getElementById("rteImgInput").addEventListener("change", async function
   var file = (e.target.files || [])[0];
   var id = document.getElementById("p-id").value.trim();
   if(!file || !id) return;
-  var safeName = file.name.replace(/[^a-zA-Z0-9.-]/g,"_");
+  var pu = await prepUpload(file, 1920);
+  var safeName = pu.name.replace(/[^a-zA-Z0-9.-]/g,"_");
   var path = id + "/cuerpo-" + Date.now() + "-" + safeName;
-  var up = await sb.storage.from("fotos-blog").upload(path, file, { upsert:true });
+  var up = await sb.storage.from("fotos-blog").upload(path, pu.blob, { upsert:true, contentType: pu.type });
   e.target.value = "";
   if(up.error){ alert("Error al subir "+file.name+": "+up.error.message); return; }
   var url = sb.storage.from("fotos-blog").getPublicUrl(path).data.publicUrl;
@@ -2576,9 +2641,10 @@ document.getElementById("p-portada").addEventListener("change", async function(e
   var file = (e.target.files || [])[0];
   var id = document.getElementById("p-id").value.trim();
   if(!id || !file) return;
-  var safeName = file.name.replace(/[^a-zA-Z0-9.-]/g,"_");
+  var pu = await prepUpload(file, 1920);
+  var safeName = pu.name.replace(/[^a-zA-Z0-9.-]/g,"_");
   var path = id + "/portada-" + Date.now() + "-" + safeName;
-  var up = await sb.storage.from("fotos-blog").upload(path, file, { upsert:true });
+  var up = await sb.storage.from("fotos-blog").upload(path, pu.blob, { upsert:true, contentType: pu.type });
   if(up.error){ alert("Error al subir "+file.name+": "+up.error.message); return; }
   draftPortada = path;
   e.target.value = "";
@@ -2591,9 +2657,10 @@ document.getElementById("p-fotos").addEventListener("change", async function(e){
   if(!id || files.length === 0) return;
   for(var i=0;i<files.length;i++){
     var file = files[i];
-    var safeName = file.name.replace(/[^a-zA-Z0-9.-]/g,"_");
+    var pu = await prepUpload(file, 1920);
+    var safeName = pu.name.replace(/[^a-zA-Z0-9.-]/g,"_");
     var path = id + "/" + Date.now() + "-" + safeName;
-    var up = await sb.storage.from("fotos-blog").upload(path, file, { upsert:true });
+    var up = await sb.storage.from("fotos-blog").upload(path, pu.blob, { upsert:true, contentType: pu.type });
     if(up.error){ alert("Error al subir "+file.name+": "+up.error.message); continue; }
     draftPostFotos.push(path);
   }
@@ -2883,9 +2950,10 @@ function renderImagenPrincipalThumb(){
 document.getElementById("an-imagen").addEventListener("change", async function(e){
   var file = (e.target.files || [])[0];
   if(!file) return;
-  var safeName = file.name.replace(/[^a-zA-Z0-9.-]/g,"_");
+  var pu = await prepUpload(file, 1920);
+  var safeName = pu.name.replace(/[^a-zA-Z0-9.-]/g,"_");
   var path = "anunciate/imagen-principal-" + Date.now() + "-" + safeName;
-  var up = await sb.storage.from("fotos-blog").upload(path, file, { upsert:true });
+  var up = await sb.storage.from("fotos-blog").upload(path, pu.blob, { upsert:true, contentType: pu.type });
   e.target.value = "";
   if(up.error){ alert("Error al subir la imagen: "+up.error.message); return; }
   draftImagenPrincipal = path;
@@ -3071,9 +3139,10 @@ function renderApHeroThumb(){
 document.getElementById("ap-hero-foto").addEventListener("change", async function(e){
   var file = (e.target.files || [])[0];
   if(!file) return;
-  var safeName = file.name.replace(/[^a-zA-Z0-9.-]/g,"_");
+  var pu = await prepUpload(file, 1920);
+  var safeName = pu.name.replace(/[^a-zA-Z0-9.-]/g,"_");
   var path = "hero/hero-" + Date.now() + "-" + safeName;
-  var up = await sb.storage.from("fotos-blog").upload(path, file, { upsert:true });
+  var up = await sb.storage.from("fotos-blog").upload(path, pu.blob, { upsert:true, contentType: pu.type });
   e.target.value = "";
   if(up.error){ alert("Error al subir "+file.name+": "+up.error.message); return; }
   draftHeroImage = path;
@@ -3103,6 +3172,58 @@ document.getElementById("btnSaveApariencia").addEventListener("click", async fun
     return;
   }
   alert("Apariencia guardada. Los cambios se verán en la web al recargarla.");
+});
+
+
+// ---- Optimizar imágenes ya subidas (mismo nombre/ruta, sin tocar la base de datos) ----
+async function listAllFiles(bucket, prefix){
+  var out = [], offset = 0;
+  while(true){
+    var r = await sb.storage.from(bucket).list(prefix, { limit: 100, offset: offset, sortBy: { column: "name", order: "asc" } });
+    if(r.error || !r.data || !r.data.length) break;
+    for(var i=0;i<r.data.length;i++){
+      var it = r.data[i], full = prefix ? prefix + "/" + it.name : it.name;
+      if(it.id === null || !it.metadata){ out = out.concat(await listAllFiles(bucket, full)); }
+      else out.push({ path: full, size: it.metadata.size || 0, type: it.metadata.mimetype || "" });
+    }
+    if(r.data.length < 100) break;
+    offset += 100;
+  }
+  return out;
+}
+document.getElementById("btnOptimizarImgs").addEventListener("click", async function(){
+  var btn = this, log = document.getElementById("optimLog");
+  if(!confirm("Se van a recomprimir las imágenes existentes de viviendas y blog (se sobrescriben con una versión más ligera). ¿Continuar?")) return;
+  btn.disabled = true; log.textContent = "";
+  var say = function(t){ log.textContent += t + "\n"; log.scrollTop = log.scrollHeight; };
+  var saved = 0, done = 0, skipped = 0, failed = 0;
+  try{
+    var buckets = ["fotos-viviendas", "fotos-blog"];
+    for(var b=0;b<buckets.length;b++){
+      var bucket = buckets[b];
+      say("Listando " + bucket + "…");
+      var files = (await listAllFiles(bucket, "")).filter(function(f){ return /\.(jpe?g|png|webp)$/i.test(f.path) && f.type.indexOf("svg") === -1; });
+      say(files.length + " imágenes en " + bucket);
+      for(var i=0;i<files.length;i++){
+        var f = files[i];
+        if(f.size && f.size < 300*1024){ skipped++; continue; }
+        try{
+          var url = sb.storage.from(bucket).getPublicUrl(f.path).data.publicUrl;
+          var r = await fetch(url, { cache: "no-store" });
+          if(!r.ok) throw new Error("HTTP " + r.status);
+          var blob = await r.blob();
+          var c = await compressImage(blob, 1920, 0.82);
+          if(c.blob === blob || c.blob.size > blob.size * 0.85){ skipped++; continue; }
+          var up = await sb.storage.from(bucket).upload(f.path, c.blob, { upsert: true, contentType: c.blob.type, cacheControl: "31536000" });
+          if(up.error) throw up.error;
+          saved += blob.size - c.blob.size; done++;
+          say("✓ " + f.path + "  " + Math.round(blob.size/1024) + " KB → " + Math.round(c.blob.size/1024) + " KB");
+        }catch(err){ failed++; say("✗ " + f.path + ": " + (err.message || err)); }
+      }
+    }
+    say("\nListo. Optimizadas: " + done + " · ya ligeras u omitidas: " + skipped + " · errores: " + failed + " · ahorro: " + (saved/1048576).toFixed(1) + " MB");
+  }catch(err){ say("Error: " + (err.message || err)); }
+  btn.disabled = false;
 });
 
 document.getElementById("btnResetApariencia").addEventListener("click", function(){
