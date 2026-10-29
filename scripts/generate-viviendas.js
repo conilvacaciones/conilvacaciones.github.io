@@ -445,39 +445,6 @@ function buildPageContent(template, vivienda) {
   return html;
 }
 
-// ---- Enlaces internos estáticos (para que Google descubra entradas y viviendas sin JavaScript) ----
-const LINKS_START = "<!--BLOG-LINKS-START-->";
-const LINKS_END = "<!--BLOG-LINKS-END-->";
-function fillLinks(html, inner) {
-  const i = html.indexOf(LINKS_START);
-  const j = html.indexOf(LINKS_END);
-  if (i === -1 || j === -1 || j < i) return html;
-  return html.slice(0, i + LINKS_START.length) + inner + html.slice(j);
-}
-function linksList(items) {
-  return `<ul>${items.map((it) => `<li><a href="${escapeAttr(it.href)}">${escapeText(it.text)}</a></li>`).join("")}</ul>`;
-}
-function viviendasLinksHtml(viviendas) {
-  if (!viviendas || !viviendas.length) return "";
-  return `<h2>Casas vacacionales en Conil de la Frontera</h2>` +
-    linksList(viviendas.map((v) => ({ href: `/viviendas/${encodeURIComponent(v.slug)}/`, text: v.nombre || v.slug })));
-}
-function postHref(p) { return `/blog/${encodeURIComponent(p.slug)}/`; }
-function allPostsLinksHtml(posts, viviendas) {
-  return `<h2>Todas las entradas del blog</h2>` +
-    linksList(posts.map((p) => ({ href: postHref(p), text: p.titulo || p.slug }))) +
-    viviendasLinksHtml(viviendas);
-}
-function relatedLinksHtml(post, posts, viviendas) {
-  const idx = posts.findIndex((p) => p.slug === post.slug);
-  const others = [];
-  for (let k = 1; k < posts.length && others.length < 3; k++) others.push(posts[(idx + k + posts.length) % posts.length]);
-  return (others.length ? `<h2>Te puede interesar</h2>` + linksList(others.map((p) => ({ href: postHref(p), text: p.titulo || p.slug }))) : "") +
-    viviendasLinksHtml(viviendas);
-}
-let GLOBAL_POSTS = [];
-let GLOBAL_VIVIENDAS = [];
-
 function buildBlogPageContent(template, post) {
   const pageUrl = `${SITE_URL}/blog/${encodeURIComponent(post.slug)}/`;
   const title = post.titulo ? `${post.titulo} · Conil Vacaciones` : "Blog · Conil Vacaciones — Qué hacer y ver en Conil de la Frontera";
@@ -565,8 +532,6 @@ function buildBlogPageContent(template, post) {
     html = html.replace("</head>", () => ld + "\n</head>");
   }
 
-  html = fillLinks(html, relatedLinksHtml(post, GLOBAL_POSTS, GLOBAL_VIVIENDAS));
-
   return html;
 }
 
@@ -630,8 +595,6 @@ function generateStaticPages(items, template, outputDir, buildContentFn) {
 function main() {
   Promise.all([fetchActiveViviendas(), fetchPublishedBlogPosts()])
     .then(([viviendas, blogPosts]) => {
-      GLOBAL_POSTS = blogPosts;
-      GLOBAL_VIVIENDAS = viviendas;
       let viviendaStats = { slugs: [], created: 0, updated: 0, removed: 0 };
       if (viviendas.length === 0) {
         console.log("No hay viviendas activas en Supabase. No se generan páginas de viviendas (y no se borra nada por seguridad).");
@@ -658,20 +621,6 @@ function main() {
         blogStats = generateStaticPages(blogPosts, blogTemplate, BLOG_OUTPUT_DIR, buildBlogPageContent);
         console.log(`Entradas de blog publicadas: ${blogStats.slugs.length}`);
         console.log(`Páginas de blog creadas: ${blogStats.created}, actualizadas: ${blogStats.updated}, eliminadas: ${blogStats.removed}`);
-      }
-
-      // Enlaces estáticos en /blog/ y en la portada (se rellenan entre marcadores, de forma idempotente).
-      if (blogPosts.length) {
-        const targets = [
-          [BLOG_TEMPLATE_PATH, allPostsLinksHtml(blogPosts, viviendas)],
-          [path.join(REPO_ROOT, "index.html"), allPostsLinksHtml(blogPosts, viviendas)],
-        ];
-        for (const [file, inner] of targets) {
-          if (!fs.existsSync(file)) continue;
-          const cur = fs.readFileSync(file, "utf-8");
-          const next = fillLinks(cur, inner);
-          if (next !== cur) { fs.writeFileSync(file, next, "utf-8"); console.log(`Enlaces internos actualizados en ${path.relative(REPO_ROOT, file)}`); }
-        }
       }
 
       // Mantiene sitemap.xml sincronizado con las páginas fijas, las viviendas activas y el blog.
