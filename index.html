@@ -340,6 +340,12 @@ input,textarea{font:inherit;}
 .qh-link .icon{width:16px;height:16px;transition:transform .2s ease;}
 .qh-link:hover .icon{transform:translateX(3px);}
 .qh-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
+.blog-links{margin:44px 0 0;padding-top:26px;border-top:1px solid var(--line);}
+.blog-links h2{font-family:var(--ff-display);font-weight:600;font-size:20px;color:var(--atlantic);margin:0 0 12px;}
+.blog-links h2:not(:first-child){margin-top:26px;}
+.blog-links ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px 28px;}
+.blog-links a{color:var(--atlantic);text-decoration:underline;text-underline-offset:3px;font-size:15px;line-height:1.4;}
+.blog-links a:hover{color:var(--bougain);}
 .qh-card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 8px 20px -16px rgba(11,61,92,.25);transition:box-shadow .25s ease,transform .25s ease;}
 .qh-card:hover{box-shadow:var(--shadow-card);transform:translateY(-3px);}
 .qh-photo{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--cal-2);}
@@ -971,6 +977,7 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
     </div>
     <div class="qh-grid" id="qhGrid"></div>
     <div class="qh-more"><a href="/blog/" class="btn btn-primary">Ver más</a></div>
+    <nav class="blog-links" id="homeBlogLinks" aria-label="Entradas del blog"><!--BLOG-LINKS-START--><!--BLOG-LINKS-END--></nav>
   </div>
 </section>
 
