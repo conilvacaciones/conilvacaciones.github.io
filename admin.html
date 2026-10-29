@@ -1624,12 +1624,14 @@ async function loadImgBitmap(blob){
     im.src = u;
   });
 }
-function hasAlpha(ctx, w, h){
+// Devuelve la proporción de píxeles (muestreados) con transparencia real
+function alphaRatio(ctx, w, h){
   try{
-    var d = ctx.getImageData(0, 0, w, h).data;
-    for(var i=3;i<d.length;i+=4*7){ if(d[i] < 250) return true; }
+    var d = ctx.getImageData(0, 0, w, h).data, n = 0, t = 0;
+    for(var i=3;i<d.length;i+=4*7){ n++; if(d[i] < 250) t++; }
+    return n ? t / n : 0;
   }catch(e){}
-  return false;
+  return 0;
 }
 // Devuelve { blob, ext }. Si no mejora el tamaño (o falla) devuelve el original.
 async function compressImage(blob, maxSide, quality){
@@ -1645,11 +1647,13 @@ async function compressImage(blob, maxSide, quality){
     var ctx = c.getContext("2d", { willReadFrequently: true });
     ctx.drawImage(bmp, 0, 0, cw, ch);
     if(bmp.close) bmp.close();
-    var alpha = blob.type === "image/png" && hasAlpha(ctx, cw, ch);
+    // Solo se conserva la transparencia si es significativa (>3 % de la imagen); si no, se aplana a JPEG
+    var alpha = blob.type === "image/png" && alphaRatio(ctx, cw, ch) > 0.03;
     var out;
     if(alpha){
-      out = await new Promise(function(r){ c.toBlob(r, "image/png"); });
-      if(out) out = { blob: out, ext: "png" };
+      var wb = await new Promise(function(r){ c.toBlob(r, "image/webp", 0.85); });
+      out = wb && wb.type === "image/webp" ? { blob: wb, ext: "webp" } : null;
+      if(!out){ var pb = await new Promise(function(r){ c.toBlob(r, "image/png"); }); if(pb) out = { blob: pb, ext: "png" }; }
     }else{
       // fondo blanco por si acaso y JPEG (compatible con redes sociales y Bing/Google)
       var c2 = document.createElement("canvas"); c2.width = cw; c2.height = ch;
@@ -1658,7 +1662,7 @@ async function compressImage(blob, maxSide, quality){
       out = jb ? { blob: jb, ext: "jpg" } : null;
     }
     if(out && out.blob && (out.blob.size < blob.size || k < 1)) return out;
-  }catch(e){ console.warn("compressImage", e); }
+  }catch(e){ console.warn("compressImage", e); orig.error = (e && e.message) || String(e); }
   return orig;
 }
 function nameWithExt(name, ext){ return name.replace(/\.[^.]+$/, "") + "." + ext; }
@@ -3564,7 +3568,11 @@ document.getElementById("btnOptimizarImgs").addEventListener("click", async func
           if(!r.ok) throw new Error("HTTP " + r.status);
           var blob = await r.blob();
           var c = await compressImage(blob, 1920, 0.82);
-          if(c.blob === blob || c.blob.size > blob.size * 0.85){ skipped++; continue; }
+          if(c.blob === blob || c.blob.size > blob.size * 0.85){
+            skipped++;
+            say("– " + f.path + " (" + Math.round(blob.size/1024) + " KB) sin cambios: " + (c.error ? "error al comprimir: " + c.error : "no se reduce lo suficiente (" + Math.round(c.blob.size/1024) + " KB)"));
+            continue;
+          }
           var up = await sb.storage.from(bucket).upload(f.path, c.blob, { upsert: true, contentType: c.blob.type, cacheControl: "31536000" });
           if(up.error) throw up.error;
           saved += blob.size - c.blob.size; done++;
