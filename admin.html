@@ -168,6 +168,37 @@ main.wrap{padding:40px 24px 90px;}
 .rte-toolbar .rte-sep{width:1px;height:22px;background:var(--line);margin:0 4px;}
 .rte-editor{min-height:240px;border:1.5px solid var(--line);border-radius:0 0 10px 10px;padding:14px 16px;background:#fff;color:var(--ink);font-size:14.5px;line-height:1.65;overflow-y:auto;}
 .rte-editor:focus{outline:2px solid var(--sol);outline-offset:-2px;}
+.rte-editor .cv-bloque{margin:26px 0;}
+.rte-editor .cv-media{margin:0;position:relative;}
+.rte-editor .cv-media img{width:100%;height:auto;display:block;margin:0;border-radius:12px;}
+.rte-editor .cv-lado{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;}
+.rte-editor .cv-lado.cv-inv>.cv-media{order:2;}
+.rte-editor .cv-lado>.cv-texto:only-child{grid-column:1/-1;}
+.rte-editor .cv-texto>*:last-child{margin-bottom:0;}
+.rte-editor .cv-video{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;}
+.rte-editor .cv-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;margin:0;border-radius:0;max-width:none;}
+.rte-editor .cv-fila{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+.rte-editor .cv-fila img{aspect-ratio:4/3;object-fit:cover;}
+.rte-editor .cv-ancho img{aspect-ratio:auto;}
+.rte-editor .cv-media figcaption{font-size:.85em;line-height:1.4;color:#667985;text-align:center;margin-top:6px;}
+@media(max-width:700px){.rte-editor .cv-lado{grid-template-columns:1fr;gap:14px;}.rte-editor .cv-lado.cv-inv>.cv-media{order:0;}}
+
+.rte-editor .cv-bloque{outline:1.5px dashed transparent;outline-offset:6px;border-radius:8px;}
+.rte-editor .cv-bloque:hover{outline-color:var(--sol);}
+.rte-editor .cv-vacio{aspect-ratio:4/3;display:grid;place-items:center;text-align:center;padding:10px;background:var(--cal);border:2px dashed var(--line);border-radius:12px;color:var(--ink-soft);font-size:13px;cursor:pointer;}
+.rte-editor .cv-video+.cv-vacio{display:none;}
+.rte-editor .cv-media{cursor:pointer;}
+.rte-editor .cv-media figcaption{cursor:text;min-height:1.2em;}
+.rte-editor .cv-media figcaption:empty:before{content:"Pie de foto (opcional)";color:var(--ink-faint);}
+.rte-editor .cv-texto p:only-child:has(> br:only-child)::before{content:"Escribe aquí el texto…";color:var(--ink-faint);}
+.rte-editor.cv-drop .cv-media:hover{outline:2px solid var(--sol);}
+#cvBlockTools,#cvFigPop{position:fixed;z-index:9999;display:none;gap:4px;background:var(--atlantic);border-radius:9px;padding:4px;box-shadow:0 6px 18px rgba(0,0,0,.25);}
+#cvBlockTools button,#cvFigPop button{border:0;background:transparent;color:#fff;font-size:12.5px;padding:5px 9px;border-radius:6px;cursor:pointer;white-space:nowrap;}
+#cvBlockTools button:hover,#cvFigPop button:hover{background:rgba(255,255,255,.2);}
+#cvBlockTools button.cv-del:hover,#cvFigPop button.cv-del:hover{background:#c0392b;}
+#cvFigPop{flex-direction:column;}
+.rte-toolbar #cvBlockSel{max-width:170px;}
+
 .rte-editor img{max-width:100%;border-radius:8px;display:block;margin:10px 0;}
 .rte-editor iframe{max-width:100%;border-radius:8px;display:block;margin:10px 0;}
 .rte-editor h2{font-family:var(--ff-display);font-size:22px;margin:14px 0 6px;color:var(--atlantic);}
@@ -677,6 +708,16 @@ main.wrap{padding:40px 24px 90px;}
             <button type="button" id="rteImgBtn" title="Insertar imagen">🖼</button>
             <button type="button" id="rteVideoBtn" title="Insertar vídeo (YouTube/Vimeo)">▶</button>
             <button type="button" id="rteMapBtn" title="Insertar mapa">📍</button>
+            <div class="rte-sep"></div>
+            <select id="cvBlockSel" title="Insertar un bloque de maquetación: foto + texto, vídeo + texto, fila de fotos…">
+              <option value="">＋ Bloque…</option>
+              <option value="izq">Foto a la izquierda + texto</option>
+              <option value="der">Texto + foto a la derecha</option>
+              <option value="video">Vídeo + texto</option>
+              <option value="fila2">Fila de 2 fotos</option>
+              <option value="fila3">Fila de 3 fotos</option>
+              <option value="ancho">Foto ancha con pie de foto</option>
+            </select>
             <div class="rte-sep"></div>
             <button type="button" data-cmd="removeFormat" title="Quitar formato">✕</button>
           </div>
@@ -2502,6 +2543,7 @@ function openPostForm(p){
   document.getElementById("p-titulo").value = p ? p.titulo : "";
   document.getElementById("p-resumen").value = p ? (p.resumen || "") : "";
   document.getElementById("p-contenido").innerHTML = p ? (p.contenido || "") : "";
+  cvDecorate();
   document.getElementById("p-publicado").checked = p ? !!p.publicado : true;
 
   draftPortada = p ? (p.portada || null) : null;
@@ -2638,6 +2680,235 @@ document.getElementById("rteMapBtn").addEventListener("click", function(){
   document.execCommand("insertHTML", false, embed);
 });
 
+
+/* CV-BLOCKS-START */
+// ---- Bloques de maquetación (imagen+texto, vídeo+texto, filas de fotos, imagen ancha) ----
+var cvLastRange = null;
+["keyup","mouseup","focusout"].forEach(function(ev){
+  rteEditor.addEventListener(ev, function(){
+    var s = window.getSelection();
+    if(s.rangeCount && rteEditor.contains(s.anchorNode)) cvLastRange = s.getRangeAt(0).cloneRange();
+  });
+});
+var CV_VACIO = '<div class="cv-vacio" contenteditable="false">＋ Pulsa para añadir foto o vídeo<br><small>(también puedes arrastrar una foto aquí)</small></div>';
+function cvFig(cap){ return '<figure class="cv-media">' + CV_VACIO + (cap ? '<figcaption></figcaption>' : '') + '</figure>'; }
+var CV_TEXTO = '<div class="cv-texto"><p><br></p></div>';
+function cvDecorate(){
+  rteEditor.querySelectorAll("figure.cv-media").forEach(function(f){
+    f.setAttribute("contenteditable", "false");
+    var tieneMedio = f.querySelector("img,iframe");
+    var vacio = f.querySelector(".cv-vacio");
+    if(!tieneMedio && !vacio) f.insertAdjacentHTML("afterbegin", CV_VACIO);
+    if(tieneMedio && vacio) vacio.remove();
+    var cap = f.querySelector("figcaption"); if(cap) cap.setAttribute("contenteditable", "true");
+  });
+}
+function cvCleanHtml(){
+  var c = rteEditor.cloneNode(true);
+  c.querySelectorAll(".cv-vacio").forEach(function(n){ n.remove(); });
+  c.querySelectorAll("figure.cv-media").forEach(function(f){ if(!f.querySelector("img,iframe")) f.remove(); });
+  c.querySelectorAll("figcaption").forEach(function(f){ if(!f.textContent.trim()) f.remove(); });
+  c.querySelectorAll("[contenteditable]").forEach(function(n){ n.removeAttribute("contenteditable"); });
+  c.querySelectorAll("[style]").forEach(function(n){ if(!n.getAttribute("style").trim()) n.removeAttribute("style"); });
+  return c.innerHTML.trim();
+}
+function cvTop(node){ while(node && node.parentNode !== rteEditor) node = node.parentNode; return node; }
+function cvInsert(html){
+  var sel = window.getSelection(), ref = null;
+  if(sel.rangeCount && rteEditor.contains(sel.anchorNode) && sel.anchorNode !== rteEditor) ref = cvTop(sel.anchorNode);
+  else if(cvLastRange && rteEditor.contains(cvLastRange.startContainer) && cvLastRange.startContainer !== rteEditor) ref = cvTop(cvLastRange.startContainer);
+  var tmp = document.createElement("div"); tmp.innerHTML = html;
+  var blk = tmp.firstElementChild;
+  if(ref && ref.parentNode === rteEditor) ref.parentNode.insertBefore(blk, ref.nextSibling); else rteEditor.appendChild(blk);
+  if(!blk.nextElementSibling){ var p = document.createElement("p"); p.innerHTML = "<br>"; blk.after(p); }
+  cvDecorate();
+  // cursor dentro del texto del bloque (o en el párrafo siguiente) para encadenar bloques en orden
+  var dest = blk.querySelector(".cv-texto p, figcaption") || blk.nextElementSibling;
+  if(dest){
+    var r = document.createRange(); r.selectNodeContents(dest); r.collapse(true);
+    var sl = window.getSelection(); sl.removeAllRanges(); sl.addRange(r); cvLastRange = r.cloneRange();
+  }
+  blk.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  return blk;
+}
+function cvEmbedSrc(url){
+  var yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/);
+  var vm = url.match(/vimeo\.com\/(\d+)/);
+  if(yt) return "https://www.youtube-nocookie.com/embed/" + yt[1];
+  if(vm) return "https://player.vimeo.com/video/" + vm[1];
+  return null;
+}
+function cvSetVideo(fig, src){
+  fig.querySelectorAll("img,iframe,.cv-video,.cv-vacio").forEach(function(n){ n.remove(); });
+  fig.insertAdjacentHTML("afterbegin", '<div class="cv-video"><iframe src="' + src + '" title="Vídeo" loading="lazy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>');
+}
+function cvAskVideo(fig){
+  var url = prompt("Pega el enlace del vídeo (YouTube, YouTube Shorts o Vimeo):");
+  if(!url) return false;
+  var src = cvEmbedSrc(url);
+  if(!src){ alert("No he reconocido ese enlace. Usa un enlace de YouTube o Vimeo."); return false; }
+  cvSetVideo(fig, src); return true;
+}
+function cvSetImage(fig, url, alt){
+  fig.querySelectorAll("img,iframe,.cv-video,.cv-vacio").forEach(function(n){ n.remove(); });
+  var im = document.createElement("img");
+  im.src = url; im.alt = alt || ""; im.title = alt || ""; im.setAttribute("loading", "lazy");
+  fig.insertBefore(im, fig.firstChild);
+}
+async function cvUploadInto(fig, file){
+  var id = document.getElementById("p-id").value.trim();
+  if(!id){ alert("Primero escribe y guarda el identificador de la entrada (arriba) para poder subir imágenes."); return; }
+  if(!file || file.type.indexOf("image/") !== 0){ alert("Eso no es una imagen."); return; }
+  fig.style.opacity = ".5";
+  try{
+    var pu = await prepUpload(file, 1920);
+    var path = id + "/cuerpo-" + Date.now() + "-" + pu.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    var up = await sb.storage.from("fotos-blog").upload(path, pu.blob, { upsert: true, contentType: pu.type });
+    if(up.error){ alert("Error al subir " + file.name + ": " + up.error.message); return; }
+    var url = sb.storage.from("fotos-blog").getPublicUrl(path).data.publicUrl;
+    var alt = (prompt("Describe la imagen (texto alternativo y título, ayuda al SEO):", file.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ")) || "").replace(/"/g, "'").replace(/</g, "");
+    cvSetImage(fig, url, alt);
+  }finally{ fig.style.opacity = ""; }
+}
+var cvFileInput = document.createElement("input");
+cvFileInput.type = "file"; cvFileInput.accept = "image/*"; cvFileInput.style.display = "none";
+document.body.appendChild(cvFileInput);
+var cvFileTarget = null;
+cvFileInput.addEventListener("change", function(){
+  var f = cvFileInput.files && cvFileInput.files[0], fig = cvFileTarget;
+  cvFileInput.value = "";
+  if(f && fig) cvUploadInto(fig, f);
+});
+function cvPickImage(fig){
+  if(!document.getElementById("p-id").value.trim()){ alert("Primero escribe y guarda el identificador de la entrada (arriba) para poder subir imágenes."); return; }
+  cvFileTarget = fig; cvFileInput.click();
+}
+
+// Menú flotante al pulsar una foto/vídeo
+var cvPop = document.createElement("div"); cvPop.id = "cvFigPop"; document.body.appendChild(cvPop);
+function cvHidePop(){ cvPop.style.display = "none"; }
+function cvShowPop(fig){
+  var im = fig.querySelector("img"), ifr = fig.querySelector("iframe");
+  var items = [];
+  if(!im && !ifr){
+    items.push(["📷 Subir foto", function(){ cvPickImage(fig); }]);
+    items.push(["▶ Poner vídeo", function(){ cvAskVideo(fig); }]);
+  }else if(im){
+    items.push(["📷 Cambiar foto", function(){ cvPickImage(fig); }]);
+    items.push(["✎ Descripción (alt)", function(){
+      var a = prompt("Texto alternativo y título de la imagen:", im.getAttribute("alt") || "");
+      if(a !== null){ a = a.replace(/"/g, "'").replace(/</g, ""); im.setAttribute("alt", a); im.setAttribute("title", a); }
+    }]);
+    items.push(["✕ Quitar foto", function(){ fig.querySelectorAll("img").forEach(function(n){ n.remove(); }); cvDecorate(); }, "cv-del"]);
+  }else{
+    items.push(["▶ Cambiar vídeo", function(){ cvAskVideo(fig); }]);
+    items.push(["✕ Quitar vídeo", function(){ fig.querySelectorAll(".cv-video,iframe").forEach(function(n){ n.remove(); }); cvDecorate(); }, "cv-del"]);
+  }
+  cvPop.innerHTML = "";
+  items.forEach(function(it){
+    var b = document.createElement("button"); b.type = "button"; b.textContent = it[0];
+    if(it[2]) b.className = it[2];
+    b.addEventListener("click", function(){ cvHidePop(); it[1](); });
+    cvPop.appendChild(b);
+  });
+  var r = fig.getBoundingClientRect();
+  cvPop.style.display = "flex"; cvPopAt = Date.now();
+  cvPop.style.left = Math.max(8, Math.min(r.left + 10, window.innerWidth - 190)) + "px";
+  cvPop.style.top = Math.max(8, Math.min(r.top + 10, window.innerHeight - 140)) + "px";
+}
+rteEditor.addEventListener("click", function(e){
+  var fig = e.target.closest && e.target.closest("figure.cv-media");
+  if(fig && rteEditor.contains(fig) && !e.target.closest("figcaption")){ e.preventDefault(); cvShowPop(fig); }
+  else cvHidePop();
+});
+document.addEventListener("mousedown", function(e){ if(!cvPop.contains(e.target) && !(e.target.closest && e.target.closest("figure.cv-media"))) cvHidePop(); });
+var cvPopAt = 0;
+window.addEventListener("scroll", function(){ if(Date.now() - cvPopAt > 400) cvHidePop(); }, true);
+
+// Arrastrar una foto sobre un hueco
+rteEditor.addEventListener("dragover", function(e){
+  if(e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types || [], "Files") !== -1 && e.target.closest && e.target.closest("figure.cv-media")) e.preventDefault();
+});
+rteEditor.addEventListener("drop", function(e){
+  var fig = e.target.closest && e.target.closest("figure.cv-media");
+  var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if(fig && f){ e.preventDefault(); cvUploadInto(fig, f); }
+});
+
+// Herramientas del bloque (aparecen al pasar el ratón)
+var cvTools = document.createElement("div"); cvTools.id = "cvBlockTools"; document.body.appendChild(cvTools);
+var cvCurrent = null, cvHideT = null;
+function cvToolBtn(txt, title, fn, cls){
+  var b = document.createElement("button"); b.type = "button"; b.textContent = txt; b.title = title;
+  if(cls) b.className = cls;
+  b.addEventListener("click", function(e){ e.preventDefault(); fn(); cvPlaceTools(); });
+  cvTools.appendChild(b);
+}
+function cvPlaceTools(){
+  if(!cvCurrent || !cvCurrent.isConnected){ cvTools.style.display = "none"; return; }
+  var r = cvCurrent.getBoundingClientRect(), er = rteEditor.getBoundingClientRect();
+  if(r.bottom < er.top || r.top > er.bottom){ cvTools.style.display = "none"; return; }
+  cvTools.style.display = "flex";
+  cvTools.style.top = Math.max(er.top + 2, r.top - 16) + "px";
+  cvTools.style.left = Math.max(8, Math.min(r.right - cvTools.offsetWidth, window.innerWidth - cvTools.offsetWidth - 8)) + "px";
+}
+function cvBuildTools(blk){
+  cvTools.innerHTML = "";
+  cvToolBtn("↑", "Subir bloque", function(){ var p = blk.previousElementSibling; if(p) blk.parentNode.insertBefore(blk, p); });
+  cvToolBtn("↓", "Bajar bloque", function(){ var n = blk.nextElementSibling; if(n) blk.parentNode.insertBefore(n, blk); });
+  if(blk.classList.contains("cv-lado")) cvToolBtn("⇄ Lado", "Cambiar la foto de lado", function(){ blk.classList.toggle("cv-inv"); });
+  if(blk.classList.contains("cv-fila")){
+    cvToolBtn("＋ Foto", "Añadir otra foto a la fila", function(){
+      if(blk.querySelectorAll("figure.cv-media").length >= 4){ alert("Máximo 4 fotos por fila."); return; }
+      blk.insertAdjacentHTML("beforeend", cvFig(true)); cvDecorate();
+    });
+    cvToolBtn("－ Foto", "Quitar la última foto de la fila", function(){
+      var fs = blk.querySelectorAll("figure.cv-media"); if(fs.length > 1) fs[fs.length - 1].remove();
+    });
+  }
+  cvToolBtn("🗑", "Borrar bloque", function(){
+    if(!confirm("¿Borrar este bloque entero (fotos y texto)?")) return;
+    blk.remove(); cvCurrent = null; cvTools.style.display = "none";
+  }, "cv-del");
+}
+rteEditor.addEventListener("mouseover", function(e){
+  var blk = e.target.closest && e.target.closest(".cv-bloque");
+  if(!blk || !rteEditor.contains(blk)) return;
+  clearTimeout(cvHideT);
+  if(blk !== cvCurrent){ cvCurrent = blk; cvBuildTools(blk); }
+  cvPlaceTools();
+});
+rteEditor.addEventListener("mouseleave", function(){ cvHideT = setTimeout(function(){ if(!cvTools.matches(":hover")){ cvTools.style.display = "none"; cvCurrent = null; } }, 500); });
+cvTools.addEventListener("mouseenter", function(){ clearTimeout(cvHideT); });
+cvTools.addEventListener("mouseleave", function(){ cvHideT = setTimeout(function(){ cvTools.style.display = "none"; cvCurrent = null; }, 500); });
+rteEditor.addEventListener("scroll", cvPlaceTools);
+window.addEventListener("scroll", cvPlaceTools, true);
+
+// Selector "＋ Bloque…" de la barra
+var cvSel = document.getElementById("cvBlockSel");
+cvSel.addEventListener("change", function(){
+  var t = cvSel.value; cvSel.selectedIndex = 0;
+  if(!t) return;
+  if(t === "video"){
+    var url = prompt("Pega el enlace del vídeo (YouTube, YouTube Shorts o Vimeo):");
+    if(!url) return;
+    var src = cvEmbedSrc(url);
+    if(!src){ alert("No he reconocido ese enlace. Usa un enlace de YouTube o Vimeo."); return; }
+    var b = cvInsert('<div class="cv-bloque cv-lado">' + cvFig(false) + CV_TEXTO + '</div>');
+    cvSetVideo(b.querySelector("figure.cv-media"), src);
+    return;
+  }
+  var html = {
+    izq:    '<div class="cv-bloque cv-lado">' + cvFig(false) + CV_TEXTO + '</div>',
+    der:    '<div class="cv-bloque cv-lado cv-inv">' + cvFig(false) + CV_TEXTO + '</div>',
+    fila2:  '<div class="cv-bloque cv-fila">' + cvFig(true) + cvFig(true) + '</div>',
+    fila3:  '<div class="cv-bloque cv-fila">' + cvFig(true) + cvFig(true) + cvFig(true) + '</div>',
+    ancho:  '<div class="cv-bloque cv-ancho">' + cvFig(true) + '</div>'
+  }[t];
+  if(html) cvInsert(html);
+});
+/* CV-BLOCKS-END */
+
 document.getElementById("p-portada").addEventListener("change", async function(e){
   var file = (e.target.files || [])[0];
   var id = document.getElementById("p-id").value.trim();
@@ -2692,7 +2963,7 @@ document.getElementById("postForm").addEventListener("submit", async function(e)
     slug: postSlug || null,
     titulo: document.getElementById("p-titulo").value.trim(),
     resumen: document.getElementById("p-resumen").value.trim() || null,
-    contenido: document.getElementById("p-contenido").innerHTML.trim() || null,
+    contenido: cvCleanHtml() || null,
     portada: draftPortada,
     fotos: draftPostFotos,
     publicado: document.getElementById("p-publicado").checked

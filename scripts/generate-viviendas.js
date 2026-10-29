@@ -87,21 +87,59 @@ function escapeText(text) {
 }
 
 // Limpia HTML de contenido (por ejemplo pegado desde otras apps) dejando solo
-// etiquetas de texto simples y sin atributos (salvo href en enlaces).
+// etiquetas de texto simples, los bloques de maquetación del editor (clases "cv-*"),
+// imágenes (con alt/title) y vídeos/mapas incrustados de orígenes conocidos.
 function sanitizeContentHtml(html) {
   if (!html) return "";
-  const allowed = new Set(["p", "br", "h2", "h3", "h4", "ul", "ol", "li", "strong", "b", "em", "i", "a", "blockquote"]);
+  const allowed = new Set(["p", "br", "h2", "h3", "h4", "ul", "ol", "li", "strong", "b", "em", "i", "a", "blockquote", "figure", "figcaption", "img", "iframe"]);
+  const attr = (attrs, name) => {
+    const m = new RegExp("\\b" + name + "\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)')", "i").exec(attrs);
+    return m ? (m[1] !== undefined ? m[1] : m[2]) : null;
+  };
+  const cvClass = (attrs) => {
+    const c = attr(attrs, "class");
+    return c && /^(cv-[a-z0-9-]+)( cv-[a-z0-9-]+)*$/.test(c.trim()) ? c.trim() : null;
+  };
+  const okIframe = (src) => /^https:\/\/(www\.youtube-nocookie\.com\/embed\/|www\.youtube\.com\/embed\/|player\.vimeo\.com\/video\/|www\.google\.com\/maps)/i.test(src || "");
+  const divStack = [];
+  const iframeStack = [];
   let s = String(html)
     .replace(/<(script|style)[\s\S]*?<\/\1>/gi, "")
     .replace(/<!--[\s\S]*?-->/g, "");
   s = s.replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b([^>]*)>/g, (m, tag, attrs) => {
     const t = tag.toLowerCase();
     const closing = m.startsWith("</");
-    if (!allowed.has(t)) return t === "div" || t === "section" ? (closing ? "\n" : "") : "";
-    if (closing) return `</${t}>`;
+    if (t === "div") {
+      if (closing) { const kept = divStack.pop(); return kept ? "</div>" : "\n"; }
+      const c = cvClass(attrs);
+      divStack.push(!!c);
+      return c ? `<div class="${c}">` : "";
+    }
+    if (t === "section") return closing ? "\n" : "";
+    if (!allowed.has(t)) return "";
+    if (t === "iframe" && closing) return iframeStack.pop() ? "</iframe>" : "";
+    if (closing) return t === "img" ? "" : `</${t}>`;
     if (t === "a") {
       const h = /href\s*=\s*"(https?:\/\/[^"]*|\/[^"]*)"/i.exec(attrs);
       return h ? `<a href="${h[1]}">` : "<a>";
+    }
+    if (t === "img") {
+      const src = attr(attrs, "src");
+      if (!src || !/^https:\/\//i.test(src)) return "";
+      const alt = (attr(attrs, "alt") || "").replace(/"/g, "&quot;");
+      const title = (attr(attrs, "title") || "").replace(/"/g, "&quot;");
+      return `<img src="${src.replace(/"/g, "&quot;")}" alt="${alt}"${title ? ` title="${title}"` : ""} loading="lazy">`;
+    }
+    if (t === "iframe") {
+      const src = attr(attrs, "src");
+      if (!okIframe(src)) { iframeStack.push(false); return ""; }
+      iframeStack.push(true);
+      const title = (attr(attrs, "title") || "Contenido incrustado").replace(/"/g, "&quot;");
+      return `<iframe src="${src.replace(/"/g, "&quot;")}" title="${title}" loading="lazy" frameborder="0" allowfullscreen>`;
+    }
+    if (t === "figure" || t === "figcaption") {
+      const c = cvClass(attrs);
+      return c ? `<${t} class="${c}">` : `<${t}>`;
     }
     return `<${t}>`;
   });
