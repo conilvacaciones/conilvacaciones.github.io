@@ -541,6 +541,21 @@ input,textarea{font:inherit;}
 .blog-modal-content h3{font-family:var(--ff-display);font-size:19px;color:var(--atlantic);margin:16px 0 8px;}
 .blog-modal-content p{margin:0 0 12px;}
 .blog-modal-content ul{margin:0 0 12px;padding-left:22px;}
+.blog-modal-content .cv-bloque{margin:26px 0;}
+.blog-modal-content .cv-media{margin:0;position:relative;}
+.blog-modal-content .cv-media img{width:100%;height:auto;display:block;margin:0;border-radius:12px;}
+.blog-modal-content .cv-lado{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;}
+.blog-modal-content .cv-lado.cv-inv>.cv-media{order:2;}
+.blog-modal-content .cv-lado>.cv-texto:only-child{grid-column:1/-1;}
+.blog-modal-content .cv-texto>*:last-child{margin-bottom:0;}
+.blog-modal-content .cv-video{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;}
+.blog-modal-content .cv-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;margin:0;border-radius:0;max-width:none;}
+.blog-modal-content .cv-fila{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+.blog-modal-content .cv-fila img{aspect-ratio:4/3;object-fit:cover;}
+.blog-modal-content .cv-ancho img{aspect-ratio:auto;}
+.blog-modal-content .cv-media figcaption{font-size:.85em;line-height:1.4;color:#667985;text-align:center;margin-top:6px;}
+@media(max-width:700px){.blog-modal-content .cv-lado{grid-template-columns:1fr;gap:14px;}.blog-modal-content .cv-lado.cv-inv>.cv-media{order:0;}}
+
 .blog-houses{margin:40px 0 44px;padding-top:30px;border-top:1px solid var(--line);}
 .blog-houses-title{font-family:var(--ff-display);font-weight:600;font-size:22px;color:var(--atlantic);margin:0 0 4px;}
 .blog-houses-sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px;}
@@ -676,7 +691,7 @@ input,textarea{font:inherit;}
 <p>Sí, la pesca marítima recreativa desde tierra está contemplada en Andalucía.</p>
 <p>Para practicarla en aguas interiores de Andalucía es necesario disponer de la correspondiente <strong>licencia de pesca marítima recreativa desde tierra, clase 1</strong>. La Junta de Andalucía indica actualmente que esta licencia tiene una vigencia de tres años. </p>
 <p>Esto es importante si vienes de vacaciones a Conil y quieres pescar por tu cuenta.</p>
-<p>No basta con llevar la caña y el resto del equipo: <strong>debes comprobar que tienes la licencia necesaria y que está en vigor</strong>.</p><p></p>
+<p>No basta con llevar la caña y el resto del equipo: <strong>debes comprobar que tienes la licencia necesaria y que está en vigor</strong>.</p><p><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/pescasurfcasting/cuerpo-1787688111063-Licencia-de-pesca-para-playa-Andalucia.png" alt="Licencia de pesca para playa en Andalucía" title="Licencia de pesca para playa en Andalucía" loading="lazy"></p>
 <h2>📜 Licencia de pesca para hacer surfcasting</h2>
 <p>La licencia que corresponde a la pesca marítima recreativa desde tierra en Andalucía es la <strong>licencia de clase 1</strong>.</p>
 <p>Según la información oficial de la Junta de Andalucía:</p>
@@ -725,7 +740,7 @@ input,textarea{font:inherit;}
 <h2>🎣 ¿Cuántos anzuelos puedes utilizar?</h2>
 <p>La normativa de pesca recreativa establece límites sobre los aparejos.</p>
 <p>En la regulación aplicable a la pesca marítima recreativa se contempla un máximo de <strong>seis anzuelos por licencia</strong> para los aparejos de anzuelo. Además, determinadas poteras, anzuelos dobles o triples y señuelos artificiales tienen reglas específicas de cómputo. </p>
-<p>Por eso, si estás preparando tu equipo de surfcasting, conviene comprobar que la configuración que utilizas cumple la normativa vigente.</p><p></p>
+<p>Por eso, si estás preparando tu equipo de surfcasting, conviene comprobar que la configuración que utilizas cumple la normativa vigente.</p><p><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/pescasurfcasting/cuerpo-1787688267923-IMG_2321-800x800.jpg" alt="Surfcasting en las playas de Conil de la Frontera" title="Surfcasting en las playas de Conil de la Frontera" loading="lazy"></p>
 <h2>🐟 ¿Cuánto pescado se puede capturar?</h2>
 <p>La pesca recreativa tiene <strong>límites de capturas y otras restricciones</strong>.</p>
 <p>No se trata simplemente de pescar y llevarse todo lo que se capture.</p>
@@ -741,7 +756,7 @@ input,textarea{font:inherit;}
 <p>Que un pez haya picado <strong>no significa necesariamente que puedas quedártelo</strong>.</p>
 <p>Las especies están sujetas a tallas mínimas y otras condiciones.</p>
 <p>Si una captura no cumple los requisitos legales, debe devolverse al mar cuando corresponda.</p>
-<p>Antes de salir a pescar, consulta siempre la información oficial actualizada sobre las especies que puedes capturar y sus tallas.</p><p></p>
+<p>Antes de salir a pescar, consulta siempre la información oficial actualizada sobre las especies que puedes capturar y sus tallas.</p><p><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/pescasurfcasting/cuerpo-1787688323986-Tallas_m_nimas_Mar_tima_2.jpeg" alt="Tabla de tallas mínimas marítimas para la pesca" title="Tabla de tallas mínimas marítimas para la pesca" loading="lazy"></p>
 <h2>🧰 ¿Qué equipo necesitas para hacer surfcasting?</h2>
 <p>Si estás empezando, no necesitas complicarte demasiado.</p>
 <p>Un equipo básico de surfcasting puede incluir:</p>
@@ -761,7 +776,7 @@ input,textarea{font:inherit;}
 <p>Si vienes de vacaciones y no quieres traer todo el equipo desde casa, puedes buscar una <strong>tienda de pesca en Conil</strong>.</p>
 <p>Una de las opciones que puedes encontrar en el municipio es <strong>Pesca elté</strong>, situada en la calle Federico García Lorca.</p>
 <p>La tienda aparece especializada en artículos y accesorios de pesca, por lo que puede resultar interesante para quienes necesiten preparar su equipo antes de salir a la costa. </p>
-<p>También puedes consultar directamente con la tienda para conocer su horario y disponibilidad de material antes de desplazarte.</p><p></p>
+<p>También puedes consultar directamente con la tienda para conocer su horario y disponibilidad de material antes de desplazarte.</p><p><iframe src="https://www.google.com/maps?q=el%20te%20pesca.%20conil&amp;output=embed" title="Mapa" loading="lazy" frameborder="0" allowfullscreen></iframe></p>
 <h2>🎣 ¿Qué comprar para surfcasting en Conil?</h2>
 <p>Si es tu primera vez pescando en la zona y necesitas comprar material, una tienda especializada puede ayudarte a elegir el equipo adecuado.</p>
 <p>Dependiendo de tu modalidad y experiencia puedes necesitar:</p>

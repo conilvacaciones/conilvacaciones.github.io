@@ -541,6 +541,21 @@ input,textarea{font:inherit;}
 .blog-modal-content h3{font-family:var(--ff-display);font-size:19px;color:var(--atlantic);margin:16px 0 8px;}
 .blog-modal-content p{margin:0 0 12px;}
 .blog-modal-content ul{margin:0 0 12px;padding-left:22px;}
+.blog-modal-content .cv-bloque{margin:26px 0;}
+.blog-modal-content .cv-media{margin:0;position:relative;}
+.blog-modal-content .cv-media img{width:100%;height:auto;display:block;margin:0;border-radius:12px;}
+.blog-modal-content .cv-lado{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;}
+.blog-modal-content .cv-lado.cv-inv>.cv-media{order:2;}
+.blog-modal-content .cv-lado>.cv-texto:only-child{grid-column:1/-1;}
+.blog-modal-content .cv-texto>*:last-child{margin-bottom:0;}
+.blog-modal-content .cv-video{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;}
+.blog-modal-content .cv-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;margin:0;border-radius:0;max-width:none;}
+.blog-modal-content .cv-fila{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+.blog-modal-content .cv-fila img{aspect-ratio:4/3;object-fit:cover;}
+.blog-modal-content .cv-ancho img{aspect-ratio:auto;}
+.blog-modal-content .cv-media figcaption{font-size:.85em;line-height:1.4;color:#667985;text-align:center;margin-top:6px;}
+@media(max-width:700px){.blog-modal-content .cv-lado{grid-template-columns:1fr;gap:14px;}.blog-modal-content .cv-lado.cv-inv>.cv-media{order:0;}}
+
 .blog-houses{margin:40px 0 44px;padding-top:30px;border-top:1px solid var(--line);}
 .blog-houses-title{font-family:var(--ff-display);font-weight:600;font-size:22px;color:var(--atlantic);margin:0 0 4px;}
 .blog-houses-sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px;}
@@ -810,7 +825,7 @@ Recomendaciones de ropa y calzado.
 <p>El mar, la gastronomía, el casco histórico y los atardeceres son algunos de sus grandes atractivos, pero también existen experiencias que permiten disfrutar del entorno de una forma completamente diferente.</p>
 <p><strong>Entre Ramas es una de ellas.</strong> 🌳🧗</p>
 <p>Si durante tus vacaciones quieres cambiar durante unas horas la arena por los árboles, el descanso por la aventura y la playa por un poco de adrenalina, puede ser un plan perfecto.</p>
-<p>Y después siempre puedes volver a la costa para terminar el día viendo uno de los famosos <strong>atardeceres de Conil frente al Atlántico</strong>. 🌅❤️</p><p></p></div></article>
+<p>Y después siempre puedes volver a la costa para terminar el día viendo uno de los famosos <strong>atardeceres de Conil frente al Atlántico</strong>. 🌅❤️</p><p><iframe src="https://www.google.com/maps?q=entre%20ramas%2C%20roche&amp;output=embed" title="Mapa" loading="lazy" frameborder="0" allowfullscreen></iframe></p></div></article>
     </div>
   </div>
 </section>

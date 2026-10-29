@@ -541,6 +541,21 @@ input,textarea{font:inherit;}
 .blog-modal-content h3{font-family:var(--ff-display);font-size:19px;color:var(--atlantic);margin:16px 0 8px;}
 .blog-modal-content p{margin:0 0 12px;}
 .blog-modal-content ul{margin:0 0 12px;padding-left:22px;}
+.blog-modal-content .cv-bloque{margin:26px 0;}
+.blog-modal-content .cv-media{margin:0;position:relative;}
+.blog-modal-content .cv-media img{width:100%;height:auto;display:block;margin:0;border-radius:12px;}
+.blog-modal-content .cv-lado{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;}
+.blog-modal-content .cv-lado.cv-inv>.cv-media{order:2;}
+.blog-modal-content .cv-lado>.cv-texto:only-child{grid-column:1/-1;}
+.blog-modal-content .cv-texto>*:last-child{margin-bottom:0;}
+.blog-modal-content .cv-video{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;}
+.blog-modal-content .cv-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;margin:0;border-radius:0;max-width:none;}
+.blog-modal-content .cv-fila{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+.blog-modal-content .cv-fila img{aspect-ratio:4/3;object-fit:cover;}
+.blog-modal-content .cv-ancho img{aspect-ratio:auto;}
+.blog-modal-content .cv-media figcaption{font-size:.85em;line-height:1.4;color:#667985;text-align:center;margin-top:6px;}
+@media(max-width:700px){.blog-modal-content .cv-lado{grid-template-columns:1fr;gap:14px;}.blog-modal-content .cv-lado.cv-inv>.cv-media{order:0;}}
+
 .blog-houses{margin:40px 0 44px;padding-top:30px;border-top:1px solid var(--line);}
 .blog-houses-title{font-family:var(--ff-display);font-weight:600;font-size:22px;color:var(--atlantic);margin:0 0 4px;}
 .blog-houses-sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px;}
@@ -671,12 +686,12 @@ input,textarea{font:inherit;}
 <p>Cuando pensamos en Conil de la Frontera, normalmente pensamos en sus playas, sus calles blancas y sus atardeceres frente al Atlántico. Pero hay otro lugar que merece una visita, especialmente si quieres conocer una parte diferente del municipio: <strong>el Puerto de Conil</strong>.</p>
 <p>Situado junto a Cabo Roche, a unos 8 kilómetros del centro de Conil, el puerto combina la actividad <strong>pesquera y náutico-deportiva</strong> en un entorno con unas vistas espectaculares de la costa gaditana. </p>
 <p>Y además de pasear y disfrutar del paisaje, desde el puerto puedes encontrar diferentes actividades para disfrutar del mar: <strong>rutas en barco, excursiones de pesca, turismo marinero y motos de agua</strong>. 🌊🚤</p>
-<p>Si estás alojado en un <strong>alquiler vacacional en Conil</strong>, te recomendamos reservar al menos una mañana o una tarde para acercarte hasta esta zona.</p><p></p>
+<p>Si estás alojado en un <strong>alquiler vacacional en Conil</strong>, te recomendamos reservar al menos una mañana o una tarde para acercarte hasta esta zona.</p><p><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/PuertoDeConil/cuerpo-1787572184736-puerto-deportivo-conil.jpg" alt="Puerto deportivo de Conil de la Frontera" title="Puerto deportivo de Conil de la Frontera" loading="lazy"></p>
 <h2>📍 ¿Dónde está el Puerto de Conil?</h2>
 <p>El Puerto de Conil se encuentra en la zona de <strong>Cabo Roche</strong>, al norte del municipio.</p>
 <p>Está aproximadamente a <strong>8 kilómetros del centro de Conil de la Frontera</strong>, entre la desembocadura del río Roche y el entorno del Faro de Roche. </p>
 <p>Su ubicación hace que sea un punto muy interesante para conocer la costa desde otra perspectiva.</p>
-<p>Desde los alrededores puedes disfrutar de las vistas del litoral y del paisaje de los acantilados de la Costa de la Luz.</p><p></p>
+<p>Desde los alrededores puedes disfrutar de las vistas del litoral y del paisaje de los acantilados de la Costa de la Luz.</p><p><iframe src="https://www.google.com/maps?q=puerto%20de%20conil&amp;output=embed" title="Mapa" loading="lazy" frameborder="0" allowfullscreen></iframe></p>
 <h2>⚓ Un puerto con dos caras: pesca y ocio</h2>
 <p>Una de las características más interesantes del Puerto de Conil es que aquí conviven dos actividades muy diferentes.</p>
 <p>Por un lado está la <strong>pesca tradicional</strong>, que continúa teniendo un papel importante en Conil.</p>
@@ -687,7 +702,7 @@ input,textarea{font:inherit;}
 <p>La pesca forma parte de la identidad de Conil desde hace generaciones.</p>
 <p>La flota local está vinculada principalmente a la pesca artesanal y de cercanía, con diferentes artes tradicionales como el <strong>trasmallo y el palangre</strong>. </p>
 <p>El puerto y su lonja están estrechamente relacionados con esta actividad.</p>
-<p>De hecho, existen experiencias de <strong>turismo pesquero</strong> que permiten a los visitantes conocer de primera mano cómo es el trabajo de los pescadores y acercarse a las tradiciones marineras de Conil. </p><p></p>
+<p>De hecho, existen experiencias de <strong>turismo pesquero</strong> que permiten a los visitantes conocer de primera mano cómo es el trabajo de los pescadores y acercarse a las tradiciones marineras de Conil. </p><p><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/PuertoDeConil/cuerpo-1787572333754-palangre_y_trasmallo_pesca.jpg" alt="Pesca con palangre y trasmallo en el puerto de Conil" title="Pesca con palangre y trasmallo en el puerto de Conil" loading="lazy"></p>
 <h2>🚤 Ruta en barco por la costa de Conil</h2>
 <p>Una de las mejores formas de conocer el litoral es hacerlo desde el agua.</p>
 <p>Desde el Puerto de Conil puedes encontrar <strong>rutas turísticas en barco</strong> que recorren la costa y permiten disfrutar de lugares que desde tierra tienen una perspectiva completamente diferente.</p>
@@ -703,7 +718,7 @@ input,textarea{font:inherit;}
 <p>Si prefieres algo con un poco más de adrenalina, también puedes disfrutar del mar sobre una <strong>moto de agua</strong>. 🌊🔥</p>
 <p><a href="https://jetskiconil.com/">Home - Jet Ski Conil</a>&nbsp;realiza excursiones en moto de agua con salidas desde el Puerto de Conil.</p>
 <p>La empresa indica que realiza diferentes rutas acompañadas por un monitor y que cuenta con varias salidas desde el puerto. </p>
-<p>Es una alternativa especialmente interesante para quienes buscan <strong>actividades acuáticas en Conil</strong> y quieren conocer la costa de una manera más dinámica.</p><p></p>
+<p>Es una alternativa especialmente interesante para quienes buscan <strong>actividades acuáticas en Conil</strong> y quieren conocer la costa de una manera más dinámica.</p><p><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/puertodeconil/cuerpo-1787578732424-jetski_conil_motos_de_agua.jpg" alt="Motos de agua en el puerto de Conil" title="Motos de agua en el puerto de Conil" loading="lazy"></p>
 <h2>🎣 Turismo pesquero: conviértete en pescador por un día</h2>
 <p>Si te interesa más la tradición que la velocidad, existe otra experiencia muy diferente.</p>
 <p><strong>Pesca Turismo Conil</strong>, vinculada a la Organización de Productores Pesqueros Artesanales de Conil, ofrece experiencias en las que los visitantes pueden embarcarse con pescadores y conocer cómo se desarrolla su actividad en el mar. </p>
@@ -714,7 +729,7 @@ input,textarea{font:inherit;}
 <p>La lonja forma parte de la actividad pesquera del puerto y es uno de los lugares que mejor representan la relación de Conil con el mar.</p>
 <p>La actividad pesquera local está muy vinculada al pescado fresco y a la gastronomía del municipio.</p>
 <p>De hecho, el Ayuntamiento destaca actualmente la relación entre la actividad del puerto, la pesca artesanal y la gastronomía local. </p>
-<p>Si te interesa este aspecto de Conil, merece la pena consultar las experiencias de turismo pesquero disponibles durante las fechas de tu viaje.</p><p></p>
+<p>Si te interesa este aspecto de Conil, merece la pena consultar las experiencias de turismo pesquero disponibles durante las fechas de tu viaje.</p><p><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/puertodeconil/cuerpo-1787578754801-lonja_de_conil.jpeg" alt="Lonja de pescado de Conil de la Frontera" title="Lonja de pescado de Conil de la Frontera" loading="lazy"></p>
 <h2>🦪 Mar, gastronomía y productos de Conil</h2>
 <p>El mar no solo está presente en las actividades del puerto.</p>
 <p>También es protagonista de la gastronomía de Conil.</p>
@@ -739,7 +754,7 @@ input,textarea{font:inherit;}
 <p>Una de las grandes ventajas de visitar esta zona es que no tienes que limitarte al puerto.</p>
 <p>El entorno de <strong>Cabo Roche y el Faro de Roche</strong> permite disfrutar de unas magníficas vistas sobre la costa.</p>
 <p>El propio Ayuntamiento incluye el puerto y el mirador de Cabo Roche dentro de la denominada <strong>Ruta del Mar</strong>, un recorrido relacionado con los orígenes pesqueros de Conil. </p>
-<p>Desde el mirador puedes contemplar la costa en dirección a Barbate y, en días despejados, incluso llegar a distinguir la costa africana. </p><p></p><p></p>
+<p>Desde el mirador puedes contemplar la costa en dirección a Barbate y, en días despejados, incluso llegar a distinguir la costa africana. </p><p><iframe src="https://www.google.com/maps?q=faro%20de%20roche&amp;output=embed" title="Mapa" loading="lazy" frameborder="0" allowfullscreen></iframe></p><p><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/puertodeconil/cuerpo-1787578798329-faro_de_roche.jpg" alt="Faro de Roche, Conil de la Frontera" title="Faro de Roche, Conil de la Frontera" loading="lazy"></p>
 <h2>🚶 Una ruta para descubrir el Conil marinero</h2>
 <p>Si te gusta caminar, puedes combinar la visita al puerto con otros puntos relacionados con la historia marítima de Conil.</p>
 <p>La <strong>Ruta del Mar</strong> recorre diferentes lugares vinculados al pasado pesquero del municipio, entre ellos la Torre de Guzmán, las antiguas marcaciones de la almadraba, el puerto pesquero de Cabo Roche y el mirador. </p>
