@@ -177,6 +177,7 @@ main.wrap{padding:40px 24px 90px;}
 .rte-editor .cv-texto>*:last-child{margin-bottom:0;}
 .rte-editor .cv-video{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;}
 .rte-editor .cv-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;margin:0;border-radius:0;max-width:none;}
+.rte-editor .cv-mapa{aspect-ratio:4/3;}
 .rte-editor .cv-fila{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
 .rte-editor .cv-fila img{aspect-ratio:4/3;object-fit:cover;}
 .rte-editor .cv-ancho img{aspect-ratio:auto;}
@@ -2746,6 +2747,16 @@ function cvAskVideo(fig){
   if(!src){ alert("No he reconocido ese enlace. Usa un enlace de YouTube o Vimeo."); return false; }
   cvSetVideo(fig, src); return true;
 }
+function cvSetMap(fig, place){
+  fig.querySelectorAll("img,iframe,.cv-video,.cv-vacio").forEach(function(n){ n.remove(); });
+  var src = "https://www.google.com/maps?q=" + encodeURIComponent(place) + "&output=embed";
+  fig.insertAdjacentHTML("afterbegin", '<div class="cv-video cv-mapa"><iframe src="' + src + '" title="Mapa: ' + place.replace(/[<>"&]/g, "") + '" loading="lazy" frameborder="0"></iframe></div>');
+}
+function cvAskMap(fig){
+  var place = prompt("Escribe la dirección o el lugar a mostrar en el mapa (ej. \"Playa de los Bateles, Conil de la Frontera\"):");
+  if(!place || !place.trim()) return false;
+  cvSetMap(fig, place.trim()); return true;
+}
 function cvSetImage(fig, url, alt){
   fig.querySelectorAll("img,iframe,.cv-video,.cv-vacio").forEach(function(n){ n.remove(); });
   var im = document.createElement("img");
@@ -2790,6 +2801,7 @@ function cvShowPop(fig){
   if(!im && !ifr){
     items.push(["📷 Subir foto", function(){ cvPickImage(fig); }]);
     items.push(["▶ Poner vídeo", function(){ cvAskVideo(fig); }]);
+    items.push(["📍 Poner ubicación (mapa)", function(){ cvAskMap(fig); }]);
   }else if(im){
     items.push(["📷 Cambiar foto", function(){ cvPickImage(fig); }]);
     items.push(["✎ Descripción (alt)", function(){
@@ -2798,8 +2810,11 @@ function cvShowPop(fig){
     }]);
     items.push(["✕ Quitar foto", function(){ fig.querySelectorAll("img").forEach(function(n){ n.remove(); }); cvDecorate(); }, "cv-del"]);
   }else{
-    items.push(["▶ Cambiar vídeo", function(){ cvAskVideo(fig); }]);
-    items.push(["✕ Quitar vídeo", function(){ fig.querySelectorAll(".cv-video,iframe").forEach(function(n){ n.remove(); }); cvDecorate(); }, "cv-del"]);
+    var esMapa = /google\.com\/maps/.test(ifr.getAttribute("src") || "");
+    items.push([esMapa ? "📍 Cambiar ubicación" : "▶ Cambiar vídeo", function(){ if(esMapa) cvAskMap(fig); else cvAskVideo(fig); }]);
+    if(esMapa) items.push(["▶ Poner vídeo en su lugar", function(){ cvAskVideo(fig); }]);
+    else items.push(["📍 Poner mapa en su lugar", function(){ cvAskMap(fig); }]);
+    items.push([esMapa ? "✕ Quitar mapa" : "✕ Quitar vídeo", function(){ fig.querySelectorAll(".cv-video,iframe").forEach(function(n){ n.remove(); }); cvDecorate(); }, "cv-del"]);
   }
   cvPop.innerHTML = "";
   items.forEach(function(it){
@@ -2886,10 +2901,13 @@ function cvSvg(parts){ return '<svg viewBox="0 0 120 70" xmlns="http://www.w3.or
 function cvPh(x,y,w,h){ return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3" fill="#8fbfd3"/><circle cx="'+(x+w*.25)+'" cy="'+(y+h*.3)+'" r="'+Math.min(w,h)*.09+'" fill="#fff" opacity=".8"/><path d="M'+x+' '+(y+h)+' L'+(x+w*.4)+' '+(y+h*.55)+' L'+(x+w*.65)+' '+(y+h*.8)+' L'+(x+w*.8)+' '+(y+h*.65)+' L'+(x+w)+' '+(y+h)+' Z" fill="#5f9bb5"/>'; }
 function cvTx(x,y,w,n){ var o=''; for(var i=0;i<n;i++) o += '<rect x="'+x+'" y="'+(y+i*7)+'" width="'+(i===n-1?w*.65:w)+'" height="3.5" rx="1.7" fill="#9aa8b2"/>'; return o; }
 function cvVid(x,y,w,h){ return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3" fill="#26323a"/><circle cx="'+(x+w/2)+'" cy="'+(y+h/2)+'" r="9" fill="#e62d3f"/><path d="M'+(x+w/2-3)+' '+(y+h/2-5)+' L'+(x+w/2+5)+' '+(y+h/2)+' L'+(x+w/2-3)+' '+(y+h/2+5)+' Z" fill="#fff"/>'; }
+function cvMap(x,y,w,h){ return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3" fill="#dfe9d6"/><path d="M'+x+' '+(y+h*.7)+' Q'+(x+w*.4)+' '+(y+h*.3)+' '+(x+w)+' '+(y+h*.55)+'" stroke="#fff" stroke-width="4" fill="none"/><path d="M'+(x+w*.3)+' '+y+' L'+(x+w*.55)+' '+(y+h)+'" stroke="#fff" stroke-width="3" fill="none"/><path d="M'+(x+w*.62)+' '+(y+h*.2)+' a7 7 0 1 1 .01 0 Z" fill="#e0453a"/><circle cx="'+(x+w*.62)+'" cy="'+(y+h*.2+5)+'" r="2.4" fill="#fff"/><path d="M'+(x+w*.62-5)+' '+(y+h*.2+8)+' L'+(x+w*.62)+' '+(y+h*.2+19)+' L'+(x+w*.62+5)+' '+(y+h*.2+8)+' Z" fill="#e0453a"/>'; }
 var CV_TIPOS = [
   ["izq",   "Foto a la izquierda + texto", cvSvg(cvPh(8,12,50,46) + cvTx(66,20,46,5))],
   ["der",   "Texto + foto a la derecha",   cvSvg(cvTx(8,20,46,5) + cvPh(62,12,50,46))],
   ["video", "Vídeo + texto",               cvSvg(cvVid(8,12,50,46) + cvTx(66,20,46,5))],
+  ["mapaizq", "Ubicación (mapa) a la izquierda + texto", cvSvg(cvMap(8,12,50,46) + cvTx(66,20,46,5))],
+  ["mapader", "Texto + ubicación (mapa) a la derecha",   cvSvg(cvTx(8,20,46,5) + cvMap(62,12,50,46))],
   ["fila2", "Fila de 2 fotos",             cvSvg(cvPh(8,14,50,36) + cvPh(62,14,50,36) + cvTx(14,57,38,1) + cvTx(68,57,38,1))],
   ["fila3", "Fila de 3 fotos",             cvSvg(cvPh(6,14,34,36) + cvPh(43,14,34,36) + cvPh(80,14,34,36) + cvTx(10,57,26,1) + cvTx(47,57,26,1) + cvTx(84,57,26,1))],
   ["ancho", "Foto ancha con pie de foto",  cvSvg(cvPh(8,8,104,44) + cvTx(30,58,60,1))]
@@ -2902,6 +2920,13 @@ function cvAddBlock(t){
     if(!src){ alert("No he reconocido ese enlace. Usa un enlace de YouTube o Vimeo."); return; }
     var b = cvInsert('<div class="cv-bloque cv-lado">' + cvFig(false) + CV_TEXTO + '</div>');
     cvSetVideo(b.querySelector("figure.cv-media"), src);
+    return;
+  }
+  if(t === "mapaizq" || t === "mapader"){
+    var place = prompt("Escribe la dirección o el lugar a mostrar en el mapa (ej. \"Playa de los Bateles, Conil de la Frontera\"):");
+    if(!place || !place.trim()) return;
+    var mb = cvInsert('<div class="cv-bloque cv-lado' + (t === "mapader" ? ' cv-inv' : '') + '">' + cvFig(false) + CV_TEXTO + '</div>');
+    cvSetMap(mb.querySelector("figure.cv-media"), place.trim());
     return;
   }
   var html = {
