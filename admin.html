@@ -3563,9 +3563,15 @@ document.getElementById("btnOptimizarImgs").addEventListener("click", async func
         var f = files[i];
         if(f.size && f.size < 300*1024){ skipped++; continue; }
         try{
-          var url = sb.storage.from(bucket).getPublicUrl(f.path).data.publicUrl;
-          var r = await fetch(url, { cache: "no-store" });
-          if(!r.ok) throw new Error("HTTP " + r.status);
+          // La API de listado puede devolver la carpeta con otras mayúsculas: se prueban las dos variantes
+          var parts = f.path.split("/"), variantes = [f.path];
+          if(parts.length > 1){ var alt = [parts[0].toLowerCase()].concat(parts.slice(1)).join("/"); if(alt !== f.path) variantes.push(alt); }
+          var r = null;
+          for(var vi=0; vi<variantes.length; vi++){
+            var rr = await fetch(sb.storage.from(bucket).getPublicUrl(variantes[vi]).data.publicUrl, { cache: "no-store" });
+            if(rr.ok){ r = rr; f.path = variantes[vi]; break; }
+          }
+          if(!r) throw new Error("no se encuentra el archivo (HTTP 400/404)");
           var blob = await r.blob();
           var c = await compressImage(blob, 1920, 0.82);
           if(c.blob === blob || c.blob.size > blob.size * 0.85){
