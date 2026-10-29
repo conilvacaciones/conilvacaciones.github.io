@@ -197,7 +197,12 @@ main.wrap{padding:40px 24px 90px;}
 #cvBlockTools button:hover,#cvFigPop button:hover{background:rgba(255,255,255,.2);}
 #cvBlockTools button.cv-del:hover,#cvFigPop button.cv-del:hover{background:#c0392b;}
 #cvFigPop{flex-direction:column;}
-.rte-toolbar #cvBlockSel{max-width:170px;}
+.rte-toolbar .cv-blockbtn{width:auto;padding:0 10px;font-size:12.5px;font-weight:600;background:var(--card);border:1px solid var(--line);}
+#cvPicker{position:fixed;z-index:9999;display:none;grid-template-columns:repeat(3,150px);gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 12px 32px rgba(0,0,0,.22);}
+#cvPicker button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 6px;border:1.5px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-size:12px;color:var(--ink);line-height:1.25;}
+#cvPicker button:hover{border-color:var(--sol);background:#fffaf0;}
+#cvPicker svg{width:100%;height:auto;display:block;}
+@media(max-width:560px){#cvPicker{grid-template-columns:repeat(2,140px);}}
 
 .rte-editor img{max-width:100%;border-radius:8px;display:block;margin:10px 0;}
 .rte-editor iframe{max-width:100%;border-radius:8px;display:block;margin:10px 0;}
@@ -709,15 +714,7 @@ main.wrap{padding:40px 24px 90px;}
             <button type="button" id="rteVideoBtn" title="Insertar vídeo (YouTube/Vimeo)">▶</button>
             <button type="button" id="rteMapBtn" title="Insertar mapa">📍</button>
             <div class="rte-sep"></div>
-            <select id="cvBlockSel" title="Insertar un bloque de maquetación: foto + texto, vídeo + texto, fila de fotos…">
-              <option value="">＋ Bloque…</option>
-              <option value="izq">Foto a la izquierda + texto</option>
-              <option value="der">Texto + foto a la derecha</option>
-              <option value="video">Vídeo + texto</option>
-              <option value="fila2">Fila de 2 fotos</option>
-              <option value="fila3">Fila de 3 fotos</option>
-              <option value="ancho">Foto ancha con pie de foto</option>
-            </select>
+            <button type="button" id="cvBlockBtn" class="cv-blockbtn" title="Insertar un bloque de maquetación">＋ Bloque ▾</button>
             <div class="rte-sep"></div>
             <button type="button" data-cmd="removeFormat" title="Quitar formato">✕</button>
           </div>
@@ -2884,11 +2881,20 @@ cvTools.addEventListener("mouseleave", function(){ cvHideT = setTimeout(function
 rteEditor.addEventListener("scroll", cvPlaceTools);
 window.addEventListener("scroll", cvPlaceTools, true);
 
-// Selector "＋ Bloque…" de la barra
-var cvSel = document.getElementById("cvBlockSel");
-cvSel.addEventListener("change", function(){
-  var t = cvSel.value; cvSel.selectedIndex = 0;
-  if(!t) return;
+// Selector visual de bloques (miniaturas)
+function cvSvg(parts){ return '<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="70" rx="5" fill="#f3f6f8"/>' + parts + '</svg>'; }
+function cvPh(x,y,w,h){ return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3" fill="#8fbfd3"/><circle cx="'+(x+w*.25)+'" cy="'+(y+h*.3)+'" r="'+Math.min(w,h)*.09+'" fill="#fff" opacity=".8"/><path d="M'+x+' '+(y+h)+' L'+(x+w*.4)+' '+(y+h*.55)+' L'+(x+w*.65)+' '+(y+h*.8)+' L'+(x+w*.8)+' '+(y+h*.65)+' L'+(x+w)+' '+(y+h)+' Z" fill="#5f9bb5"/>'; }
+function cvTx(x,y,w,n){ var o=''; for(var i=0;i<n;i++) o += '<rect x="'+x+'" y="'+(y+i*7)+'" width="'+(i===n-1?w*.65:w)+'" height="3.5" rx="1.7" fill="#9aa8b2"/>'; return o; }
+function cvVid(x,y,w,h){ return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3" fill="#26323a"/><circle cx="'+(x+w/2)+'" cy="'+(y+h/2)+'" r="9" fill="#e62d3f"/><path d="M'+(x+w/2-3)+' '+(y+h/2-5)+' L'+(x+w/2+5)+' '+(y+h/2)+' L'+(x+w/2-3)+' '+(y+h/2+5)+' Z" fill="#fff"/>'; }
+var CV_TIPOS = [
+  ["izq",   "Foto a la izquierda + texto", cvSvg(cvPh(8,12,50,46) + cvTx(66,20,46,5))],
+  ["der",   "Texto + foto a la derecha",   cvSvg(cvTx(8,20,46,5) + cvPh(62,12,50,46))],
+  ["video", "Vídeo + texto",               cvSvg(cvVid(8,12,50,46) + cvTx(66,20,46,5))],
+  ["fila2", "Fila de 2 fotos",             cvSvg(cvPh(8,14,50,36) + cvPh(62,14,50,36) + cvTx(14,57,38,1) + cvTx(68,57,38,1))],
+  ["fila3", "Fila de 3 fotos",             cvSvg(cvPh(6,14,34,36) + cvPh(43,14,34,36) + cvPh(80,14,34,36) + cvTx(10,57,26,1) + cvTx(47,57,26,1) + cvTx(84,57,26,1))],
+  ["ancho", "Foto ancha con pie de foto",  cvSvg(cvPh(8,8,104,44) + cvTx(30,58,60,1))]
+];
+function cvAddBlock(t){
   if(t === "video"){
     var url = prompt("Pega el enlace del vídeo (YouTube, YouTube Shorts o Vimeo):");
     if(!url) return;
@@ -2906,7 +2912,24 @@ cvSel.addEventListener("change", function(){
     ancho:  '<div class="cv-bloque cv-ancho">' + cvFig(true) + '</div>'
   }[t];
   if(html) cvInsert(html);
+}
+var cvPicker = document.createElement("div"); cvPicker.id = "cvPicker"; document.body.appendChild(cvPicker);
+cvPicker.innerHTML = CV_TIPOS.map(function(t){ return '<button type="button" data-t="' + t[0] + '">' + t[2] + '<span>' + t[1] + '</span></button>'; }).join("");
+cvPicker.addEventListener("mousedown", function(e){ e.preventDefault(); });
+cvPicker.addEventListener("click", function(e){
+  var b = e.target.closest("button[data-t]"); if(!b) return;
+  cvPicker.style.display = "none";
+  cvAddBlock(b.getAttribute("data-t"));
 });
+var cvBlockBtn = document.getElementById("cvBlockBtn");
+cvBlockBtn.addEventListener("click", function(){
+  if(cvPicker.style.display === "grid"){ cvPicker.style.display = "none"; return; }
+  var r = cvBlockBtn.getBoundingClientRect();
+  cvPicker.style.display = "grid";
+  cvPicker.style.top = Math.min(r.bottom + 6, Math.max(8, window.innerHeight - cvPicker.offsetHeight - 8)) + "px";
+  cvPicker.style.left = Math.max(8, Math.min(r.left, window.innerWidth - cvPicker.offsetWidth - 8)) + "px";
+});
+document.addEventListener("mousedown", function(e){ if(!cvPicker.contains(e.target) && e.target !== cvBlockBtn) cvPicker.style.display = "none"; });
 /* CV-BLOCKS-END */
 
 document.getElementById("p-portada").addEventListener("change", async function(e){
