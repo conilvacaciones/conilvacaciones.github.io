@@ -178,11 +178,14 @@ main.wrap{padding:40px 24px 90px;}
 .rte-editor .cv-video{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;}
 .rte-editor .cv-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;margin:0;border-radius:0;max-width:none;}
 .rte-editor .cv-mapa{aspect-ratio:4/3;}
+.rte-editor .cv-medios{display:flex;flex-direction:column;gap:14px;min-width:0;}
+.rte-editor .cv-lado:has(>.cv-medios){align-items:start;}
+.rte-editor .cv-lado.cv-inv>.cv-medios{order:2;}
 .rte-editor .cv-fila{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
 .rte-editor .cv-fila img{aspect-ratio:4/3;object-fit:cover;}
 .rte-editor .cv-ancho img{aspect-ratio:auto;}
 .rte-editor .cv-media figcaption{font-size:.85em;line-height:1.4;color:#667985;text-align:center;margin-top:6px;}
-@media(max-width:700px){.rte-editor .cv-lado{grid-template-columns:1fr;gap:14px;}.rte-editor .cv-lado.cv-inv>.cv-media{order:0;}}
+@media(max-width:700px){.rte-editor .cv-lado{grid-template-columns:1fr;gap:14px;}.rte-editor .cv-lado.cv-inv>.cv-media,.rte-editor .cv-lado.cv-inv>.cv-medios{order:0;}}
 
 .rte-editor .cv-bloque{outline:1.5px dashed transparent;outline-offset:6px;border-radius:8px;}
 .rte-editor .cv-bloque:hover{outline-color:var(--sol);}
@@ -2705,6 +2708,7 @@ function cvCleanHtml(){
   var c = rteEditor.cloneNode(true);
   c.querySelectorAll(".cv-vacio").forEach(function(n){ n.remove(); });
   c.querySelectorAll("figure.cv-media").forEach(function(f){ if(!f.querySelector("img,iframe")) f.remove(); });
+  c.querySelectorAll(".cv-medios").forEach(function(m){ if(!m.querySelector("figure")) m.remove(); });
   c.querySelectorAll("figcaption").forEach(function(f){ if(!f.textContent.trim()) f.remove(); });
   c.querySelectorAll("[contenteditable]").forEach(function(n){ n.removeAttribute("contenteditable"); });
   c.querySelectorAll("[style]").forEach(function(n){ if(!n.getAttribute("style").trim()) n.removeAttribute("style"); });
@@ -2746,6 +2750,25 @@ function cvAskVideo(fig){
   var src = cvEmbedSrc(url);
   if(!src){ alert("No he reconocido ese enlace. Usa un enlace de YouTube o Vimeo."); return false; }
   cvSetVideo(fig, src); return true;
+}
+// Columna de medios: permite varias fotos/mapas/vídeos apilados en el mismo lado de un bloque
+function cvEnsureMedios(blk){
+  var m = blk.querySelector(":scope > .cv-medios");
+  if(m) return m;
+  m = document.createElement("div"); m.className = "cv-medios";
+  var first = blk.querySelector(":scope > figure.cv-media");
+  if(first){ blk.insertBefore(m, first); m.appendChild(first); }
+  else blk.insertBefore(m, blk.firstChild);
+  return m;
+}
+function cvAddMedio(blk, tipo){
+  var m = cvEnsureMedios(blk);
+  m.insertAdjacentHTML("beforeend", cvFig(false)); cvDecorate();
+  var fig = m.lastElementChild;
+  if(tipo === "mapa"){ if(!cvAskMap(fig)) fig.remove(); }
+  else if(tipo === "video"){ if(!cvAskVideo(fig)) fig.remove(); }
+  else cvPickImage(fig);
+  return fig;
 }
 function cvSetMap(fig, place){
   fig.querySelectorAll("img,iframe,.cv-video,.cv-vacio").forEach(function(n){ n.remove(); });
@@ -2816,6 +2839,8 @@ function cvShowPop(fig){
     else items.push(["📍 Poner mapa en su lugar", function(){ cvAskMap(fig); }]);
     items.push([esMapa ? "✕ Quitar mapa" : "✕ Quitar vídeo", function(){ fig.querySelectorAll(".cv-video,iframe").forEach(function(n){ n.remove(); }); cvDecorate(); }, "cv-del"]);
   }
+  var hermanas = fig.parentNode ? fig.parentNode.querySelectorAll(":scope > figure.cv-media").length : 1;
+  if(hermanas > 1) items.push(["🗑 Quitar este hueco", function(){ fig.remove(); }, "cv-del"]);
   cvPop.innerHTML = "";
   items.forEach(function(it){
     var b = document.createElement("button"); b.type = "button"; b.textContent = it[0];
@@ -2868,7 +2893,12 @@ function cvBuildTools(blk){
   cvTools.innerHTML = "";
   cvToolBtn("↑", "Subir bloque", function(){ var p = blk.previousElementSibling; if(p) blk.parentNode.insertBefore(blk, p); });
   cvToolBtn("↓", "Bajar bloque", function(){ var n = blk.nextElementSibling; if(n) blk.parentNode.insertBefore(n, blk); });
-  if(blk.classList.contains("cv-lado")) cvToolBtn("⇄ Lado", "Cambiar la foto de lado", function(){ blk.classList.toggle("cv-inv"); });
+  if(blk.classList.contains("cv-lado")){
+    cvToolBtn("⇄ Lado", "Cambiar la foto de lado", function(){ blk.classList.toggle("cv-inv"); });
+    cvToolBtn("＋ Foto", "Añadir otra foto debajo, en el mismo lado", function(){ cvAddMedio(blk, "foto"); });
+    cvToolBtn("＋ Mapa", "Añadir la ubicación (mapa) debajo, en el mismo lado", function(){ cvAddMedio(blk, "mapa"); });
+    cvToolBtn("＋ Vídeo", "Añadir un vídeo debajo, en el mismo lado", function(){ cvAddMedio(blk, "video"); });
+  }
   if(blk.classList.contains("cv-fila")){
     cvToolBtn("＋ Foto", "Añadir otra foto a la fila", function(){
       if(blk.querySelectorAll("figure.cv-media").length >= 4){ alert("Máximo 4 fotos por fila."); return; }
@@ -2906,8 +2936,8 @@ var CV_TIPOS = [
   ["izq",   "Foto a la izquierda + texto", cvSvg(cvPh(8,12,50,46) + cvTx(66,20,46,5))],
   ["der",   "Texto + foto a la derecha",   cvSvg(cvTx(8,20,46,5) + cvPh(62,12,50,46))],
   ["video", "Vídeo + texto",               cvSvg(cvVid(8,12,50,46) + cvTx(66,20,46,5))],
-  ["mapaizq", "Ubicación (mapa) a la izquierda + texto", cvSvg(cvMap(8,12,50,46) + cvTx(66,20,46,5))],
-  ["mapader", "Texto + ubicación (mapa) a la derecha",   cvSvg(cvTx(8,20,46,5) + cvMap(62,12,50,46))],
+  ["fotomapaizq", "Foto y mapa a la izquierda + texto", cvSvg(cvPh(8,6,50,28) + cvMap(8,38,50,28) + cvTx(66,20,46,5))],
+  ["fotomapader",  "Texto + foto y mapa a la derecha",   cvSvg(cvTx(8,20,46,5) + cvPh(62,6,50,28) + cvMap(62,38,50,28))],
   ["fila2", "Fila de 2 fotos",             cvSvg(cvPh(8,14,50,36) + cvPh(62,14,50,36) + cvTx(14,57,38,1) + cvTx(68,57,38,1))],
   ["fila3", "Fila de 3 fotos",             cvSvg(cvPh(6,14,34,36) + cvPh(43,14,34,36) + cvPh(80,14,34,36) + cvTx(10,57,26,1) + cvTx(47,57,26,1) + cvTx(84,57,26,1))],
   ["ancho", "Foto ancha con pie de foto",  cvSvg(cvPh(8,8,104,44) + cvTx(30,58,60,1))]
@@ -2922,11 +2952,12 @@ function cvAddBlock(t){
     cvSetVideo(b.querySelector("figure.cv-media"), src);
     return;
   }
-  if(t === "mapaizq" || t === "mapader"){
+  if(t === "fotomapaizq" || t === "fotomapader"){
     var place = prompt("Escribe la dirección o el lugar a mostrar en el mapa (ej. \"Playa de los Bateles, Conil de la Frontera\"):");
-    if(!place || !place.trim()) return;
-    var mb = cvInsert('<div class="cv-bloque cv-lado' + (t === "mapader" ? ' cv-inv' : '') + '">' + cvFig(false) + CV_TEXTO + '</div>');
-    cvSetMap(mb.querySelector("figure.cv-media"), place.trim());
+    if(place === null) return;
+    var mb = cvInsert('<div class="cv-bloque cv-lado' + (t === "fotomapader" ? ' cv-inv' : '') + '"><div class="cv-medios">' + cvFig(false) + cvFig(false) + '</div>' + CV_TEXTO + '</div>');
+    cvDecorate();
+    if(place.trim()) cvSetMap(mb.querySelectorAll("figure.cv-media")[1], place.trim());
     return;
   }
   var html = {
