@@ -891,6 +891,9 @@ async function initBlog(){
 }
 /* ============ SEO DEL BLOG (editable desde el admin) ============ */
 async function initBlogSeo(){
+  // En la página propia de una entrada (/blog/<slug>/) el título y la descripción ya vienen
+  // fijados en el HTML: no se deben sustituir por los genéricos del listado.
+  if(/\/blog\/[a-z0-9-]+\/?$/i.test(window.location.pathname) || window.location.search.indexOf("post=") !== -1) return;
   try{
     var res = await sb.from("site_settings").select("blog_seo_title, blog_seo_description").eq("id", 1).maybeSingle();
     if(res.error) throw res.error;
