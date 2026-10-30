@@ -447,7 +447,7 @@ function buildPageContent(template, vivienda) {
 
 function buildBlogPageContent(template, post) {
   const pageUrl = `${SITE_URL}/blog/${encodeURIComponent(post.slug)}/`;
-  const title = post.titulo ? `${post.titulo} · Conil Vacaciones` : "Blog · Conil Vacaciones — Qué hacer y ver en Conil de la Frontera";
+  const title = post.titulo ? (/conil vacaciones/i.test(post.titulo) ? post.titulo : `${post.titulo} · Conil Vacaciones`) : "Blog · Conil Vacaciones — Qué hacer y ver en Conil de la Frontera";
   const description = truncate(
     post.resumen || "Ideas, playas y planes en Conil de la Frontera contados por quienes vivimos aquí. Descubre qué ver y hacer en la Costa de la Luz, Cádiz.",
     200
