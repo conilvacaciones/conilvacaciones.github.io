@@ -221,7 +221,7 @@ main.wrap{padding:40px 24px 90px;}
 .rte-editor .cv-fila img{aspect-ratio:4/3;object-fit:cover;}
 .rte-editor .cv-ancho img{aspect-ratio:auto;}
 .rte-editor .cv-media figcaption{font-size:.85em;line-height:1.4;color:#667985;text-align:center;margin-top:6px;}
-@media(max-width:700px){.rte-editor .cv-lado{grid-template-columns:1fr;gap:14px;}.rte-editor .cv-lado.cv-inv>.cv-media,.rte-editor .cv-lado.cv-inv>.cv-medios{order:0;}}
+@media(max-width:700px){.rte-editor .cv-lado{grid-template-columns:1fr;gap:14px;}.rte-editor .cv-lado>.cv-texto{order:1;}.rte-editor .cv-lado>.cv-media,.rte-editor .cv-lado>.cv-medios,.rte-editor .cv-lado.cv-inv>.cv-media,.rte-editor .cv-lado.cv-inv>.cv-medios{order:2;}}
 
 .rte-editor .cv-bloque{outline:1.5px dashed transparent;outline-offset:6px;border-radius:8px;}
 .rte-editor .cv-bloque:hover{outline-color:var(--sol);}
