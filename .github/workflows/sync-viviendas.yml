@@ -31,6 +31,7 @@ jobs:
         run: node scripts/generate-viviendas.js
 
       - name: Commit y push si hay cambios
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -45,3 +46,14 @@ jobs:
           fi
           git commit -m "Actualizar páginas de /viviendas/ y /blog/ (automático)"
           git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      # Avisa a Bing (y otros buscadores compatibles con IndexNow) de las URLs del sitio
+      # cuando se han regenerado páginas, para que las rastreen antes.
+      - name: Avisar a Bing con IndexNow
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          KEY="5322becc567e75449cb6eb5d13b8d156"
+          URLS=$(grep -o '<loc>[^<]*</loc>' sitemap.xml | sed 's#</\?loc>##g' | jq -R . | jq -s .)
+          BODY=$(jq -n --arg host "conilvacaciones.github.io" --arg key "$KEY" --arg loc "https://conilvacaciones.github.io/$KEY.txt" --argjson urls "$URLS" '{host:$host,key:$key,keyLocation:$loc,urlList:$urls}')
+          curl -sS -o /dev/null -w "IndexNow HTTP %{http_code}\n" -X POST "https://api.indexnow.org/indexnow" -H "Content-Type: application/json; charset=utf-8" -d "$BODY" || true

@@ -447,10 +447,15 @@ function buildPageContent(template, vivienda) {
 
 function buildBlogPageContent(template, post) {
   const pageUrl = `${SITE_URL}/blog/${encodeURIComponent(post.slug)}/`;
-  const title = post.titulo ? (/conil vacaciones/i.test(post.titulo) ? post.titulo : `${post.titulo} · Conil Vacaciones`) : "Blog · Conil Vacaciones — Qué hacer y ver en Conil de la Frontera";
+  // Título SEO: sin emojis y, si cabe (≤ 65 caracteres), con la marca al final.
+  const tituloLimpio = post.titulo ? post.titulo.replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, "").replace(/\s+/g, " ").trim() : "";
+  const conMarca = `${tituloLimpio} · Conil Vacaciones`;
+  const title = tituloLimpio
+    ? (/conil vacaciones/i.test(tituloLimpio) || conMarca.length > 65 ? tituloLimpio : conMarca)
+    : "Blog · Conil Vacaciones — Qué hacer y ver en Conil de la Frontera";
   const description = truncate(
     post.resumen || "Ideas, playas y planes en Conil de la Frontera contados por quienes vivimos aquí. Descubre qué ver y hacer en la Costa de la Luz, Cádiz.",
-    200
+    158
   );
   const image = post.imagen;
 
@@ -504,11 +509,19 @@ function buildBlogPageContent(template, post) {
     const articulo =
       `<article class="blog-static-post" style="grid-column:1/-1;max-width:760px">` +
       (fechaTxt ? `<p class="blog-date">${escapeText(fechaTxt)}</p>` : "") +
-      `<h2>${escapeText(post.titulo)}</h2>` +
       portada +
       `<div class="blog-modal-content">${post.contenidoHtml}</div>` +
       `</article>`;
     html = html.replace('<p class="blog-empty">Cargando entradas…</p>', () => articulo);
+    // Cada entrada debe tener su propio H1 (y no el genérico del listado).
+    html = html.replace(
+      /<h1>Qué hacer y qué ver en Conil de la Frontera<\/h1>/,
+      () => `<h1>${escapeText(tituloLimpio)}</h1>`
+    );
+    html = html.replace(
+      /<p>Qué hacer y qué ver en Conil: playas, planes y recomendaciones de gente que vive aquí, en Conil de la Frontera\.<\/p>/,
+      () => `<p>${escapeText(truncate(post.resumen || description, 200))}</p>`
+    );
   }
 
   html = html.replace(
