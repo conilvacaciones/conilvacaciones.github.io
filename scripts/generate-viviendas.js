@@ -115,7 +115,10 @@ function sanitizeContentHtml(html) {
       divStack.push(!!c);
       if (!c) return "";
       const casa = c.includes("cv-casa") ? attr(attrs, "data-casa") : null;
-      return casa && /^[a-zA-Z0-9_-]+$/.test(casa) ? `<div class="${c}" data-casa="${casa}">` : `<div class="${c}">`;
+      if (casa && /^[a-zA-Z0-9_-]+$/.test(casa)) return `<div class="${c}" data-casa="${casa}">`;
+      const pst = c.includes("cv-post") ? attr(attrs, "data-post") : null;
+      if (pst && /^[a-zA-Z0-9_-]+$/.test(pst)) return `<div class="${c}" data-post="${pst}">`;
+      return `<div class="${c}">`;
     }
     if (t === "section") return closing ? "\n" : "";
     if (!allowed.has(t)) return "";
@@ -477,6 +480,20 @@ function expandCasas(html) {
   });
 }
 let GLOBAL_VIVIENDAS = [];
+let GLOBAL_POSTS = [];
+function postCardStatic(p) {
+  return `<a class="cv-post-card" href="/blog/${encodeURIComponent(p.slug)}/">` +
+    `<span class="cpc-photo">${p.portadaUrl ? `<img src="${escapeAttr(p.portadaUrl)}" alt="${escapeAttr(p.titulo)}" loading="lazy">` : ""}</span>` +
+    `<span class="cpc-body"><small>Te puede interesar</small><b>${escapeText(p.titulo || "")}</b>` +
+    (p.resumen ? `<span class="cpc-text">${escapeText(p.resumen)}</span>` : "") +
+    `<span class="cpc-btn">Leer más →</span></span></a>`;
+}
+function expandPosts(html) {
+  return html.replace(/<div class="([^"]*\bcv-post\b[^"]*)" data-post="([^"]+)"><\/div>/g, (m, cls, id) => {
+    const p = GLOBAL_POSTS.find((x) => x.slug === id || x.id === id);
+    return p ? `<div class="${cls}" data-post="${id}">${postCardStatic(p)}</div>` : "";
+  });
+}
 
 function buildBlogPageContent(template, post) {
   const pageUrl = `${SITE_URL}/blog/${encodeURIComponent(post.slug)}/`;
@@ -543,7 +560,7 @@ function buildBlogPageContent(template, post) {
       `<article class="blog-static-post" style="grid-column:1/-1;max-width:760px">` +
       (fechaTxt ? `<p class="blog-date">${escapeText(fechaTxt)}</p>` : "") +
       portada +
-      `<div class="blog-modal-content">${expandCasas(post.contenidoHtml)}</div>` +
+      `<div class="blog-modal-content">${expandPosts(expandCasas(post.contenidoHtml))}</div>` +
       `</article>`;
     html = html.replace('<p class="blog-empty">Cargando entradas…</p>', () => articulo);
     // Cada entrada debe tener su propio H1 (y no el genérico del listado).
@@ -642,6 +659,7 @@ function main() {
   Promise.all([fetchActiveViviendas(), fetchPublishedBlogPosts()])
     .then(([viviendas, blogPosts]) => {
       GLOBAL_VIVIENDAS = viviendas;
+      GLOBAL_POSTS = blogPosts;
       let viviendaStats = { slugs: [], created: 0, updated: 0, removed: 0 };
       if (viviendas.length === 0) {
         console.log("No hay viviendas activas en Supabase. No se generan páginas de viviendas (y no se borra nada por seguridad).");

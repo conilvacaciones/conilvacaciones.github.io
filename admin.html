@@ -179,6 +179,18 @@ main.wrap{padding:40px 24px 90px;}
 .rte-editor .cv-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;margin:0;border-radius:0;max-width:none;}
 .rte-editor .cv-mapa{aspect-ratio:4/3;}
 
+.rte-editor .cv-post-card{display:grid;grid-template-columns:200px 1fr;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 10px 26px -16px rgba(11,61,92,.4);color:inherit;text-decoration:none;line-height:1.4;transition:transform .25s,box-shadow .25s;}
+.rte-editor .cv-post-card:hover{transform:translateY(-3px);box-shadow:0 16px 30px -14px rgba(11,61,92,.45);}
+.rte-editor .cpc-photo{display:block;min-height:140px;background:#dfe8ee;overflow:hidden;}
+.rte-editor .cpc-photo img{width:100%;height:100%;object-fit:cover;display:block;margin:0;border-radius:0;}
+.rte-editor .cpc-body{display:flex;flex-direction:column;gap:5px;padding:16px 18px;}
+.rte-editor .cpc-body small{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#667985;}
+.rte-editor .cpc-body b{font-family:var(--ff-display);font-size:20px;color:var(--atlantic);font-weight:600;}
+.rte-editor .cpc-text{font-size:14.5px;color:#51606B;}
+.rte-editor .cpc-btn{margin-top:auto;color:var(--atlantic);font-size:14px;font-weight:700;}
+@media(max-width:700px){.rte-editor .cv-post-card{grid-template-columns:1fr;}.rte-editor .cpc-photo{min-height:0;aspect-ratio:16/9;}}
+
+
 .rte-editor .cv-casa-card{display:grid;grid-template-columns:240px 1fr;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 10px 26px -16px rgba(11,61,92,.4);color:inherit;text-decoration:none;line-height:1.4;transition:transform .25s,box-shadow .25s;}
 .rte-editor .cv-casa-card:hover{transform:translateY(-3px);box-shadow:0 16px 30px -14px rgba(11,61,92,.45);}
 .rte-editor .ccc-photo{display:block;min-height:170px;background:#dfe8ee;overflow:hidden;}
@@ -741,6 +753,7 @@ main.wrap{padding:40px 24px 90px;}
             <button type="button" id="rteImgBtn" title="Insertar imagen">🖼</button>
             <button type="button" id="rteVideoBtn" title="Insertar vídeo (YouTube/Vimeo)">▶</button>
             <button type="button" id="rteMapBtn" title="Insertar mapa">📍</button>
+            <button type="button" id="rteLinkBtn" title="Poner enlace al texto seleccionado (a otra entrada, a una casa o a una web)">🔗</button>
             <div class="rte-sep"></div>
             <button type="button" id="cvBlockBtn" class="cv-blockbtn" title="Insertar un bloque de maquetación">＋ Bloque ▾</button>
             <div class="rte-sep"></div>
@@ -2737,14 +2750,57 @@ function cvDecorate(){
     var nombre = (cvCasas.find(function(h){ return h.id === id; }) || {}).nombre || id;
     c.innerHTML = '<div class="cv-casa-ph">🏠 Tarjeta de la casa: ' + nombre.replace(/[<>&]/g, "") + ' <span style="font-weight:400">(en la web se verá con foto, precio y botón)</span></div>';
   });
+  rteEditor.querySelectorAll(".cv-post[data-post]").forEach(function(c){
+    c.setAttribute("contenteditable", "false");
+    var sl = c.getAttribute("data-post");
+    var pp = cvPosts.find(function(h){ return h.slug === sl || h.id === sl; });
+    c.innerHTML = '<div class="cv-casa-ph">📰 Tarjeta de la entrada: ' + ((pp && pp.titulo) || sl).replace(/[<>&]/g, "") + ' <span style="font-weight:400">(en la web se verá con portada, resumen y "Leer más")</span></div>';
+  });
+  if(!cvPosts.length && rteEditor.querySelector(".cv-post[data-post]")) cvLoadPosts().then(function(){ if(cvPosts.length) cvDecorate(); });
   rteEditor.querySelectorAll(".cv-cta-btn").forEach(function(b){ b.setAttribute("contenteditable", "false"); });
   if(!cvCasas.length && rteEditor.querySelector(".cv-casa[data-casa]")) cvLoadCasas().then(function(){ if(cvCasas.length) cvDecorate(); });
 }
 var cvCasas = [];
+var cvPosts = [];
+async function cvLoadPosts(){
+  if(cvPosts.length) return cvPosts;
+  try{
+    var r = await sb.from("blog_posts").select("id,slug,titulo").eq("publicado", true).order("orden", { ascending: true });
+    var cur = document.getElementById("p-id").value.trim();
+    cvPosts = (r.data || []).filter(function(x){ return x.id !== cur; });
+  }catch(e){}
+  return cvPosts;
+}
+async function cvPickPost(){
+  var posts = await cvLoadPosts();
+  if(!posts.length){ alert("No hay otras entradas publicadas."); return null; }
+  var txt = posts.map(function(h, i){ return (i + 1) + ") " + h.titulo; }).join("\n");
+  var n = prompt("¿A qué entrada quieres enlazar? Escribe su número:\n\n" + txt, "1");
+  return posts[parseInt(n, 10) - 1] || null;
+}
+// Enlace al texto seleccionado: otra entrada, una casa o una dirección web
+async function cvPickLink(){
+  var posts = await cvLoadPosts(), casas = await cvLoadCasas();
+  var lines = [], opts = [];
+  posts.forEach(function(p){ opts.push({ href: "/blog/" + encodeURIComponent(p.slug || p.id) + "/", text: p.titulo }); });
+  casas.forEach(function(h){ opts.push({ href: "/viviendas/" + encodeURIComponent(h.slug || h.id) + "/", text: h.nombre }); });
+  opts.forEach(function(o, i){ lines.push((i + 1) + ") " + (i < posts.length ? "Entrada: " : "Casa: ") + o.text); });
+  var n = prompt("¿A dónde quieres enlazar el texto seleccionado?\nEscribe el número, 0 para pegar otra dirección web, o - para quitar el enlace:\n\n" + lines.join("\n"), "1");
+  if(n === null) return null;
+  n = n.trim();
+  if(n === "-") return { href: null, text: "" };
+  if(n === "0"){
+    var u = prompt("Pega la dirección web (https://…):");
+    if(!u) return null;
+    if(!/^https?:\/\//i.test(u.trim())){ alert("La dirección debe empezar por https://"); return null; }
+    return { href: u.trim(), text: u.trim() };
+  }
+  return opts[parseInt(n, 10) - 1] || null;
+}
 async function cvLoadCasas(){
   if(cvCasas.length) return cvCasas;
   try{
-    var r = await sb.from("viviendas").select("id,nombre,activo").eq("activo", true).order("orden", { ascending: true });
+    var r = await sb.from("viviendas").select("id,slug,nombre,activo").eq("activo", true).order("orden", { ascending: true });
     cvCasas = (r.data || []);
   }catch(e){}
   return cvCasas;
@@ -2760,7 +2816,7 @@ async function cvPickCasa(){
 function cvCleanHtml(){
   var c = rteEditor.cloneNode(true);
   c.querySelectorAll(".cv-vacio").forEach(function(n){ n.remove(); });
-  c.querySelectorAll(".cv-casa[data-casa]").forEach(function(n){ n.innerHTML = ""; });
+  c.querySelectorAll(".cv-casa[data-casa],.cv-post[data-post]").forEach(function(n){ n.innerHTML = ""; });
   c.querySelectorAll("figure.cv-media").forEach(function(f){ if(!f.querySelector("img,iframe")) f.remove(); });
   c.querySelectorAll(".cv-medios").forEach(function(m){ if(!m.querySelector("figure")) m.remove(); });
   c.querySelectorAll("figcaption").forEach(function(f){ if(!f.textContent.trim()) f.remove(); });
@@ -2963,6 +3019,9 @@ function cvBuildTools(blk){
       var fs = blk.querySelectorAll("figure.cv-media"); if(fs.length > 1) fs[fs.length - 1].remove();
     });
   }
+  if(blk.classList.contains("cv-post")) cvToolBtn("📰 Cambiar entrada", "Elegir otra entrada", function(){
+    cvPickPost().then(function(p){ if(p){ blk.setAttribute("data-post", p.slug || p.id); cvDecorate(); cvPlaceTools(); } });
+  });
   if(blk.classList.contains("cv-casa")) cvToolBtn("🏠 Cambiar casa", "Elegir otra casa", function(){
     cvPickCasa().then(function(h){ if(h){ blk.setAttribute("data-casa", h.id); cvDecorate(); cvPlaceTools(); } });
   });
@@ -3000,6 +3059,7 @@ var CV_TIPOS = [
   ["fila3", "Fila de 3 fotos",             cvSvg(cvPh(6,14,34,36) + cvPh(43,14,34,36) + cvPh(80,14,34,36) + cvTx(10,57,26,1) + cvTx(47,57,26,1) + cvTx(84,57,26,1))],
   ["ancho", "Foto ancha con pie de foto",  cvSvg(cvPh(8,8,104,44) + cvTx(30,58,60,1))],
   ["casa",  "Tarjeta de una casa (foto, precio y botón)", cvSvg('<rect x="8" y="12" width="104" height="46" rx="5" fill="#fff" stroke="#c9d6df"/>' + cvPh(12,16,38,38) + cvTx(56,20,46,3) + '<rect x="56" y="44" width="30" height="9" rx="3" fill="#0B3D5C"/>')],
+  ["post",  "Tarjeta de otra entrada del blog (con enlace)", cvSvg('<rect x="8" y="12" width="104" height="46" rx="5" fill="#fff" stroke="#c9d6df"/>' + cvPh(12,16,34,38) + cvTx(52,20,50,2) + cvTx(52,36,50,2) + '<rect x="52" y="48" width="28" height="5" rx="2" fill="#0B3D5C"/>')],
   ["cta",   "Franja de contacto (WhatsApp)", cvSvg('<rect x="8" y="16" width="104" height="38" rx="6" fill="#177268"/>' + '<rect x="16" y="24" width="52" height="4" rx="2" fill="#fff"/><rect x="16" y="33" width="40" height="3" rx="1.5" fill="#cfe9e3"/><rect x="78" y="26" width="26" height="12" rx="4" fill="#25D366"/>')]
 ];
 function cvAddBlock(t){
@@ -3024,6 +3084,14 @@ function cvAddBlock(t){
     cvPickCasa().then(function(h){
       if(!h) return;
       cvInsert('<div class="cv-bloque cv-casa" data-casa="' + h.id + '"></div>');
+      cvDecorate();
+    });
+    return;
+  }
+  if(t === "post"){
+    cvPickPost().then(function(p){
+      if(!p) return;
+      cvInsert('<div class="cv-bloque cv-post" data-post="' + (p.slug || p.id) + '"></div>');
       cvDecorate();
     });
     return;
@@ -3060,6 +3128,19 @@ cvBlockBtn.addEventListener("click", function(){
   cvPicker.style.left = Math.max(8, Math.min(r.left, window.innerWidth - cvPicker.offsetWidth - 8)) + "px";
 });
 document.addEventListener("mousedown", function(e){ if(!cvPicker.contains(e.target) && e.target !== cvBlockBtn) cvPicker.style.display = "none"; });
+document.getElementById("rteLinkBtn").addEventListener("click", async function(){
+  var sel = window.getSelection(), range = null;
+  if(sel.rangeCount && rteEditor.contains(sel.anchorNode)) range = sel.getRangeAt(0).cloneRange();
+  else if(cvLastRange) range = cvLastRange.cloneRange();
+  var t = await cvPickLink();
+  if(!t) return;
+  rteEditor.focus();
+  if(range){ var s2 = window.getSelection(); s2.removeAllRanges(); s2.addRange(range); }
+  if(t.href === null){ document.execCommand("unlink"); return; }
+  var hasText = range && !range.collapsed;
+  if(hasText) document.execCommand("createLink", false, t.href);
+  else document.execCommand("insertHTML", false, '<a href="' + t.href.replace(/"/g, "&quot;") + '">' + (t.text || t.href).replace(/[<>&]/g, "") + '</a>');
+});
 /* CV-BLOCKS-END */
 
 document.getElementById("p-portada").addEventListener("change", async function(e){
