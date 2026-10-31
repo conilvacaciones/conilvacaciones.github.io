@@ -596,6 +596,18 @@ body:has(.cookie-banner.is-visible) .blog-wa{display:none;}
 .blog-modal-content .cpc-text{font-size:14.5px;color:#51606B;}
 .blog-modal-content .cpc-btn{margin-top:auto;color:var(--atlantic);font-size:14px;font-weight:700;}
 @media(max-width:700px){.blog-modal-content .cv-post-card{grid-template-columns:1fr;}.blog-modal-content .cpc-photo{min-height:0;aspect-ratio:16/9;}}
+
+.blog-modal-content .cv-faq{border-top:1px solid var(--line);padding-top:6px;}
+.blog-modal-content .cv-faq>h2{margin-top:14px;}
+.blog-modal-content .cv-faq-item{border:1px solid var(--line);border-radius:14px;padding:4px 18px;margin:10px 0;background:#fff;}
+.blog-modal-content .cv-faq-item>h3{font-family:var(--ff-display);font-size:18px;color:var(--atlantic);margin:12px 0 6px;line-height:1.35;}
+.blog-modal-content .cv-faq-a{font-size:16px;line-height:1.7;color:var(--ink);padding-bottom:6px;}
+.blog-modal-content .cv-faq-a p{margin:0 0 8px;}
+.blog-modal-content .cv-faq-item.is-acc>h3{cursor:pointer;position:relative;padding-right:30px;margin:0;padding-top:14px;padding-bottom:14px;}
+.blog-modal-content .cv-faq-item.is-acc>h3::after{content:"+";position:absolute;right:2px;top:50%;transform:translateY(-50%);font-size:24px;font-weight:400;color:var(--bougain);}
+.blog-modal-content .cv-faq-item.is-acc.is-open>h3::after{content:"–";}
+.blog-modal-content .cv-faq-item.is-acc .cv-faq-a{display:none;}
+.blog-modal-content .cv-faq-item.is-acc.is-open .cv-faq-a{display:block;}
 .blog-houses{margin:40px 0 44px;padding-top:30px;border-top:1px solid var(--line);}
 .blog-houses-title{font-family:var(--ff-display);font-weight:600;font-size:22px;color:var(--atlantic);margin:0 0 4px;}
 .blog-houses-sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px;}
@@ -1050,6 +1062,17 @@ function hydratePostCards(){
     if(p) el.innerHTML = postCardHtml(p); else el.style.display = "none";
   });
 }
+
+function initFaqAccordions(){
+  document.querySelectorAll("#blogModalContent .cv-faq-item").forEach(function(it){
+    var q = it.querySelector("h3"); if(!q) return;
+    it.classList.add("is-acc");
+    q.setAttribute("tabindex", "0"); q.setAttribute("role", "button"); q.setAttribute("aria-expanded", "false");
+    var toggle = function(){ var o = it.classList.toggle("is-open"); q.setAttribute("aria-expanded", o ? "true" : "false"); };
+    q.addEventListener("click", toggle);
+    q.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(); } });
+  });
+}
 async function hydrateCasas(){
   var els = document.querySelectorAll("#blogModalContent .cv-casa[data-casa]");
   if(!els.length) return;
@@ -1121,6 +1144,7 @@ function openBlogModal(id, esCargaInicial){
   });
   hydrateCasas();
   hydratePostCards();
+  initFaqAccordions();
   var gallery = (p.fotos || []).map(blogPhotoUrl).filter(Boolean);
   document.getElementById("blogModalGallery").innerHTML = gallery.map(function(url, gi){
     var t = escapeHTML(p.titulo) + " – foto " + (gi+1);
