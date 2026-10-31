@@ -178,6 +178,30 @@ main.wrap{padding:40px 24px 90px;}
 .rte-editor .cv-video{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;}
 .rte-editor .cv-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;margin:0;border-radius:0;max-width:none;}
 .rte-editor .cv-mapa{aspect-ratio:4/3;}
+
+.rte-editor .cv-casa-card{display:grid;grid-template-columns:240px 1fr;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 10px 26px -16px rgba(11,61,92,.4);color:inherit;text-decoration:none;line-height:1.4;transition:transform .25s,box-shadow .25s;}
+.rte-editor .cv-casa-card:hover{transform:translateY(-3px);box-shadow:0 16px 30px -14px rgba(11,61,92,.45);}
+.rte-editor .ccc-photo{display:block;min-height:170px;background:#dfe8ee;overflow:hidden;}
+.rte-editor .ccc-photo img{width:100%;height:100%;object-fit:cover;display:block;margin:0;border-radius:0;}
+.rte-editor .ccc-body{display:flex;flex-direction:column;gap:4px;padding:16px 18px;}
+.rte-editor .ccc-body small{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#667985;}
+.rte-editor .ccc-body b{font-family:var(--ff-display);font-size:21px;color:var(--atlantic);font-weight:600;}
+.rte-editor .ccc-meta{font-size:14px;color:#51606B;}
+.rte-editor .ccc-chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;}
+.rte-editor .ccc-chips i{font-style:normal;font-size:12px;background:#eef4f8;color:var(--atlantic);padding:3px 9px;border-radius:20px;}
+.rte-editor .ccc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;flex-wrap:wrap;}
+.rte-editor .ccc-price{font-size:14px;color:#51606B;}
+.rte-editor .ccc-price strong{font-family:var(--ff-display);font-size:22px;color:var(--bougain);}
+.rte-editor .ccc-btn{background:var(--atlantic);color:#fff;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:600;white-space:nowrap;}
+.rte-editor .cv-cta{display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(135deg,var(--atlantic),#177268);color:#fff;border-radius:16px;padding:22px 24px;line-height:1.4;}
+.rte-editor .cv-cta h3{font-family:var(--ff-display);font-size:21px;color:#fff;margin:0 0 4px;}
+.rte-editor .cv-cta p{font-size:14.5px;opacity:.92;margin:0;}
+.rte-editor .cv-cta-btn{background:#25D366;color:#fff !important;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:600;white-space:nowrap;text-decoration:none;}
+@media(max-width:700px){.rte-editor .cv-casa-card{grid-template-columns:1fr;}.rte-editor .ccc-photo{min-height:0;aspect-ratio:16/10;}.rte-editor .cv-cta{flex-direction:column;align-items:flex-start;}}
+.rte-editor .cv-casa-ph{display:flex;align-items:center;gap:10px;padding:16px 18px;border:2px dashed var(--sol);border-radius:14px;background:#fffaf0;color:var(--atlantic);font-size:14px;font-weight:600;cursor:default;}
+.rte-editor .cv-cta h3,.rte-editor .cv-cta p{outline:none;}
+.rte-editor .cv-cta-btn{cursor:default;}
+
 .rte-editor .cv-medios{display:flex;flex-direction:column;gap:14px;min-width:0;}
 .rte-editor .cv-lado:has(>.cv-medios){align-items:start;}
 .rte-editor .cv-lado.cv-inv>.cv-medios{order:2;}
@@ -2707,10 +2731,36 @@ function cvDecorate(){
     if(tieneMedio && vacio) vacio.remove();
     var cap = f.querySelector("figcaption"); if(cap) cap.setAttribute("contenteditable", "true");
   });
+  rteEditor.querySelectorAll(".cv-casa[data-casa]").forEach(function(c){
+    c.setAttribute("contenteditable", "false");
+    var id = c.getAttribute("data-casa");
+    var nombre = (cvCasas.find(function(h){ return h.id === id; }) || {}).nombre || id;
+    c.innerHTML = '<div class="cv-casa-ph">🏠 Tarjeta de la casa: ' + nombre.replace(/[<>&]/g, "") + ' <span style="font-weight:400">(en la web se verá con foto, precio y botón)</span></div>';
+  });
+  rteEditor.querySelectorAll(".cv-cta-btn").forEach(function(b){ b.setAttribute("contenteditable", "false"); });
+  if(!cvCasas.length && rteEditor.querySelector(".cv-casa[data-casa]")) cvLoadCasas().then(function(){ if(cvCasas.length) cvDecorate(); });
+}
+var cvCasas = [];
+async function cvLoadCasas(){
+  if(cvCasas.length) return cvCasas;
+  try{
+    var r = await sb.from("viviendas").select("id,nombre,activo").eq("activo", true).order("orden", { ascending: true });
+    cvCasas = (r.data || []);
+  }catch(e){}
+  return cvCasas;
+}
+async function cvPickCasa(){
+  var casas = await cvLoadCasas();
+  if(!casas.length){ alert("No hay viviendas activas."); return null; }
+  var txt = casas.map(function(h, i){ return (i + 1) + ") " + h.nombre; }).join("\n");
+  var n = prompt("¿Qué casa quieres mostrar? Escribe su número:\n\n" + txt, "1");
+  var h = casas[parseInt(n, 10) - 1];
+  return h || null;
 }
 function cvCleanHtml(){
   var c = rteEditor.cloneNode(true);
   c.querySelectorAll(".cv-vacio").forEach(function(n){ n.remove(); });
+  c.querySelectorAll(".cv-casa[data-casa]").forEach(function(n){ n.innerHTML = ""; });
   c.querySelectorAll("figure.cv-media").forEach(function(f){ if(!f.querySelector("img,iframe")) f.remove(); });
   c.querySelectorAll(".cv-medios").forEach(function(m){ if(!m.querySelector("figure")) m.remove(); });
   c.querySelectorAll("figcaption").forEach(function(f){ if(!f.textContent.trim()) f.remove(); });
@@ -2858,6 +2908,7 @@ function cvShowPop(fig){
   cvPop.style.top = Math.max(8, Math.min(r.top + 10, window.innerHeight - 140)) + "px";
 }
 rteEditor.addEventListener("click", function(e){
+  if(e.target.closest && e.target.closest("a.cv-cta-btn")){ e.preventDefault(); return; }
   var fig = e.target.closest && e.target.closest("figure.cv-media");
   if(fig && rteEditor.contains(fig) && !e.target.closest("figcaption")){ e.preventDefault(); cvShowPop(fig); }
   else cvHidePop();
@@ -2912,6 +2963,9 @@ function cvBuildTools(blk){
       var fs = blk.querySelectorAll("figure.cv-media"); if(fs.length > 1) fs[fs.length - 1].remove();
     });
   }
+  if(blk.classList.contains("cv-casa")) cvToolBtn("🏠 Cambiar casa", "Elegir otra casa", function(){
+    cvPickCasa().then(function(h){ if(h){ blk.setAttribute("data-casa", h.id); cvDecorate(); cvPlaceTools(); } });
+  });
   cvToolBtn("🗑", "Borrar bloque", function(){
     if(!confirm("¿Borrar este bloque entero (fotos y texto)?")) return;
     blk.remove(); cvCurrent = null; cvTools.style.display = "none";
@@ -2944,7 +2998,9 @@ var CV_TIPOS = [
   ["fotomapader",  "Texto + foto y mapa a la derecha",   cvSvg(cvTx(8,20,46,5) + cvPh(62,6,50,28) + cvMap(62,38,50,28))],
   ["fila2", "Fila de 2 fotos",             cvSvg(cvPh(8,14,50,36) + cvPh(62,14,50,36) + cvTx(14,57,38,1) + cvTx(68,57,38,1))],
   ["fila3", "Fila de 3 fotos",             cvSvg(cvPh(6,14,34,36) + cvPh(43,14,34,36) + cvPh(80,14,34,36) + cvTx(10,57,26,1) + cvTx(47,57,26,1) + cvTx(84,57,26,1))],
-  ["ancho", "Foto ancha con pie de foto",  cvSvg(cvPh(8,8,104,44) + cvTx(30,58,60,1))]
+  ["ancho", "Foto ancha con pie de foto",  cvSvg(cvPh(8,8,104,44) + cvTx(30,58,60,1))],
+  ["casa",  "Tarjeta de una casa (foto, precio y botón)", cvSvg('<rect x="8" y="12" width="104" height="46" rx="5" fill="#fff" stroke="#c9d6df"/>' + cvPh(12,16,38,38) + cvTx(56,20,46,3) + '<rect x="56" y="44" width="30" height="9" rx="3" fill="#0B3D5C"/>')],
+  ["cta",   "Franja de contacto (WhatsApp)", cvSvg('<rect x="8" y="16" width="104" height="38" rx="6" fill="#177268"/>' + '<rect x="16" y="24" width="52" height="4" rx="2" fill="#fff"/><rect x="16" y="33" width="40" height="3" rx="1.5" fill="#cfe9e3"/><rect x="78" y="26" width="26" height="12" rx="4" fill="#25D366"/>')]
 ];
 function cvAddBlock(t){
   if(t === "video"){
@@ -2962,6 +3018,20 @@ function cvAddBlock(t){
     var mb = cvInsert('<div class="cv-bloque cv-lado' + (t === "fotomapader" ? ' cv-inv' : '') + '"><div class="cv-medios">' + cvFig(false) + cvFig(false) + '</div>' + CV_TEXTO + '</div>');
     cvDecorate();
     if(place.trim()) cvSetMap(mb.querySelectorAll("figure.cv-media")[1], place.trim());
+    return;
+  }
+  if(t === "casa"){
+    cvPickCasa().then(function(h){
+      if(!h) return;
+      cvInsert('<div class="cv-bloque cv-casa" data-casa="' + h.id + '"></div>');
+      cvDecorate();
+    });
+    return;
+  }
+  if(t === "cta"){
+    var tel = "34650283373";
+    cvInsert('<div class="cv-bloque cv-cta"><div class="cv-cta-texto"><h3>¿Quieres alojarte en Conil? Te ayudamos a elegir</h3><p>Escríbenos y te decimos qué casa encaja contigo y qué fechas hay libres.</p></div><a class="cv-cta-btn" href="https://wa.me/' + tel + '?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20alojamiento%20en%20Conil">Escribir por WhatsApp</a></div>');
+    cvDecorate();
     return;
   }
   var html = {

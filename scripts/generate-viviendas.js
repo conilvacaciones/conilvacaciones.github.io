@@ -113,7 +113,9 @@ function sanitizeContentHtml(html) {
       if (closing) { const kept = divStack.pop(); return kept ? "</div>" : "\n"; }
       const c = cvClass(attrs);
       divStack.push(!!c);
-      return c ? `<div class="${c}">` : "";
+      if (!c) return "";
+      const casa = c.includes("cv-casa") ? attr(attrs, "data-casa") : null;
+      return casa && /^[a-zA-Z0-9_-]+$/.test(casa) ? `<div class="${c}" data-casa="${casa}">` : `<div class="${c}">`;
     }
     if (t === "section") return closing ? "\n" : "";
     if (!allowed.has(t)) return "";
@@ -121,7 +123,8 @@ function sanitizeContentHtml(html) {
     if (closing) return t === "img" ? "" : `</${t}>`;
     if (t === "a") {
       const h = /href\s*=\s*"(https?:\/\/[^"]*|\/[^"]*)"/i.exec(attrs);
-      return h ? `<a href="${h[1]}">` : "<a>";
+      const ac = cvClass(attrs);
+      return h ? `<a${ac ? ` class="${ac}"` : ""} href="${h[1]}"${ac ? ' rel="noopener"' : ""}>` : "<a>";
     }
     if (t === "img") {
       const src = attr(attrs, "src");
@@ -171,7 +174,7 @@ function publicBlogPhotoUrl(storagePath) {
 }
 
 async function fetchActiveViviendas() {
-  const url = `${SUPABASE_URL}/rest/v1/viviendas?select=id,slug,nombre,tagline,descripcion,fotos,huespedes,dormitorios,banos,zona,amenities&activo=eq.true`;
+  const url = `${SUPABASE_URL}/rest/v1/viviendas?select=id,slug,nombre,tagline,descripcion,fotos,huespedes,dormitorios,banos,zona,amenities,precio,unidad_precio,distancia&activo=eq.true`;
   const res = await fetch(url, {
     headers: {
       apikey: SUPABASE_KEY,
@@ -199,6 +202,9 @@ async function fetchActiveViviendas() {
       huespedes: Number(r.huespedes) || 0,
       dormitorios: Number(r.dormitorios) || 0,
       banos: Number(r.banos) || 0,
+      precio: r.precio != null && r.precio !== "" ? String(r.precio) : "",
+      unidadPrecio: r.unidad_precio === "semana" ? "semana" : "noche",
+      distancia: r.distancia || "",
       amenities: Array.isArray(r.amenities)
         ? [...new Set(r.amenities.map((a) => String((a && a.label) || "").trim()).filter(Boolean))]
         : [],
@@ -445,6 +451,33 @@ function buildPageContent(template, vivienda) {
   return html;
 }
 
+// ---- Tarjetas de casa dentro de las entradas (versión estática; el navegador las refresca con datos en vivo) ----
+const CCC_CHIPS = [["piscina", "Piscina privada"], ["jard", "Jardín"], ["barbacoa", "Barbacoa"], ["mascota", "Admite mascotas"], ["aire acondicionado", "Aire acondicionado"], ["wifi", "WiFi"]];
+function casaCardStatic(v) {
+  const labels = (v.amenities || []).map((a) => String(a).toLowerCase());
+  const chips = [];
+  for (const [k, label] of CCC_CHIPS) if (chips.length < 4 && labels.some((l) => l.includes(k))) chips.push(label);
+  const meta = [];
+  if (v.huespedes) meta.push(`${v.huespedes} huéspedes`);
+  if (v.dormitorios) meta.push(`${v.dormitorios} ${v.dormitorios === 1 ? "dormitorio" : "dormitorios"}`);
+  if (v.banos) meta.push(`${v.banos} ${v.banos === 1 ? "baño" : "baños"}`);
+  const foto = v.fotosUrls && v.fotosUrls[0];
+  return `<a class="cv-casa-card" href="/viviendas/${encodeURIComponent(v.slug)}/">` +
+    `<span class="ccc-photo">${foto ? `<img src="${escapeAttr(foto)}" alt="${escapeAttr(v.nombre)}" loading="lazy">` : ""}</span>` +
+    `<span class="ccc-body"><small>Casa vacacional · Conil</small><b>${escapeText(v.nombre)}</b>` +
+    `<span class="ccc-meta">${escapeText(meta.join(" · "))}</span>` +
+    `<span class="ccc-chips">${chips.map((c) => `<i>${escapeText(c)}</i>`).join("")}</span>` +
+    `<span class="ccc-row"><span class="ccc-price">${v.precio ? `desde <strong>${escapeText(v.precio)} €</strong> / ${v.unidadPrecio}` : escapeText(v.distancia || "")}</span>` +
+    `<span class="ccc-btn">Ver casa y fechas →</span></span></span></a>`;
+}
+function expandCasas(html) {
+  return html.replace(/<div class="([^"]*\bcv-casa\b[^"]*)" data-casa="([^"]+)"><\/div>/g, (m, cls, id) => {
+    const v = GLOBAL_VIVIENDAS.find((x) => x.id === id || x.slug === id);
+    return v ? `<div class="${cls}" data-casa="${id}">${casaCardStatic(v)}</div>` : "";
+  });
+}
+let GLOBAL_VIVIENDAS = [];
+
 function buildBlogPageContent(template, post) {
   const pageUrl = `${SITE_URL}/blog/${encodeURIComponent(post.slug)}/`;
   // Título SEO: sin emojis y, si cabe (≤ 65 caracteres), con la marca al final.
@@ -510,7 +543,7 @@ function buildBlogPageContent(template, post) {
       `<article class="blog-static-post" style="grid-column:1/-1;max-width:760px">` +
       (fechaTxt ? `<p class="blog-date">${escapeText(fechaTxt)}</p>` : "") +
       portada +
-      `<div class="blog-modal-content">${post.contenidoHtml}</div>` +
+      `<div class="blog-modal-content">${expandCasas(post.contenidoHtml)}</div>` +
       `</article>`;
     html = html.replace('<p class="blog-empty">Cargando entradas…</p>', () => articulo);
     // Cada entrada debe tener su propio H1 (y no el genérico del listado).
@@ -608,6 +641,7 @@ function generateStaticPages(items, template, outputDir, buildContentFn) {
 function main() {
   Promise.all([fetchActiveViviendas(), fetchPublishedBlogPosts()])
     .then(([viviendas, blogPosts]) => {
+      GLOBAL_VIVIENDAS = viviendas;
       let viviendaStats = { slugs: [], created: 0, updated: 0, removed: 0 };
       if (viviendas.length === 0) {
         console.log("No hay viviendas activas en Supabase. No se generan páginas de viviendas (y no se borra nada por seguridad).");
