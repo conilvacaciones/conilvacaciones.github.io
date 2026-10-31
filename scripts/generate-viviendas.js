@@ -341,6 +341,18 @@ function viviendaLd(v, pageUrl) {
   return data;
 }
 
+function faqLd(html) {
+  const items = [];
+  const re = /<div class="cv-faq-item"><h3>([\s\S]*?)<\/h3><div class="cv-faq-a">([\s\S]*?)<\/div><\/div>/g;
+  const clean = (t) => t.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+  let m;
+  while ((m = re.exec(html || ""))) {
+    const q = clean(m[1]), a = clean(m[2]);
+    if (q && a) items.push({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } });
+  }
+  return items.length ? { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: items } : null;
+}
+
 function blogPostLd(post, pageUrl) {
   const data = {
     "@context": "https://schema.org",
@@ -592,7 +604,8 @@ function buildBlogPageContent(template, post) {
         ]),
         "breadcrumbJsonLd"
       );
-    html = html.replace("</head>", () => ld + "\n</head>");
+    const faq = faqLd(post.contenidoHtml);
+    html = html.replace("</head>", () => ld + (faq ? "\n" + jsonLdScript(faq, "faqJsonLd") : "") + "\n</head>");
   }
 
   return html;

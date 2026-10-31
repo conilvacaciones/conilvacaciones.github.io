@@ -179,6 +179,25 @@ main.wrap{padding:40px 24px 90px;}
 .rte-editor .cv-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;margin:0;border-radius:0;max-width:none;}
 .rte-editor .cv-mapa{aspect-ratio:4/3;}
 
+.rte-editor .cv-faq{border-top:1px solid var(--line);padding-top:6px;}
+.rte-editor .cv-faq>h2{margin-top:14px;}
+.rte-editor .cv-faq-item{border:1px solid var(--line);border-radius:14px;padding:4px 18px;margin:10px 0;background:#fff;}
+.rte-editor .cv-faq-item>h3{font-family:var(--ff-display);font-size:18px;color:var(--atlantic);margin:12px 0 6px;line-height:1.35;}
+.rte-editor .cv-faq-a{font-size:16px;line-height:1.7;color:var(--ink);padding-bottom:6px;}
+.rte-editor .cv-faq-a p{margin:0 0 8px;}
+.rte-editor .cv-faq-item.is-acc>h3{cursor:pointer;position:relative;padding-right:30px;margin:0;padding-top:14px;padding-bottom:14px;}
+.rte-editor .cv-faq-item.is-acc>h3::after{content:"+";position:absolute;right:2px;top:50%;transform:translateY(-50%);font-size:24px;font-weight:400;color:var(--bougain);}
+.rte-editor .cv-faq-item.is-acc.is-open>h3::after{content:"–";}
+.rte-editor .cv-faq-item.is-acc .cv-faq-a{display:none;}
+.rte-editor .cv-faq-item.is-acc.is-open .cv-faq-a{display:block;}
+.rte-editor .cv-faq-item>h3:has(> br:only-child)::before{content:"Escribe la pregunta…";color:var(--ink-faint);font-weight:400;}
+.rte-editor .cv-faq-a p:only-child:has(> br:only-child)::before{content:"Escribe la respuesta…";color:var(--ink-faint);}
+#cvFaqModal{position:fixed;inset:0;z-index:10000;background:rgba(10,30,45,.55);display:none;align-items:center;justify-content:center;padding:16px;}
+#cvFaqModal .box{background:#fff;border-radius:14px;max-width:640px;width:100%;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.3);}
+#cvFaqModal textarea{width:100%;min-height:260px;border:1.5px solid var(--line);border-radius:10px;padding:10px;font:13.5px/1.5 inherit;}
+#cvFaqModal .row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;}
+
+
 .rte-editor .cv-post-card{display:grid;grid-template-columns:200px 1fr;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 10px 26px -16px rgba(11,61,92,.4);color:inherit;text-decoration:none;line-height:1.4;transition:transform .25s,box-shadow .25s;}
 .rte-editor .cv-post-card:hover{transform:translateY(-3px);box-shadow:0 16px 30px -14px rgba(11,61,92,.45);}
 .rte-editor .cpc-photo{display:block;min-height:140px;background:#dfe8ee;overflow:hidden;}
@@ -2761,6 +2780,34 @@ function cvDecorate(){
   if(!cvCasas.length && rteEditor.querySelector(".cv-casa[data-casa]")) cvLoadCasas().then(function(){ if(cvCasas.length) cvDecorate(); });
 }
 var cvCasas = [];
+function cvEsc(t){ return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function cvFaqItem(q, a){
+  var paras = (a && a.length ? a : [""]).map(function(x){ return "<p>" + (x ? cvEsc(x) : "<br>") + "</p>"; }).join("");
+  return '<div class="cv-faq-item"><h3>' + (q ? cvEsc(q) : "<br>") + '</h3><div class="cv-faq-a">' + paras + '</div></div>';
+}
+// Interpreta un texto pegado: una línea de título opcional, preguntas (líneas que acaban en ?) y sus respuestas
+function cvParseFaq(txt){
+  var lines = txt.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
+  var title = "", items = [], cur = null;
+  lines.forEach(function(l){
+    var isQ = /\?\s*$/.test(l) && l.length < 200;
+    if(isQ){ cur = { q: l.replace(/^\d+[.)]\s*/, ""), a: [] }; items.push(cur); }
+    else if(cur) cur.a.push(l);
+    else title = l;
+  });
+  return { title: title, items: items };
+}
+var cvFaqModal = document.createElement("div"); cvFaqModal.id = "cvFaqModal";
+cvFaqModal.innerHTML = '<div class="box"><h3 style="margin:0 0 6px">Preguntas frecuentes</h3><p style="margin:0 0 10px;font-size:13.5px;color:#51606B">Pega aquí el texto con el título, las preguntas y las respuestas (cada pregunta en su línea, acabada en ?). También puedes dejarlo vacío para empezar con 3 preguntas en blanco.</p><textarea id="cvFaqText" placeholder="Preguntas frecuentes sobre las Calas de Roche&#10;¿Dónde están las Calas de Roche?&#10;Se encuentran en…"></textarea><div class="row"><button type="button" class="btn btn-ghost btn-sm" id="cvFaqCancel">Cancelar</button><button type="button" class="btn btn-primary btn-sm" id="cvFaqOk">Insertar</button></div></div>';
+document.body.appendChild(cvFaqModal);
+function cvOpenFaqModal(){ document.getElementById("cvFaqText").value = ""; cvFaqModal.style.display = "flex"; document.getElementById("cvFaqText").focus(); }
+document.getElementById("cvFaqCancel").addEventListener("click", function(){ cvFaqModal.style.display = "none"; });
+document.getElementById("cvFaqOk").addEventListener("click", function(){
+  var parsed = cvParseFaq(document.getElementById("cvFaqText").value);
+  var items = parsed.items.length ? parsed.items : [{q:"",a:[]},{q:"",a:[]},{q:"",a:[]}];
+  cvFaqModal.style.display = "none";
+  cvInsert('<div class="cv-bloque cv-faq"><h2>' + cvEsc(parsed.title || "Preguntas frecuentes") + '</h2>' + items.map(function(i){ return cvFaqItem(i.q, i.a); }).join("") + '</div>');
+});
 var cvPosts = [];
 async function cvLoadPosts(){
   if(cvPosts.length) return cvPosts;
@@ -2816,6 +2863,8 @@ async function cvPickCasa(){
 function cvCleanHtml(){
   var c = rteEditor.cloneNode(true);
   c.querySelectorAll(".cv-vacio").forEach(function(n){ n.remove(); });
+  c.querySelectorAll(".cv-faq-item").forEach(function(it){ if(!it.textContent.trim()) it.remove(); });
+  c.querySelectorAll(".cv-faq").forEach(function(f){ if(!f.querySelector(".cv-faq-item")) f.remove(); });
   c.querySelectorAll(".cv-casa[data-casa],.cv-post[data-post]").forEach(function(n){ n.innerHTML = ""; });
   c.querySelectorAll("figure.cv-media").forEach(function(f){ if(!f.querySelector("img,iframe")) f.remove(); });
   c.querySelectorAll(".cv-medios").forEach(function(m){ if(!m.querySelector("figure")) m.remove(); });
@@ -3019,6 +3068,10 @@ function cvBuildTools(blk){
       var fs = blk.querySelectorAll("figure.cv-media"); if(fs.length > 1) fs[fs.length - 1].remove();
     });
   }
+  if(blk.classList.contains("cv-faq")){
+    cvToolBtn("＋ Pregunta", "Añadir una pregunta al final", function(){ blk.insertAdjacentHTML("beforeend", cvFaqItem("", [])); });
+    cvToolBtn("－ Pregunta", "Quitar la última pregunta", function(){ var it = blk.querySelectorAll(".cv-faq-item"); if(it.length > 1) it[it.length - 1].remove(); });
+  }
   if(blk.classList.contains("cv-post")) cvToolBtn("📰 Cambiar entrada", "Elegir otra entrada", function(){
     cvPickPost().then(function(p){ if(p){ blk.setAttribute("data-post", p.slug || p.id); cvDecorate(); cvPlaceTools(); } });
   });
@@ -3060,6 +3113,7 @@ var CV_TIPOS = [
   ["ancho", "Foto ancha con pie de foto",  cvSvg(cvPh(8,8,104,44) + cvTx(30,58,60,1))],
   ["casa",  "Tarjeta de una casa (foto, precio y botón)", cvSvg('<rect x="8" y="12" width="104" height="46" rx="5" fill="#fff" stroke="#c9d6df"/>' + cvPh(12,16,38,38) + cvTx(56,20,46,3) + '<rect x="56" y="44" width="30" height="9" rx="3" fill="#0B3D5C"/>')],
   ["post",  "Tarjeta de otra entrada del blog (con enlace)", cvSvg('<rect x="8" y="12" width="104" height="46" rx="5" fill="#fff" stroke="#c9d6df"/>' + cvPh(12,16,34,38) + cvTx(52,20,50,2) + cvTx(52,36,50,2) + '<rect x="52" y="48" width="28" height="5" rx="2" fill="#0B3D5C"/>')],
+  ["faq",   "Preguntas frecuentes (desplegables)", cvSvg('<rect x="8" y="8" width="104" height="16" rx="5" fill="#fff" stroke="#c9d6df"/><rect x="16" y="14" width="60" height="4" rx="2" fill="#0B3D5C"/><text x="100" y="21" font-size="12" fill="#D6336C" font-family="Arial">+</text><rect x="8" y="28" width="104" height="16" rx="5" fill="#fff" stroke="#c9d6df"/><rect x="16" y="34" width="70" height="4" rx="2" fill="#0B3D5C"/><text x="100" y="41" font-size="12" fill="#D6336C" font-family="Arial">+</text><rect x="8" y="48" width="104" height="16" rx="5" fill="#fff" stroke="#c9d6df"/><rect x="16" y="54" width="50" height="4" rx="2" fill="#0B3D5C"/><text x="100" y="61" font-size="12" fill="#D6336C" font-family="Arial">+</text>')],
   ["cta",   "Franja de contacto (WhatsApp)", cvSvg('<rect x="8" y="16" width="104" height="38" rx="6" fill="#177268"/>' + '<rect x="16" y="24" width="52" height="4" rx="2" fill="#fff"/><rect x="16" y="33" width="40" height="3" rx="1.5" fill="#cfe9e3"/><rect x="78" y="26" width="26" height="12" rx="4" fill="#25D366"/>')]
 ];
 function cvAddBlock(t){
@@ -3088,6 +3142,7 @@ function cvAddBlock(t){
     });
     return;
   }
+  if(t === "faq"){ cvOpenFaqModal(); return; }
   if(t === "post"){
     cvPickPost().then(function(p){
       if(!p) return;
