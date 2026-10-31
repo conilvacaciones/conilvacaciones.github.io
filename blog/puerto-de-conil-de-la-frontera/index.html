@@ -585,6 +585,17 @@ input,textarea{font:inherit;}
 /* No tapar el aviso de cookies: el botón vuelve cuando se acepta o rechaza */
 body:has(.cookie-banner.is-visible) .blog-wa{display:none;}
 @media(max-width:600px){.blog-wa{right:12px;bottom:12px;padding:11px 14px;font-size:13px;}}
+
+.blog-modal-content .cv-post-card{display:grid;grid-template-columns:200px 1fr;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 10px 26px -16px rgba(11,61,92,.4);color:inherit;text-decoration:none;line-height:1.4;transition:transform .25s,box-shadow .25s;}
+.blog-modal-content .cv-post-card:hover{transform:translateY(-3px);box-shadow:0 16px 30px -14px rgba(11,61,92,.45);}
+.blog-modal-content .cpc-photo{display:block;min-height:140px;background:#dfe8ee;overflow:hidden;}
+.blog-modal-content .cpc-photo img{width:100%;height:100%;object-fit:cover;display:block;margin:0;border-radius:0;}
+.blog-modal-content .cpc-body{display:flex;flex-direction:column;gap:5px;padding:16px 18px;}
+.blog-modal-content .cpc-body small{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#667985;}
+.blog-modal-content .cpc-body b{font-family:var(--ff-display);font-size:20px;color:var(--atlantic);font-weight:600;}
+.blog-modal-content .cpc-text{font-size:14.5px;color:#51606B;}
+.blog-modal-content .cpc-btn{margin-top:auto;color:var(--atlantic);font-size:14px;font-weight:700;}
+@media(max-width:700px){.blog-modal-content .cv-post-card{grid-template-columns:1fr;}.blog-modal-content .cpc-photo{min-height:0;aspect-ratio:16/9;}}
 .blog-houses{margin:40px 0 44px;padding-top:30px;border-top:1px solid var(--line);}
 .blog-houses-title{font-family:var(--ff-display);font-weight:600;font-size:22px;color:var(--atlantic);margin:0 0 4px;}
 .blog-houses-sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px;}
@@ -1135,6 +1146,21 @@ function casaCardHtml(h){
     '<span class="ccc-row"><span class="ccc-price">'+(h.precio ? 'desde <strong>'+escapeHTML(String(h.precio))+' €</strong> / '+unidad : (h.distancia ? escapeHTML(h.distancia) : ''))+'</span>'+
     '<span class="ccc-btn">Ver casa y fechas →</span></span></span></a>';
 }
+
+function postCardHtml(p){
+  var cover = blogPhotoUrl(p.portada);
+  return '<a class="cv-post-card" href="/blog/'+encodeURIComponent(p.slug || p.id)+'/">'+
+    '<span class="cpc-photo">'+(cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" loading="lazy">' : '')+'</span>'+
+    '<span class="cpc-body"><small>Te puede interesar</small><b>'+escapeHTML(p.titulo || "")+'</b>'+
+    (p.resumen ? '<span class="cpc-text">'+escapeHTML(p.resumen)+'</span>' : '')+
+    '<span class="cpc-btn">Leer más →</span></span></a>';
+}
+function hydratePostCards(){
+  document.querySelectorAll("#blogModalContent .cv-post[data-post]").forEach(function(el){
+    var p = BLOG_POSTS.find(function(x){ return x.slug === el.getAttribute("data-post") || x.id === el.getAttribute("data-post"); });
+    if(p) el.innerHTML = postCardHtml(p); else el.style.display = "none";
+  });
+}
 async function hydrateCasas(){
   var els = document.querySelectorAll("#blogModalContent .cv-casa[data-casa]");
   if(!els.length) return;
@@ -1205,6 +1231,7 @@ function openBlogModal(id, esCargaInicial){
     if(!im.getAttribute("title")) im.setAttribute("title", im.getAttribute("alt"));
   });
   hydrateCasas();
+  hydratePostCards();
   var gallery = (p.fotos || []).map(blogPhotoUrl).filter(Boolean);
   document.getElementById("blogModalGallery").innerHTML = gallery.map(function(url, gi){
     var t = escapeHTML(p.titulo) + " – foto " + (gi+1);

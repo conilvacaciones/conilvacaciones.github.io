@@ -51,11 +51,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://conilvacaciones.github.io/blog/playa-de-la-fontanilla/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://conilvacaciones.github.io/blog/los-mejores-lugares-para-ver-el-atardecer-en-conil-de-la-frontera/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -81,17 +76,22 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://conilvacaciones.github.io/blog/playa-de-la-fontanilla/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://conilvacaciones.github.io/blog/mejores-playas-conil/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://conilvacaciones.github.io/blog/puerto-de-conil-de-la-frontera/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://conilvacaciones.github.io/blog/mejores-restaurantes-conil/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://conilvacaciones.github.io/blog/mejores-playas-conil/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
