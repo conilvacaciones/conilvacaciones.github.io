@@ -178,6 +178,7 @@ main.wrap{padding:40px 24px 90px;}
 .rte-editor .cv-video{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;}
 .rte-editor .cv-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;margin:0;border-radius:0;max-width:none;}
 .rte-editor .cv-mapa{aspect-ratio:4/3;}
+.rte-editor .cv-video iframe{pointer-events:none;}
 
 .rte-editor .cv-faq{border-top:1px solid var(--line);padding-top:6px;}
 .rte-editor .cv-faq>h2{margin-top:14px;}
@@ -2999,7 +3000,13 @@ function cvShowPop(fig){
     items.push([esMapa ? "✕ Quitar mapa" : "✕ Quitar vídeo", function(){ fig.querySelectorAll(".cv-video,iframe").forEach(function(n){ n.remove(); }); cvDecorate(); }, "cv-del"]);
   }
   var hermanas = fig.parentNode ? fig.parentNode.querySelectorAll(":scope > figure.cv-media").length : 1;
-  if(hermanas > 1) items.push(["🗑 Quitar este hueco", function(){ fig.remove(); }, "cv-del"]);
+  if(hermanas > 1){
+    var prev = fig.previousElementSibling, next = fig.nextElementSibling;
+    var esFig = function(n){ return n && n.matches && n.matches("figure.cv-media"); };
+    if(esFig(prev)) items.push(["⬆ Subir (poner antes)", function(){ fig.parentNode.insertBefore(fig, prev); }]);
+    if(esFig(next)) items.push(["⬇ Bajar (poner después)", function(){ fig.parentNode.insertBefore(next, fig); }]);
+    items.push(["🗑 Quitar este hueco", function(){ fig.remove(); }, "cv-del"]);
+  }
   cvPop.innerHTML = "";
   items.forEach(function(it){
     var b = document.createElement("button"); b.type = "button"; b.textContent = it[0];
