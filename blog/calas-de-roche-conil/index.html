@@ -560,6 +560,29 @@ input,textarea{font:inherit;}
 .blog-modal-content .cv-media figcaption{font-size:.85em;line-height:1.4;color:#667985;text-align:center;margin-top:6px;}
 @media(max-width:700px){.blog-modal-content .cv-lado{grid-template-columns:1fr;gap:14px;}.blog-modal-content .cv-lado.cv-inv>.cv-media,.blog-modal-content .cv-lado.cv-inv>.cv-medios{order:0;}}
 
+
+.blog-modal-content .cv-casa-card{display:grid;grid-template-columns:240px 1fr;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 10px 26px -16px rgba(11,61,92,.4);color:inherit;text-decoration:none;line-height:1.4;transition:transform .25s,box-shadow .25s;}
+.blog-modal-content .cv-casa-card:hover{transform:translateY(-3px);box-shadow:0 16px 30px -14px rgba(11,61,92,.45);}
+.blog-modal-content .ccc-photo{display:block;min-height:170px;background:#dfe8ee;overflow:hidden;}
+.blog-modal-content .ccc-photo img{width:100%;height:100%;object-fit:cover;display:block;margin:0;border-radius:0;}
+.blog-modal-content .ccc-body{display:flex;flex-direction:column;gap:4px;padding:16px 18px;}
+.blog-modal-content .ccc-body small{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#667985;}
+.blog-modal-content .ccc-body b{font-family:var(--ff-display);font-size:21px;color:var(--atlantic);font-weight:600;}
+.blog-modal-content .ccc-meta{font-size:14px;color:#51606B;}
+.blog-modal-content .ccc-chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;}
+.blog-modal-content .ccc-chips i{font-style:normal;font-size:12px;background:#eef4f8;color:var(--atlantic);padding:3px 9px;border-radius:20px;}
+.blog-modal-content .ccc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;flex-wrap:wrap;}
+.blog-modal-content .ccc-price{font-size:14px;color:#51606B;}
+.blog-modal-content .ccc-price strong{font-family:var(--ff-display);font-size:22px;color:var(--bougain);}
+.blog-modal-content .ccc-btn{background:var(--atlantic);color:#fff;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:600;white-space:nowrap;}
+.blog-modal-content .cv-cta{display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(135deg,var(--atlantic),#177268);color:#fff;border-radius:16px;padding:22px 24px;line-height:1.4;}
+.blog-modal-content .cv-cta h3{font-family:var(--ff-display);font-size:21px;color:#fff;margin:0 0 4px;}
+.blog-modal-content .cv-cta p{font-size:14.5px;opacity:.92;margin:0;}
+.blog-modal-content .cv-cta-btn{background:#25D366;color:#fff !important;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:600;white-space:nowrap;text-decoration:none;}
+@media(max-width:700px){.blog-modal-content .cv-casa-card{grid-template-columns:1fr;}.blog-modal-content .ccc-photo{min-height:0;aspect-ratio:16/10;}.blog-modal-content .cv-cta{flex-direction:column;align-items:flex-start;}}
+.blog-wa{position:fixed;right:18px;bottom:18px;z-index:300;display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;border-radius:40px;padding:12px 18px;font-size:14px;font-weight:600;text-decoration:none;box-shadow:0 8px 20px rgba(0,0,0,.25);}
+.blog-wa:hover{filter:brightness(.95);}
+@media(max-width:600px){.blog-wa{right:12px;bottom:12px;padding:11px 14px;font-size:13px;}}
 .blog-houses{margin:40px 0 44px;padding-top:30px;border-top:1px solid var(--line);}
 .blog-houses-title{font-family:var(--ff-display);font-weight:600;font-size:22px;color:var(--atlantic);margin:0 0 4px;}
 .blog-houses-sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px;}
@@ -571,6 +594,7 @@ input,textarea{font:inherit;}
 .bh-card:hover .bh-photo img{transform:scale(1.05);}
 .bh-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px;flex:1;}
 .bh-name{font-family:var(--ff-display);font-weight:600;font-size:17px;color:var(--atlantic);line-height:1.2;}
+.bh-why{font-size:12px;font-weight:600;color:#1d7a58;}
 .bh-meta{font-size:12.5px;color:var(--ink-soft);}
 .bh-price{margin-top:auto;padding-top:8px;font-size:13px;color:var(--ink-soft);}
 .bh-price b{font-family:var(--ff-display);font-size:18px;color:var(--bougain);}
@@ -952,7 +976,7 @@ function renderShareButtons(containerId, url, title, resumen){
 var BLOG_HOUSES = null;
 async function loadBlogHouses(){
   try{
-    var res = await sb.from("viviendas").select("id,slug,nombre,distancia,huespedes,dormitorios,precio,unidad_precio,fotos,orden").eq("activo", true).order("orden", {ascending:true});
+    var res = await sb.from("viviendas").select("id,slug,nombre,distancia,huespedes,dormitorios,banos,precio,unidad_precio,fotos,orden,amenities").eq("activo", true).order("orden", {ascending:true});
     if(res.error) throw res.error;
     BLOG_HOUSES = res.data || [];
   }catch(err){
@@ -961,17 +985,64 @@ async function loadBlogHouses(){
   }
 }
 var blogHousesPromise = loadBlogHouses();
+
+var CCC_CHIPS = [["piscina","Piscina privada"],["jard","Jardín"],["barbacoa","Barbacoa"],["mascota","Admite mascotas"],["aire acondicionado","Aire acondicionado"],["wifi","WiFi"]];
+function cccChips(h){
+  var labels = (h.amenities || []).map(function(a){ return String(typeof a === "string" ? a : (a && a.label) || "").toLowerCase(); });
+  var out = [];
+  CCC_CHIPS.forEach(function(c){ if(out.length < 4 && labels.some(function(l){ return l.indexOf(c[0]) !== -1; })) out.push(c[1]); });
+  return out;
+}
+function casaCardHtml(h){
+  var foto = (h.fotos && h.fotos[0]) ? sb.storage.from("fotos-viviendas").getPublicUrl(h.fotos[0]).data.publicUrl : "";
+  var meta = [];
+  if(h.huespedes) meta.push(h.huespedes + " huéspedes");
+  if(h.dormitorios) meta.push(h.dormitorios + (h.dormitorios === 1 ? " dormitorio" : " dormitorios"));
+  if(h.banos) meta.push(h.banos + (h.banos === 1 ? " baño" : " baños"));
+  var unidad = h.unidad_precio === "semana" ? "semana" : "noche";
+  return '<a class="cv-casa-card" href="/viviendas/'+encodeURIComponent(h.slug || h.id)+'/">'+
+    '<span class="ccc-photo">'+(foto ? '<img src="'+foto+'" alt="'+escapeHTML(h.nombre)+'" loading="lazy">' : '')+'</span>'+
+    '<span class="ccc-body"><small>Casa vacacional · Conil</small><b>'+escapeHTML(h.nombre)+'</b>'+
+    '<span class="ccc-meta">'+escapeHTML(meta.join(" · "))+'</span>'+
+    '<span class="ccc-chips">'+cccChips(h).map(function(c){ return '<i>'+escapeHTML(c)+'</i>'; }).join("")+'</span>'+
+    '<span class="ccc-row"><span class="ccc-price">'+(h.precio ? 'desde <strong>'+escapeHTML(String(h.precio))+' €</strong> / '+unidad : (h.distancia ? escapeHTML(h.distancia) : ''))+'</span>'+
+    '<span class="ccc-btn">Ver casa y fechas →</span></span></span></a>';
+}
+async function hydrateCasas(){
+  var els = document.querySelectorAll("#blogModalContent .cv-casa[data-casa]");
+  if(!els.length) return;
+  await blogHousesPromise;
+  els.forEach(function(el){
+    var h = (BLOG_HOUSES || []).find(function(x){ return x.id === el.getAttribute("data-casa") || x.slug === el.getAttribute("data-casa"); });
+    if(h) el.innerHTML = casaCardHtml(h); else el.style.display = "none";
+  });
+}
+
 async function renderBlogHouses(postId){
   var cont = document.getElementById("blogHouses");
   if(!cont) return;
   cont.innerHTML = "";
   await blogHousesPromise;
   if(!BLOG_HOUSES || !BLOG_HOUSES.length) return;
-  // Reparto: cada entrada empieza en una vivienda distinta para que no salgan siempre las mismas.
+  // Casas relacionadas con el tema de la entrada (si no hay tema claro, se reparten por turnos).
+  var post = BLOG_POSTS.find(function(x){ return x.id === postId; }) || {};
+  var txt = ((post.titulo || "") + " " + (post.resumen || "")).toLowerCase();
   var idx = Math.max(0, BLOG_POSTS.findIndex(function(x){ return x.id === postId; }));
+  var has = function(h, k){ return cccChips(h).indexOf(k) !== -1 || (h.amenities || []).some(function(a){ return String(typeof a === "string" ? a : (a && a.label) || "").toLowerCase().indexOf("mascota") !== -1 && k === "Admite mascotas"; }); };
+  var rules = [];
+  if(/perro|mascota/.test(txt)) rules.push({ why: "🐾 Admite mascotas", ok: function(h){ return has(h, "Admite mascotas"); } });
+  if(/pareja|rom[aá]ntic/.test(txt)) rules.push({ why: "💑 Ideal para parejas", ok: function(h){ return (h.huespedes || 9) <= 4; } });
+  if(/familia|ni[nñ]os|grupo|amigos/.test(txt)) rules.push({ why: "👨‍👩‍👧 Para familias y grupos", ok: function(h){ return (h.huespedes || 0) >= 5; } });
+  if(/playa|cala|atardecer|fontanilla|roche|surf|pesca/.test(txt)) rules.push({ why: "🏖️ Cerca de la playa", ok: function(h){ return /playa|min/.test(String(h.distancia || "").toLowerCase()); } });
   var n = Math.min(3, BLOG_HOUSES.length);
-  var list = [];
-  for(var k=0; k<n; k++){ list.push(BLOG_HOUSES[(idx + k) % BLOG_HOUSES.length]); }
+  var list = [], whyMap = {};
+  rules.forEach(function(r){
+    BLOG_HOUSES.forEach(function(h){ if(list.length < n && list.indexOf(h) === -1 && r.ok(h)){ list.push(h); whyMap[h.id] = r.why; } });
+  });
+  for(var k=0; list.length < n && k < BLOG_HOUSES.length; k++){
+    var c = BLOG_HOUSES[(idx + k) % BLOG_HOUSES.length];
+    if(list.indexOf(c) === -1) list.push(c);
+  }
   var cards = list.map(function(h){
     var foto = (h.fotos && h.fotos[0]) ? sb.storage.from("fotos-viviendas").getPublicUrl(h.fotos[0]).data.publicUrl : "";
     var meta = [];
@@ -982,7 +1053,7 @@ async function renderBlogHouses(postId){
     var unidad = h.unidad_precio === "semana" ? "semana" : "noche";
     return '<a class="bh-card" href="'+url+'">'+
       '<div class="bh-photo">'+(foto ? '<img src="'+foto+'" alt="'+escapeHTML(h.nombre)+'" loading="lazy">' : '')+'</div>'+
-      '<div class="bh-body"><span class="bh-name">'+escapeHTML(h.nombre)+'</span>'+
+      '<div class="bh-body"><span class="bh-name">'+escapeHTML(h.nombre)+'</span>'+(whyMap[h.id] ? '<span class="bh-why">'+whyMap[h.id]+'</span>' : '')+
       '<span class="bh-meta">'+escapeHTML(meta.join(" · "))+'</span>'+
       (h.precio ? '<span class="bh-price">desde <b>'+escapeHTML(String(h.precio))+' €</b> / '+unidad+'</span>' : '')+
       '</div></a>';
@@ -1006,6 +1077,7 @@ function openBlogModal(id, esCargaInicial){
     if(!im.getAttribute("alt")) im.setAttribute("alt", p.titulo + " – imagen " + (ii+1));
     if(!im.getAttribute("title")) im.setAttribute("title", im.getAttribute("alt"));
   });
+  hydrateCasas();
   var gallery = (p.fotos || []).map(blogPhotoUrl).filter(Boolean);
   document.getElementById("blogModalGallery").innerHTML = gallery.map(function(url, gi){
     var t = escapeHTML(p.titulo) + " – foto " + (gi+1);
@@ -1051,5 +1123,6 @@ if("serviceWorker" in navigator){
 }
 </script>
 <script src="/img-loading.js" defer></script>
+<a class="blog-wa" href="https://wa.me/34650283373?text=Hola%2C%20vengo%20del%20blog%20de%20Conil%20Vacaciones%20y%20quiero%20informaci%C3%B3n%20sobre%20alojamiento" target="_blank" rel="noopener">💬 ¿Reservar? Escríbenos</a>
 </body>
 </html>
