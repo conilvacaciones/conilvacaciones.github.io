@@ -367,7 +367,7 @@ main.wrap{padding:40px 24px 90px;}
         <div class="form-actions" style="width:100%">
           <div style="margin:0 0 14px;padding:12px;border:1px solid #dde3ea;border-radius:10px;background:#f7f9fb">
             <strong>⚡ Optimizar imágenes existentes</strong>
-            <p style="margin:6px 0 8px;font-size:.9rem">Reduce el peso de las fotos ya subidas (viviendas y blog) para que la web cargue más rápido. Mantiene el mismo nombre y enlace, así que no cambia nada más. No se tocan las que ya son ligeras. Déjalo abierto hasta que termine.</p>
+            <p style="margin:6px 0 8px;font-size:.9rem">Reduce el peso de las fotos ya subidas (viviendas y blog) para que la web cargue más rápido. Mantiene el mismo nombre y enlace, así que no cambia nada más. No se tocan las que ya pesan menos de 150 KB. Déjalo abierto hasta que termine.</p>
             <button type="button" class="btn btn-primary btn-sm" id="btnOptimizarImgs">Optimizar ahora</button>
             <pre id="optimLog" style="margin:8px 0 0;max-height:220px;overflow:auto;font-size:.8rem;white-space:pre-wrap"></pre>
           </div>
@@ -3712,7 +3712,7 @@ document.getElementById("btnOptimizarImgs").addEventListener("click", async func
       say(files.length + " imágenes en " + bucket);
       for(var i=0;i<files.length;i++){
         var f = files[i];
-        if(f.size && f.size < 300*1024){ skipped++; continue; }
+        if(f.size && f.size < 150*1024){ skipped++; continue; }
         try{
           // La API de listado puede devolver la carpeta con otras mayúsculas: se prueban las dos variantes
           var parts = f.path.split("/"), variantes = [f.path];
@@ -3724,7 +3724,7 @@ document.getElementById("btnOptimizarImgs").addEventListener("click", async func
           }
           if(!r) throw new Error("no se encuentra el archivo (HTTP 400/404)");
           var blob = await r.blob();
-          var c = await compressImage(blob, 1920, 0.82);
+          var c = await compressImage(blob, 1600, 0.78);
           if(c.blob === blob || c.blob.size > blob.size * 0.85){
             skipped++;
             say("– " + f.path + " (" + Math.round(blob.size/1024) + " KB) sin cambios: " + (c.error ? "error al comprimir: " + c.error : "no se reduce lo suficiente (" + Math.round(c.blob.size/1024) + " KB)"));
