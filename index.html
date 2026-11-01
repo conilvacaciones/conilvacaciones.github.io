@@ -289,6 +289,16 @@ input,textarea{font:inherit;}
   align-items:center;justify-content:center;padding:0 4px;
 }
 @media (max-width:720px){.search-row{grid-template-columns:1fr;}}
+.search-widget.in-hero{position:relative;z-index:3;max-width:1000px;margin:34px 0 0;padding:20px 24px 16px;box-shadow:0 20px 55px rgba(11,61,92,.3);color:var(--ink);}
+.search-widget.in-hero .search-row{grid-template-columns:1.1fr 1.1fr .7fr auto;align-items:end;}
+.search-widget.in-hero .search-actions{margin-top:0;flex-wrap:nowrap;}
+.search-widget.in-hero .search-actions .btn{white-space:nowrap;}
+.search-widget.in-hero .search-result-msg{margin-top:10px;}
+.search-widget.in-hero .search-result-msg:empty{display:none;}
+.hero-inner{padding-bottom:84px;}
+@media (max-width:900px){.search-widget.in-hero .search-row{grid-template-columns:1fr 1fr;}.search-widget.in-hero .search-actions{grid-column:1/3;}}
+@media (max-width:720px){.search-widget.in-hero .search-row{grid-template-columns:1fr 1fr;}.hero-inner{padding-bottom:70px;}}
+
 
 .houses-grid{display:grid;grid-template-columns:1fr;gap:26px;align-items:stretch;}
 @media (min-width:641px) and (max-width:1024px){
@@ -851,6 +861,29 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
         <a href="#contacto" class="btn btn-outline">Hablar por WhatsApp</a>
       </div>
     </div>
+    <div class="search-widget in-hero" id="searchWidget">
+      <h3>Encuentra tu casa ideal</h3>
+      <p class="search-sub">Dinos tus fechas y cuántos sois, y te recomendamos las casas que mejor encajan.</p>
+      <div class="search-row">
+        <div class="search-field">
+          <label for="searchCheckin">Entrada</label>
+          <input type="date" id="searchCheckin">
+        </div>
+        <div class="search-field">
+          <label for="searchCheckout">Salida</label>
+          <input type="date" id="searchCheckout">
+        </div>
+        <div class="search-field">
+          <label for="searchGuests">Personas</label>
+          <input type="number" id="searchGuests" min="1" max="30" value="2">
+        </div>
+        <div class="search-actions">
+          <button class="btn btn-primary" id="searchBtn">Buscar casa</button>
+          <button class="btn btn-outline" id="searchClearBtn" style="color:var(--ink);border-color:var(--line)">Ver todas</button>
+        </div>
+      </div>
+      <p class="search-result-msg" id="searchResultMsg"></p>
+    </div>
   </div>
   <svg class="hero-wave" viewBox="0 0 1440 110" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <path fill="#FAFAF7" d="M0,64 C240,108 480,22 720,50 C960,78 1200,92 1440,42 L1440,120 L0,120 Z"></path>
@@ -867,29 +900,6 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
         <p>Elige una casa para ver todas las fotos, la información completa y el calendario de disponibilidad.</p>
         <div class="interest-badge" id="weeklyInterestBadge" style="display:none"></div>
       </div>
-    </div>
-    <div class="search-widget reveal" id="searchWidget">
-      <h3>Encuentra tu casa ideal</h3>
-      <p class="search-sub">Dinos tus fechas y cuántos sois, y te recomendamos las casas que mejor encajan.</p>
-      <div class="search-row">
-        <div class="search-field">
-          <label for="searchCheckin">Entrada</label>
-          <input type="date" id="searchCheckin">
-        </div>
-        <div class="search-field">
-          <label for="searchCheckout">Salida</label>
-          <input type="date" id="searchCheckout">
-        </div>
-        <div class="search-field">
-          <label for="searchGuests">Personas</label>
-          <input type="number" id="searchGuests" min="1" max="30" value="2">
-        </div>
-      </div>
-      <div class="search-actions">
-        <button class="btn btn-primary" id="searchBtn">Buscar y recomendar</button>
-        <button class="btn btn-outline" id="searchClearBtn" style="color:var(--ink);border-color:var(--line)">Ver todas las casas</button>
-      </div>
-      <p class="search-result-msg" id="searchResultMsg"></p>
     </div>
     <div class="houses-grid" id="housesGrid"></div>
   </div>
