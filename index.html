@@ -855,7 +855,7 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
     <div class="hero-text reveal is-visible">
       <span class="eyebrow">Conil de la Frontera · Cádiz</span>
       <h1 id="heroTitulo"><span class="hero-title-main" id="heroTituloMain">Conil Vacaciones</span><span class="hero-title-sub" id="heroTituloSub">Encuentra tu alojamiento vacacional en Conil de la Frontera</span></h1>
-      <p id="heroSubtitulo">Encuentra tu próximo alojamiento vacacional en Conil de la Frontera y te ponemos en contacto directamente con quienes lo ofrecen: playa, pueblo blanco y atardeceres sin prisa, sin agencias tradicionales de por medio.</p>
+      <p id="heroSubtitulo" hidden></p>
       <div class="hero-cta">
         <a href="#viviendas" class="btn btn-primary">Ver alojamientos</a>
         <a href="#contacto" class="btn btn-outline">Hablar por WhatsApp</a>
@@ -1736,7 +1736,7 @@ async function initApariencia(){
     }
     if(s.hero_titulo) document.getElementById("heroTituloMain").textContent = s.hero_titulo;
     if(s.hero_titulo_sub) document.getElementById("heroTituloSub").textContent = s.hero_titulo_sub;
-    if(s.hero_subtitulo) document.getElementById("heroSubtitulo").textContent = s.hero_subtitulo;
+    if(s.hero_subtitulo){ var hs=document.getElementById("heroSubtitulo"); hs.textContent = s.hero_subtitulo; hs.hidden = false; }
     if(s.hero_image){
       var floatPhoto = document.getElementById("heroFloatPhoto");
       if(floatPhoto){
