@@ -1611,6 +1611,7 @@ document.getElementById("searchClearBtn").addEventListener("click", function(){
   document.getElementById("searchResultMsg").textContent = "";
   document.getElementById("searchResultMsg").classList.remove("has-results");
   renderHouseCards();
+  var vv=document.getElementById("viviendas"); if(vv) vv.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 /* ============ CARGA DE DATOS DESDE SUPABASE ============ */
