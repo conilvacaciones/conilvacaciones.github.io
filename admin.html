@@ -55,6 +55,9 @@ input,select,textarea{font:inherit;}
 #appView{display:none;}
 .topbar{background:var(--atlantic);color:var(--cal);padding:16px 0;}
 .topbar .wrap{display:flex;justify-content:space-between;align-items:center;}
+.topbar .logo-toggle{display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;margin-left:auto;margin-right:16px;background:rgba(255,255,255,.12);padding:7px 12px;border-radius:99px;}
+.topbar .logo-toggle input{width:17px;height:17px;accent-color:#E7B15C;cursor:pointer;}
+@media (max-width:640px){.topbar .wrap{flex-wrap:wrap;gap:10px;}.topbar .logo-toggle{order:3;margin:0;width:100%;}}
 .topbar .logo{font-family:var(--ff-display);font-weight:600;font-style:italic;font-size:19px;}
 main.wrap{padding:40px 24px 90px;}
 .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;flex-wrap:wrap;gap:14px;}
@@ -343,6 +346,7 @@ main.wrap{padding:40px 24px 90px;}
   <div class="topbar">
     <div class="wrap">
       <span class="logo">Conil Vacaciones · Panel</span>
+      <label class="logo-toggle" title="Al activarlo, todas las fotos que subas llevarán el logo de Conil Vacaciones en la esquina inferior derecha"><input type="checkbox" id="cvLogoToggle"><span>Poner logo en las fotos nuevas</span></label>
       <button class="btn btn-ghost btn-sm" id="btnLogout" style="color:var(--cal);border-color:rgba(241,242,234,.35)">Cerrar sesión</button>
     </div>
   </div>
@@ -1691,7 +1695,7 @@ function alphaRatio(ctx, w, h){
   return 0;
 }
 // Devuelve { blob, ext }. Si no mejora el tamaño (o falla) devuelve el original.
-async function compressImage(blob, maxSide, quality){
+async function compressImage(blob, maxSide, quality, withLogo){
   maxSide = maxSide || 1920; quality = quality || 0.82;
   var origExt = ((blob.name || "").split(".").pop() || "jpg").toLowerCase();
   var orig = { blob: blob, ext: origExt };
@@ -1706,6 +1710,7 @@ async function compressImage(blob, maxSide, quality){
     if(bmp.close) bmp.close();
     // Solo se conserva la transparencia si es significativa (>3 % de la imagen); si no, se aplana a JPEG
     var alpha = blob.type === "image/png" && alphaRatio(ctx, cw, ch) > 0.03;
+    if(withLogo) await cvStampLogo(ctx, cw, ch);
     var out;
     if(alpha){
       var wb = await new Promise(function(r){ c.toBlob(r, "image/webp", 0.85); });
@@ -1718,13 +1723,44 @@ async function compressImage(blob, maxSide, quality){
       var jb = await new Promise(function(r){ c2.toBlob(r, "image/jpeg", quality); });
       out = jb ? { blob: jb, ext: "jpg" } : null;
     }
-    if(out && out.blob && (out.blob.size < blob.size || k < 1)) return out;
+    if(out && out.blob && (out.blob.size < blob.size || k < 1 || withLogo)) return out;
   }catch(e){ console.warn("compressImage", e); orig.error = (e && e.message) || String(e); }
   return orig;
 }
 function nameWithExt(name, ext){ return name.replace(/\.[^.]+$/, "") + "." + ext; }
-async function prepUpload(file, maxSide){
-  var r = await compressImage(file, maxSide || 1920, 0.82);
+// ---- Logo de Conil Vacaciones en la esquina inferior derecha de las fotos ----
+var cvLogoCache = null;
+function cvLogoOn(){ try{ return localStorage.getItem("cvLogoOn") === "1"; }catch(e){ return false; } }
+function cvLoadLogo(){
+  return new Promise(function(res){
+    if(cvLogoCache) return res(cvLogoCache);
+    var im = new Image();
+    im.onload = function(){ cvLogoCache = im; res(im); };
+    im.onerror = function(){ res(null); };
+    im.src = "/images/logo-conil-vacaciones.png";
+  });
+}
+async function cvStampLogo(ctx, cw, ch){
+  if(cw < 360 || ch < 240) return; // fotos muy pequeñas: sin logo
+  var lg = await cvLoadLogo();
+  if(!lg) return;
+  var lw = Math.max(110, Math.round(Math.min(cw * 0.17, ch * 0.30)));
+  var lh = Math.round(lw * lg.naturalHeight / lg.naturalWidth);
+  var m = Math.round(Math.min(cw, ch) * 0.02);
+  ctx.save();
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(lg, cw - lw - m, ch - lh - m, lw, lh);
+  ctx.restore();
+}
+(function(){
+  var t = document.getElementById("cvLogoToggle");
+  if(!t) return;
+  t.checked = cvLogoOn();
+  t.addEventListener("change", function(){ try{ localStorage.setItem("cvLogoOn", t.checked ? "1" : "0"); }catch(e){} });
+})();
+async function prepUpload(file, maxSide, opts){
+  var withLogo = cvLogoOn() && !(opts && opts.noLogo);
+  var r = await compressImage(file, maxSide || 1920, 0.82, withLogo);
   return { blob: r.blob, name: nameWithExt(file.name || "foto.jpg", r.ext), type: r.blob.type || undefined };
 }
 
@@ -1789,7 +1825,7 @@ async function recortarFotoExistente(i, btn){
   }
   startCropQueue([file], async function(blobOrFile, originalFile){
     if(blobOrFile === originalFile) return; // "Subir sin recortar": se queda como está
-    var pu = await prepUpload(new File([blobOrFile], originalFile.name, {type: blobOrFile.type}), 1920);
+    var pu = await prepUpload(new File([blobOrFile], originalFile.name, {type: blobOrFile.type}), 1920, { noLogo: true });
     var safeName = pu.name.replace(/[^a-zA-Z0-9.-]/g,"_").replace(/^\d+-/, "");
     var path = id + "/" + Date.now() + "-" + safeName;
     var up = await sb.storage.from("fotos-viviendas").upload(path, pu.blob, { upsert:true, contentType: pu.type });
