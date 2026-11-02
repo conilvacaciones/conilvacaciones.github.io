@@ -2493,11 +2493,9 @@ function detectVideoPlatform(url){
 /* ============ RESEÑAS REALES (aprobadas en el panel) en la portada ============ */
 (async function(){
   try{
-    var r = await sb.from("resenas").select("nombre, comentario, valoracion, created_at, viviendas(nombre)").eq("estado","aprobada").order("created_at",{ascending:false}).limit(30);
+    var r = await sb.from("resenas").select("nombre, comentario, valoracion, created_at, orden_portada, viviendas(nombre)").eq("estado","aprobada").eq("en_portada", true).order("orden_portada",{ascending:true,nullsFirst:false}).order("created_at",{ascending:false}).limit(12);
     if(r.error || !r.data) return;
-    var rows = r.data.filter(function(x){ return x.comentario && x.comentario.trim().length > 25 && x.valoracion >= 4; });
-    rows.sort(function(a,b){ return b.valoracion - a.valoracion; });
-    rows = rows.slice(0,6);
+    var rows = r.data.filter(function(x){ return x.comentario && x.comentario.trim().length > 0; });
     if(!rows.length) return;
     var box = document.getElementById("grGrid");
     box.innerHTML = rows.map(function(x){

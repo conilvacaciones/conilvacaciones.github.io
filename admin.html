@@ -2630,7 +2630,9 @@ document.querySelectorAll(".tab-btn").forEach(function(btn){
 async function loadReviewsAdmin(){
   var box = document.getElementById("reviewsAdminList");
   box.innerHTML = '<p class="empty-note">Cargando…</p>';
-  var res = await sb.from("resenas").select("*, viviendas(nombre)").eq("estado", currentReviewTab).order("created_at", {ascending:false});
+  var q = sb.from("resenas").select("*, viviendas(nombre)").eq("estado", currentReviewTab);
+  if(currentReviewTab === "aprobada") q = q.order("en_portada", {ascending:false}).order("orden_portada", {ascending:true, nullsFirst:false});
+  var res = await q.order("created_at", {ascending:false});
   if(res.error){
     box.innerHTML = '<p class="empty-note" style="color:var(--bougain)">Error al cargar: '+res.error.message+'</p>';
     return;
@@ -2646,15 +2648,32 @@ async function loadReviewsAdmin(){
     var actions = "";
     if(currentReviewTab !== "aprobada") actions += '<button type="button" class="btn btn-dark btn-sm" data-approve="'+r.id+'">Aprobar</button>';
     if(currentReviewTab !== "oculta") actions += '<button type="button" class="btn btn-ghost btn-sm" data-hide="'+r.id+'">Ocultar</button>';
+    var badge = "";
+    if(currentReviewTab === "aprobada"){
+      var nPort = rows.filter(function(z){ return z.en_portada; }).length;
+      if(r.en_portada){
+        var pos = rows.filter(function(z){ return z.en_portada; }).indexOf(r) + 1;
+        badge = ' <span class="rv-house" style="background:#e6f4ef;color:#177268;border-radius:99px;padding:2px 9px;font-weight:700">En portada · nº '+pos+'</span>';
+        actions = '<button type="button" class="btn btn-ghost btn-sm" data-pt-up="'+r.id+'"'+(pos===1?' disabled':'')+' title="Subir">⬆</button>'+
+                  '<button type="button" class="btn btn-ghost btn-sm" data-pt-down="'+r.id+'"'+(pos===nPort?' disabled':'')+' title="Bajar">⬇</button>'+
+                  '<button type="button" class="btn btn-dark btn-sm" data-pt-off="'+r.id+'">Quitar de la portada</button>' + actions;
+      }else{
+        actions = '<button type="button" class="btn btn-primary btn-sm" data-pt-on="'+r.id+'">Mostrar en portada</button>' + actions;
+      }
+    }
     actions += '<button type="button" class="btn btn-danger btn-sm" data-del-review="'+r.id+'">Eliminar</button>';
     return '<div class="rv-row">'+
-      '<div class="rv-head"><div><b>'+escapeHTMLAdmin(r.nombre)+'</b> <span class="rv-house">· '+escapeHTMLAdmin(houseName)+'</span></div><span class="rv-stars">'+stars+'</span></div>'+
+      '<div class="rv-head"><div><b>'+escapeHTMLAdmin(r.nombre)+'</b> <span class="rv-house">· '+escapeHTMLAdmin(houseName)+'</span>'+badge+'</div><span class="rv-stars">'+stars+'</span></div>'+
       (r.comentario ? '<p>'+escapeHTMLAdmin(r.comentario)+'</p>' : '<p style="font-style:italic;color:var(--ink-faint)">Sin comentario</p>')+
       '<span class="rv-date">'+new Date(r.created_at).toLocaleDateString("es-ES")+'</span>'+
       '<div class="rv-actions">'+actions+'</div>'+
     '</div>';
   }).join("");
 
+  box.querySelectorAll("[data-pt-on]").forEach(function(b){ b.addEventListener("click", function(){ portadaSet(b.getAttribute("data-pt-on"), true); }); });
+  box.querySelectorAll("[data-pt-off]").forEach(function(b){ b.addEventListener("click", function(){ portadaSet(b.getAttribute("data-pt-off"), false); }); });
+  box.querySelectorAll("[data-pt-up]").forEach(function(b){ b.addEventListener("click", function(){ portadaMove(b.getAttribute("data-pt-up"), -1); }); });
+  box.querySelectorAll("[data-pt-down]").forEach(function(b){ b.addEventListener("click", function(){ portadaMove(b.getAttribute("data-pt-down"), 1); }); });
   box.querySelectorAll("[data-approve]").forEach(function(b){ b.addEventListener("click", function(){ setReviewEstado(b.getAttribute("data-approve"), "aprobada"); }); });
   box.querySelectorAll("[data-hide]").forEach(function(b){ b.addEventListener("click", function(){ setReviewEstado(b.getAttribute("data-hide"), "oculta"); }); });
   box.querySelectorAll("[data-del-review]").forEach(function(b){ b.addEventListener("click", function(){ deleteReview(b.getAttribute("data-del-review")); }); });
@@ -2687,7 +2706,7 @@ async function loadReviewsAdmin(){
     if(!casa){ msg.textContent = "Elige la vivienda."; return; }
     if(!nombre){ msg.textContent = "Escribe el nombre del huésped."; return; }
     if(!texto){ msg.textContent = "Pega el comentario de la reseña."; return; }
-    var row = { vivienda_id: casa, nombre: nombre, comentario: texto, valoracion: val, estado: "aprobada" };
+    var row = { vivienda_id: casa, nombre: nombre, comentario: texto, valoracion: val, estado: "aprobada", en_portada: true, orden_portada: (await portadaIds()).length + 1 };
     if(fecha) row.created_at = fecha + "T12:00:00+01:00";
     this.disabled = true;
     var r = await sb.from("resenas").insert(row);
@@ -2699,6 +2718,35 @@ async function loadReviewsAdmin(){
   });
 })();
 
+// Reseñas visibles en la portada y su orden
+async function portadaIds(){
+  var r = await sb.from("resenas").select("id").eq("estado","aprobada").eq("en_portada", true).order("orden_portada",{ascending:true,nullsFirst:false}).order("created_at",{ascending:false});
+  return (r.data || []).map(function(x){ return x.id; });
+}
+async function portadaGuardaOrden(ids){
+  for(var i=0;i<ids.length;i++){
+    var u = await sb.from("resenas").update({ orden_portada: i+1, en_portada: true }).eq("id", ids[i]);
+    if(u.error){ alert("No se ha podido guardar el orden: "+u.error.message); return; }
+  }
+}
+async function portadaSet(id, on){
+  if(on){
+    var ids = await portadaIds(); ids.push(id);
+    await portadaGuardaOrden(ids);
+  }else{
+    var u = await sb.from("resenas").update({ en_portada: false, orden_portada: null }).eq("id", id);
+    if(u.error){ alert("No se ha podido actualizar: "+u.error.message); return; }
+    await portadaGuardaOrden((await portadaIds()));
+  }
+  loadReviewsAdmin();
+}
+async function portadaMove(id, dir){
+  var ids = await portadaIds(), i = ids.indexOf(id), j = i + dir;
+  if(i < 0 || j < 0 || j >= ids.length) return;
+  var tmp = ids[i]; ids[i] = ids[j]; ids[j] = tmp;
+  await portadaGuardaOrden(ids);
+  loadReviewsAdmin();
+}
 async function setReviewEstado(id, estado){
   var res = await sb.from("resenas").update({ estado: estado }).eq("id", id);
   if(res.error){ alert("No se ha podido actualizar: "+res.error.message); return; }
