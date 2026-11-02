@@ -386,6 +386,12 @@ input,textarea{font:inherit;}
 @media (max-width:900px){.qh-grid{grid-template-columns:1fr 1fr;}.qh-grid .qh-card:nth-child(3){display:none;}}
 @media (max-width:600px){.qh-grid{grid-template-columns:1fr;}.qh-grid .qh-card:nth-child(3){display:flex;}.quehacer-section{padding-bottom:60px;}}
 .google-reviews-section{padding:20px 0 70px;}
+.gr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:1000px;margin:28px auto 0;}
+.gr-rev{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:22px 22px 18px;text-align:left;display:flex;flex-direction:column;gap:10px;}
+.gr-rev .stars{color:var(--sol);font-size:17px;letter-spacing:2px;}
+.gr-rev p{font-size:14.5px;line-height:1.6;color:var(--ink);margin:0;}
+.gr-rev .who{margin-top:auto;font-size:13px;color:var(--ink-soft);}
+.gr-rev .who b{color:var(--ink);}
 .gr-card{max-width:640px;margin:0 auto;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:44px 32px 40px;}
 .gr-google-badge{
   display:inline-flex;align-items:center;gap:8px;background:var(--teal-soft);color:var(--teal);
@@ -1030,6 +1036,7 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
       <p class="gr-text">Así nos valoran quienes ya han reservado su alojamiento en Conil con nosotros. Opiniones reales, verificadas por Google.</p>
       <a href="https://share.google/GP0MEcCs451DQtlmv" target="_blank" rel="noopener" class="btn btn-primary">Ver reseñas en Google</a>
     </div>
+    <div class="gr-grid" id="grGrid" hidden></div>
   </div>
 </section>
 
@@ -2481,6 +2488,25 @@ function detectVideoPlatform(url){
   if(host.indexOf("youtube.com") > -1 || host.indexOf("youtu.be") > -1) return { icon:"i-play", label:"Ver vídeo en YouTube" };
   return { icon:"i-play", label:"Ver vídeo" };
 }
+
+/* ============ RESEÑAS REALES (aprobadas en el panel) en la portada ============ */
+(async function(){
+  try{
+    var r = await sb.from("resenas").select("nombre, comentario, valoracion, created_at, viviendas(nombre)").eq("estado","aprobada").order("created_at",{ascending:false}).limit(30);
+    if(r.error || !r.data) return;
+    var rows = r.data.filter(function(x){ return x.comentario && x.comentario.trim().length > 25 && x.valoracion >= 4; });
+    rows.sort(function(a,b){ return b.valoracion - a.valoracion; });
+    rows = rows.slice(0,6);
+    if(!rows.length) return;
+    var box = document.getElementById("grGrid");
+    box.innerHTML = rows.map(function(x){
+      var t = x.comentario.trim(); if(t.length > 260) t = t.slice(0,257).replace(/\s+\S*$/,"") + "…";
+      var casa = x.viviendas && x.viviendas.nombre ? " · " + escapeHTML(x.viviendas.nombre) : "";
+      return '<article class="gr-rev"><div class="stars" aria-label="'+x.valoracion+' de 5">'+"★★★★★".slice(0,x.valoracion)+'</div><p>“'+escapeHTML(t)+'”</p><div class="who"><b>'+escapeHTML(x.nombre)+'</b>'+casa+'</div></article>';
+    }).join("");
+    box.hidden = false;
+  }catch(e){}
+})();
 
 function escapeHTML(str){
   var div = document.createElement("div");
