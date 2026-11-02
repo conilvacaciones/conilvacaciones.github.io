@@ -55,9 +55,6 @@ input,select,textarea{font:inherit;}
 #appView{display:none;}
 .topbar{background:var(--atlantic);color:var(--cal);padding:16px 0;}
 .topbar .wrap{display:flex;justify-content:space-between;align-items:center;}
-.topbar .logo-toggle{display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;margin-left:auto;margin-right:16px;background:rgba(255,255,255,.12);padding:7px 12px;border-radius:99px;}
-.topbar .logo-toggle input{width:17px;height:17px;accent-color:#E7B15C;cursor:pointer;}
-@media (max-width:640px){.topbar .wrap{flex-wrap:wrap;gap:10px;}.topbar .logo-toggle{order:3;margin:0;width:100%;}}
 .topbar .logo{font-family:var(--ff-display);font-weight:600;font-style:italic;font-size:19px;}
 main.wrap{padding:40px 24px 90px;}
 .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;flex-wrap:wrap;gap:14px;}
@@ -99,6 +96,17 @@ main.wrap{padding:40px 24px 90px;}
 .empty-note{color:var(--ink-soft);font-size:14px;padding:30px 0;text-align:center;}
 
 /* ---- modal ---- */
+#cvLogoAsk{z-index:400;align-items:center;}
+#cvLogoAsk .box{background:#fff;border-radius:16px;max-width:420px;width:100%;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.35);}
+#cvLogoAsk h3{margin:0 0 4px;font-size:19px;color:var(--atlantic);}
+#cvLogoAsk .prev{border-radius:10px;background:#e9eef1;margin:12px 0;line-height:0;text-align:center;overflow:hidden;}
+#cvLogoAsk .prev .in{position:relative;display:inline-block;max-width:100%;}
+#cvLogoAsk .prev img.ph{max-width:100%;max-height:230px;display:block;}
+#cvLogoAsk .prev .wm{position:absolute;right:3%;bottom:3%;width:24%;line-height:0;display:none;}
+#cvLogoAsk .prev.on .wm{display:block;}
+#cvLogoAsk label.chk{display:flex;align-items:center;gap:10px;font-size:15.5px;font-weight:600;cursor:pointer;}
+#cvLogoAsk label.chk input{width:20px;height:20px;accent-color:var(--atlantic);}
+#cvLogoAsk label.sub{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);margin-top:8px;cursor:pointer;}
 .modal-backdrop{position:fixed;inset:0;background:rgba(8,26,38,.55);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s ease;}
 .modal-backdrop.open{opacity:1;pointer-events:auto;}
 .modal-panel{background:var(--card);border-radius:var(--radius-lg);max-width:640px;width:100%;padding:30px 30px 34px;position:relative;box-shadow:var(--shadow);margin-bottom:40px;}
@@ -346,7 +354,6 @@ main.wrap{padding:40px 24px 90px;}
   <div class="topbar">
     <div class="wrap">
       <span class="logo">Conil Vacaciones · Panel</span>
-      <label class="logo-toggle" title="Al activarlo, todas las fotos que subas llevarán el logo de Conil Vacaciones en la esquina inferior derecha"><input type="checkbox" id="cvLogoToggle"><span>Poner logo en las fotos nuevas</span></label>
       <button class="btn btn-ghost btn-sm" id="btnLogout" style="color:var(--cal);border-color:rgba(241,242,234,.35)">Cerrar sesión</button>
     </div>
   </div>
@@ -817,6 +824,16 @@ main.wrap{padding:40px 24px 90px;}
 </div>
 
 <!-- ============ MODAL: RECORTAR IMAGEN ============ -->
+<div class="modal-backdrop" id="cvLogoAsk">
+  <div class="box">
+    <h3>Nueva foto</h3>
+    <div style="font-size:13.5px;color:var(--ink-soft)" id="cvLogoName"></div>
+    <div class="prev" id="cvLogoPrev"><div class="in"><img class="ph" id="cvLogoPh" alt=""><img class="wm" src="/images/logo-conil-vacaciones.png" alt=""></div></div>
+    <label class="chk"><input type="checkbox" id="cvLogoChk"> Añadir el logo de Conil Vacaciones (esquina inferior derecha)</label>
+    <label class="sub"><input type="checkbox" id="cvLogoAll"> Hacer lo mismo con las siguientes fotos de esta subida</label>
+    <div style="display:flex;justify-content:flex-end;margin-top:16px"><button type="button" class="btn btn-primary" id="cvLogoOk">Subir foto</button></div>
+  </div>
+</div>
 <div class="modal-backdrop" id="cropModalBackdrop">
   <div class="modal-panel" style="max-width:640px">
     <button class="modal-close" id="cropModalClose">×</button>
@@ -1730,7 +1747,32 @@ async function compressImage(blob, maxSide, quality, withLogo){
 function nameWithExt(name, ext){ return name.replace(/\.[^.]+$/, "") + "." + ext; }
 // ---- Logo de Conil Vacaciones en la esquina inferior derecha de las fotos ----
 var cvLogoCache = null;
-function cvLogoOn(){ try{ return localStorage.getItem("cvLogoOn") === "1"; }catch(e){ return false; } }
+function cvLogoLast(){ try{ return localStorage.getItem("cvLogoOn") === "1"; }catch(e){ return false; } }
+var cvAskChain = Promise.resolve(), cvAskRemember = null; // { val, t }
+function cvAskLogo(file){
+  var run = function(){
+    if(cvAskRemember && Date.now() - cvAskRemember.t < 90000){ cvAskRemember.t = Date.now(); return Promise.resolve(cvAskRemember.val); }
+    return new Promise(function(res){
+      var bd = document.getElementById("cvLogoAsk"), chk = document.getElementById("cvLogoChk"), all = document.getElementById("cvLogoAll"),
+          prev = document.getElementById("cvLogoPrev"), ph = document.getElementById("cvLogoPh"), ok = document.getElementById("cvLogoOk");
+      var url = URL.createObjectURL(file);
+      ph.src = url; document.getElementById("cvLogoName").textContent = file.name || "";
+      chk.checked = cvLogoLast(); all.checked = false;
+      var sync = function(){ prev.classList.toggle("on", chk.checked); };
+      sync(); chk.onchange = sync;
+      bd.classList.add("open");
+      ok.onclick = function(){
+        bd.classList.remove("open"); URL.revokeObjectURL(url);
+        try{ localStorage.setItem("cvLogoOn", chk.checked ? "1" : "0"); }catch(e){}
+        if(all.checked) cvAskRemember = { val: chk.checked, t: Date.now() };
+        res(chk.checked);
+      };
+    });
+  };
+  var p = cvAskChain.then(run, run);
+  cvAskChain = p.catch(function(){});
+  return p;
+}
 function cvLoadLogo(){
   return new Promise(function(res){
     if(cvLogoCache) return res(cvLogoCache);
@@ -1752,14 +1794,8 @@ async function cvStampLogo(ctx, cw, ch){
   ctx.drawImage(lg, cw - lw - m, ch - lh - m, lw, lh);
   ctx.restore();
 }
-(function(){
-  var t = document.getElementById("cvLogoToggle");
-  if(!t) return;
-  t.checked = cvLogoOn();
-  t.addEventListener("change", function(){ try{ localStorage.setItem("cvLogoOn", t.checked ? "1" : "0"); }catch(e){} });
-})();
 async function prepUpload(file, maxSide, opts){
-  var withLogo = cvLogoOn() && !(opts && opts.noLogo);
+  var withLogo = (opts && opts.noLogo) ? false : await cvAskLogo(file);
   var r = await compressImage(file, maxSide || 1920, 0.82, withLogo);
   return { blob: r.blob, name: nameWithExt(file.name || "foto.jpg", r.ext), type: r.blob.type || undefined };
 }
