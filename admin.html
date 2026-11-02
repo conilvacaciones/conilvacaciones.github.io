@@ -102,7 +102,7 @@ main.wrap{padding:40px 24px 90px;}
 #cvLogoAsk .prev{border-radius:10px;background:#e9eef1;margin:12px 0;line-height:0;text-align:center;overflow:hidden;}
 #cvLogoAsk .prev .in{position:relative;display:inline-block;max-width:100%;}
 #cvLogoAsk .prev img.ph{max-width:100%;max-height:230px;display:block;}
-#cvLogoAsk .prev .wm{position:absolute;right:3%;bottom:3%;width:24%;line-height:0;display:none;}
+#cvLogoAsk .prev .wm{position:absolute;right:2%;bottom:2%;width:20%;line-height:0;display:none;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 3px #fff);}
 #cvLogoAsk .prev.on .wm{display:block;}
 #cvLogoAsk label.chk{display:flex;align-items:center;gap:10px;font-size:15.5px;font-weight:600;cursor:pointer;}
 #cvLogoAsk label.chk input{width:20px;height:20px;accent-color:var(--atlantic);}
@@ -1797,12 +1797,18 @@ async function cvStampLogo(ctx, cw, ch){
   if(cw < 360 || ch < 240) return; // fotos muy pequeñas: sin logo
   var lg = await cvLoadLogo();
   if(!lg) return;
-  var lw = Math.max(110, Math.round(Math.min(cw * 0.17, ch * 0.30)));
+  var lw = Math.max(110, Math.round(Math.min(cw * 0.20, ch * 0.34)));
   var lh = Math.round(lw * lg.naturalHeight / lg.naturalWidth);
   var m = Math.round(Math.min(cw, ch) * 0.02);
   ctx.save();
   ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(lg, cw - lw - m, ch - lh - m, lw, lh);
+  var x = cw - lw - m, y = ch - lh - m, blur = Math.max(4, Math.round(lw * 0.05));
+  // halo blanco para que el logo resalte sobre cualquier fondo (cielo, piscina, sombras)
+  ctx.shadowColor = "rgba(255,255,255,.95)"; ctx.shadowBlur = blur;
+  ctx.drawImage(lg, x, y, lw, lh);
+  ctx.drawImage(lg, x, y, lw, lh);
+  ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
+  ctx.drawImage(lg, x, y, lw, lh);
   ctx.restore();
 }
 // Pone el logo en una foto ya subida: se descarga, se estampa y se sube como foto nueva (la original se conserva en Storage).
