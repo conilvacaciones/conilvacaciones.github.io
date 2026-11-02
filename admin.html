@@ -1610,11 +1610,22 @@ function renderPhotoThumbs(){
         (i>0 ? '<button type="button" data-mv="'+i+':-1" title="Mover a la izquierda">‹</button>' : '')+
         (i<draftFotos.length-1 ? '<button type="button" data-mv="'+i+':1" title="Mover a la derecha">›</button>' : '')+
         '<button type="button" data-crop="'+i+'" title="Recortar esta foto">✂</button>'+
+        '<button type="button" data-logo="'+i+'" title="Añadir el logo en la esquina">🏷</button>'+
         '<button type="button" data-rm="'+i+'" title="Quitar">×</button>'+
       '</div></div>';
   }).join("");
   box.querySelectorAll("[data-crop]").forEach(function(b){
     b.addEventListener("click", function(){ recortarFotoExistente(parseInt(b.getAttribute("data-crop"),10), b); });
+  });
+  box.querySelectorAll("[data-logo]").forEach(function(b){
+    b.addEventListener("click", async function(){
+      var i = parseInt(b.getAttribute("data-logo"),10);
+      if(!cvConfirmLogo()) return;
+      b.textContent = "…"; b.disabled = true;
+      try{ draftFotos[i] = await cvLogoEnFotoSubida("fotos-viviendas", draftFotos[i]); }
+      catch(err){ alert("No se ha podido añadir el logo: " + err.message); }
+      renderPhotoThumbs();
+    });
   });
   box.querySelectorAll("[data-rm]").forEach(function(b){
     b.addEventListener("click", function(){
@@ -1794,6 +1805,24 @@ async function cvStampLogo(ctx, cw, ch){
   ctx.drawImage(lg, cw - lw - m, ch - lh - m, lw, lh);
   ctx.restore();
 }
+// Pone el logo en una foto ya subida: se descarga, se estampa y se sube como foto nueva (la original se conserva en Storage).
+async function cvLogoEnFotoSubida(bucket, srcPathOrUrl){
+  var url = /^https?:/.test(srcPathOrUrl) ? srcPathOrUrl : sb.storage.from(bucket).getPublicUrl(srcPathOrUrl).data.publicUrl;
+  var oldPath = /^https?:/.test(srcPathOrUrl) ? decodeURIComponent((srcPathOrUrl.split("/" + bucket + "/")[1] || "").split("?")[0]) : srcPathOrUrl;
+  if(!oldPath){ throw new Error("No se reconoce la ruta de la foto"); }
+  var r = await fetch(url, { cache: "no-store" });
+  if(!r.ok) throw new Error("No se pudo descargar la foto (HTTP " + r.status + ")");
+  var blob = await r.blob();
+  var base = oldPath.split("/").pop().replace(/\.[^.]+$/, "").replace(/^\d+-/, "").replace(/-logo$/, "");
+  var f = new File([blob], base + "." + ((blob.type || "image/jpeg").split("/")[1] || "jpg"), { type: blob.type || "image/jpeg" });
+  var c = await compressImage(f, 2000, 0.85, true);
+  var folder = oldPath.indexOf("/") !== -1 ? oldPath.slice(0, oldPath.lastIndexOf("/")) : "";
+  var path = (folder ? folder + "/" : "") + Date.now() + "-" + base.replace(/[^a-zA-Z0-9.-]/g, "_") + "-logo." + c.ext;
+  var up = await sb.storage.from(bucket).upload(path, c.blob, { upsert: true, contentType: c.blob.type || undefined });
+  if(up.error) throw new Error(up.error.message);
+  return path;
+}
+function cvConfirmLogo(){ return confirm("Se añadirá el logo de Conil Vacaciones en la esquina inferior derecha de esta foto.\n\nSi la foto ya lleva el logo, se verá repetido. ¿Continuar?"); }
 async function prepUpload(file, maxSide, opts){
   var withLogo = (opts && opts.noLogo) ? false : await cvAskLogo(file);
   var r = await compressImage(file, maxSide || 1920, 0.82, withLogo);
@@ -2704,7 +2733,14 @@ function renderPortadaThumb(){
   if(!draftPortada){ box.innerHTML = ""; return; }
   var url = sb.storage.from("fotos-blog").getPublicUrl(draftPortada).data.publicUrl;
   box.innerHTML = '<div class="photo-thumb"><img src="'+url+'" alt="">'+
-    '<div class="p-actions"><button type="button" id="btnRmPortada" title="Quitar">×</button></div></div>';
+    '<div class="p-actions"><button type="button" id="btnLogoPortada" title="Añadir el logo en la esquina">🏷</button><button type="button" id="btnRmPortada" title="Quitar">×</button></div></div>';
+  document.getElementById("btnLogoPortada").addEventListener("click", async function(){
+    if(!cvConfirmLogo()) return;
+    this.textContent = "…"; this.disabled = true;
+    try{ draftPortada = await cvLogoEnFotoSubida("fotos-blog", draftPortada); }
+    catch(err){ alert("No se ha podido añadir el logo: " + err.message); }
+    renderPortadaThumb();
+  });
   document.getElementById("btnRmPortada").addEventListener("click", function(){ draftPortada = null; renderPortadaThumb(); });
 }
 
@@ -2716,9 +2752,20 @@ function renderPostPhotoThumbs(){
       '<div class="p-actions">'+
         (i>0 ? '<button type="button" data-mv-p="'+i+':-1" title="Mover a la izquierda">‹</button>' : '')+
         (i<draftPostFotos.length-1 ? '<button type="button" data-mv-p="'+i+':1" title="Mover a la derecha">›</button>' : '')+
+        '<button type="button" data-logo-p="'+i+'" title="Añadir el logo en la esquina">🏷</button>'+
         '<button type="button" data-rm-p="'+i+'" title="Quitar">×</button>'+
       '</div></div>';
   }).join("");
+  box.querySelectorAll("[data-logo-p]").forEach(function(b){
+    b.addEventListener("click", async function(){
+      var i = parseInt(b.getAttribute("data-logo-p"),10);
+      if(!cvConfirmLogo()) return;
+      b.textContent = "…"; b.disabled = true;
+      try{ draftPostFotos[i] = await cvLogoEnFotoSubida("fotos-blog", draftPostFotos[i]); }
+      catch(err){ alert("No se ha podido añadir el logo: " + err.message); }
+      renderPostPhotoThumbs();
+    });
+  });
   box.querySelectorAll("[data-rm-p]").forEach(function(b){
     b.addEventListener("click", function(){
       draftPostFotos.splice(parseInt(b.getAttribute("data-rm-p"),10), 1);
@@ -3059,6 +3106,15 @@ function cvShowPop(fig){
     items.push(["📍 Poner ubicación (mapa)", function(){ cvAskMap(fig); }]);
   }else if(im){
     items.push(["📷 Cambiar foto", function(){ cvPickImage(fig); }]);
+    items.push(["🏷 Añadir logo", async function(){
+      if(!cvConfirmLogo()) return;
+      var prevOp = fig.style.opacity; fig.style.opacity = ".5";
+      try{
+        var np = await cvLogoEnFotoSubida("fotos-blog", im.getAttribute("src") || "");
+        im.setAttribute("src", sb.storage.from("fotos-blog").getPublicUrl(np).data.publicUrl);
+      }catch(err){ alert("No se ha podido añadir el logo: " + err.message); }
+      finally{ fig.style.opacity = prevOp || ""; }
+    }]);
     items.push(["✎ Descripción (alt)", function(){
       var a = prompt("Texto alternativo y título de la imagen:", im.getAttribute("alt") || "");
       if(a !== null){ a = a.replace(/"/g, "'").replace(/</g, ""); im.setAttribute("alt", a); im.setAttribute("title", a); }
