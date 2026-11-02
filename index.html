@@ -388,10 +388,11 @@ input,textarea{font:inherit;}
 .google-reviews-section{padding:20px 0 70px;}
 .gr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:1000px;margin:28px auto 0;}
 .gr-rev{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:22px 22px 18px;text-align:left;display:flex;flex-direction:column;gap:10px;}
-.gr-rev .stars{color:var(--sol);font-size:17px;letter-spacing:2px;}
+.gr-rev .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.gr-rev .stars{color:var(--sol);font-size:16px;letter-spacing:1px;white-space:nowrap;}
 .gr-rev p{font-size:14.5px;line-height:1.6;color:var(--ink);margin:0;}
-.gr-rev .who{margin-top:auto;font-size:13px;color:var(--ink-soft);}
-.gr-rev .who b{color:var(--ink);}
+.gr-rev .who{font-size:13px;color:var(--ink-soft);display:flex;flex-direction:column;gap:2px;}
+.gr-rev .who b{color:var(--ink);font-size:15px;}
 .gr-card{max-width:640px;margin:0 auto;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:44px 32px 40px;}
 .gr-google-badge{
   display:inline-flex;align-items:center;gap:8px;background:var(--teal-soft);color:var(--teal);
@@ -2502,7 +2503,7 @@ function detectVideoPlatform(url){
     box.innerHTML = rows.map(function(x){
       var t = x.comentario.trim(); if(t.length > 260) t = t.slice(0,257).replace(/\s+\S*$/,"") + "…";
       var casa = x.viviendas && x.viviendas.nombre ? " · " + escapeHTML(x.viviendas.nombre) : "";
-      return '<article class="gr-rev"><div class="stars" aria-label="'+x.valoracion+' de 5">'+"★★★★★".slice(0,x.valoracion)+'</div><p>“'+escapeHTML(t)+'”</p><div class="who"><b>'+escapeHTML(x.nombre)+'</b>'+casa+'</div></article>';
+      return '<article class="gr-rev"><div class="top"><div class="who"><b>'+escapeHTML(x.nombre)+'</b>'+(casa ? '<span>'+casa.replace(" · ","")+'</span>' : '')+'</div><div class="stars" aria-label="'+x.valoracion+' de 5">'+"★★★★★".slice(0,x.valoracion)+'</div></div><p>“'+escapeHTML(t)+'”</p></article>';
     }).join("");
     box.hidden = false;
   }catch(e){}
