@@ -538,6 +538,21 @@ main.wrap{padding:40px 24px 90px;}
         </button>
       </div>
       <div class="drawer-body-wrap"><div class="drawer-body"><div class="drawer-body-inner">
+      <div style="margin-bottom:14px">
+        <button type="button" class="btn btn-dark btn-sm" id="btnRvNueva">＋ Añadir reseña (por ejemplo, de Google)</button>
+        <div id="rvNuevaBox" style="display:none;margin-top:12px;background:var(--cal);border:1.5px solid var(--line);border-radius:12px;padding:16px;">
+          <p style="font-size:13px;color:var(--ink-soft);margin:0 0 12px">Copia aquí una reseña real que te hayan dejado (Google, WhatsApp…). Se publica directamente. Úsala solo si el huésped la ha escrito de verdad.</p>
+          <div class="form-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+            <div class="field" style="margin:0"><label for="rvN-casa">Vivienda</label><select id="rvN-casa"></select></div>
+            <div class="field" style="margin:0"><label for="rvN-nombre">Nombre del huésped</label><input type="text" id="rvN-nombre" maxlength="80"></div>
+            <div class="field" style="margin:0"><label for="rvN-val">Estrellas</label><select id="rvN-val"><option value="5">★★★★★ (5)</option><option value="4">★★★★☆ (4)</option><option value="3">★★★☆☆ (3)</option></select></div>
+            <div class="field" style="margin:0"><label for="rvN-fecha">Fecha</label><input type="date" id="rvN-fecha"></div>
+          </div>
+          <div class="field" style="margin:12px 0 0"><label for="rvN-texto">Comentario (tal y como lo escribió)</label><textarea id="rvN-texto" rows="4" maxlength="1500"></textarea></div>
+          <div style="display:flex;gap:10px;margin-top:12px"><button type="button" class="btn btn-primary btn-sm" id="btnRvGuardar">Publicar reseña</button><button type="button" class="btn btn-ghost btn-sm" id="btnRvCancelar">Cancelar</button></div>
+          <p id="rvNMsg" style="font-size:13px;margin:10px 0 0"></p>
+        </div>
+      </div>
       <div class="tabs" id="reviewTabs">
         <button type="button" class="tab-btn is-active" data-tab="pendiente">Pendientes</button>
         <button type="button" class="tab-btn" data-tab="aprobada">Aprobadas</button>
@@ -2644,6 +2659,45 @@ async function loadReviewsAdmin(){
   box.querySelectorAll("[data-hide]").forEach(function(b){ b.addEventListener("click", function(){ setReviewEstado(b.getAttribute("data-hide"), "oculta"); }); });
   box.querySelectorAll("[data-del-review]").forEach(function(b){ b.addEventListener("click", function(){ deleteReview(b.getAttribute("data-del-review")); }); });
 }
+
+// Añadir una reseña a mano (por ejemplo, copiada de Google)
+(function(){
+  var btn = document.getElementById("btnRvNueva"), box = document.getElementById("rvNuevaBox"), msg = document.getElementById("rvNMsg");
+  var sel = document.getElementById("rvN-casa");
+  async function cargaCasas(){
+    var r = await sb.from("viviendas").select("id, nombre").order("orden", { ascending: true });
+    sel.innerHTML = (r.data || []).map(function(v){ return '<option value="'+v.id+'">'+escapeHTMLAdmin(v.nombre)+'</option>'; }).join("");
+  }
+  function limpia(){
+    ["rvN-nombre","rvN-texto"].forEach(function(i){ document.getElementById(i).value = ""; });
+    document.getElementById("rvN-val").value = "5";
+    document.getElementById("rvN-fecha").value = new Date().toISOString().slice(0,10);
+    msg.textContent = "";
+  }
+  btn.addEventListener("click", async function(){
+    var abre = box.style.display === "none";
+    box.style.display = abre ? "block" : "none";
+    if(abre){ await cargaCasas(); limpia(); }
+  });
+  document.getElementById("btnRvCancelar").addEventListener("click", function(){ box.style.display = "none"; });
+  document.getElementById("btnRvGuardar").addEventListener("click", async function(){
+    var nombre = document.getElementById("rvN-nombre").value.trim(), texto = document.getElementById("rvN-texto").value.trim();
+    var fecha = document.getElementById("rvN-fecha").value, casa = sel.value, val = parseInt(document.getElementById("rvN-val").value, 10);
+    msg.style.color = "#c0392b";
+    if(!casa){ msg.textContent = "Elige la vivienda."; return; }
+    if(!nombre){ msg.textContent = "Escribe el nombre del huésped."; return; }
+    if(!texto){ msg.textContent = "Pega el comentario de la reseña."; return; }
+    var row = { vivienda_id: casa, nombre: nombre, comentario: texto, valoracion: val, estado: "aprobada" };
+    if(fecha) row.created_at = fecha + "T12:00:00+01:00";
+    this.disabled = true;
+    var r = await sb.from("resenas").insert(row);
+    this.disabled = false;
+    if(r.error){ msg.textContent = "No se ha podido guardar: " + r.error.message; return; }
+    msg.style.color = "#1d7a52"; msg.textContent = "✓ Reseña publicada. Puedes añadir otra.";
+    document.getElementById("rvN-nombre").value = ""; document.getElementById("rvN-texto").value = "";
+    if(typeof loadReviewsAdmin === "function") loadReviewsAdmin();
+  });
+})();
 
 async function setReviewEstado(id, estado){
   var res = await sb.from("resenas").update({ estado: estado }).eq("id", id);
