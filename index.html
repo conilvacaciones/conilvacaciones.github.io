@@ -317,6 +317,9 @@ input,textarea{font:inherit;}
 .search-widget.in-hero .search-field input[type=date]{min-height:52px;text-align:left;}
 .search-widget.in-hero .search-field input::-webkit-date-and-time-value{text-align:left;min-width:0;}
 .search-widget.in-hero .search-row>*{min-width:0;}
+.search-widget.in-hero .sf-box{border:1px solid var(--line);border-radius:var(--radius-sm);background:#fff;overflow:hidden;width:100%;min-width:0;max-width:100%;}
+.search-widget.in-hero .sf-box input{border:0 !important;background:transparent !important;border-radius:0;outline-offset:-2px;}
+
 @media (max-width:560px){.search-widget.in-hero{padding:20px 16px 16px;}.search-widget.in-hero .search-row{grid-template-columns:minmax(0,1fr);gap:12px;}.search-widget.in-hero .search-actions{grid-column:auto;}.search-widget.in-hero .search-actions{gap:10px;}.search-widget.in-hero .search-actions .btn{flex:1 1 0;min-width:0;justify-content:center;padding:15px 12px;font-size:15px;}.search-widget.in-hero .search-field input{padding:13px 12px;}}
 
 
@@ -894,15 +897,15 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
       <div class="search-row">
         <div class="search-field">
           <label for="searchCheckin">Entrada</label>
-          <input type="date" id="searchCheckin">
+          <div class="sf-box"><input type="date" id="searchCheckin"></div>
         </div>
         <div class="search-field">
           <label for="searchCheckout">Salida</label>
-          <input type="date" id="searchCheckout">
+          <div class="sf-box"><input type="date" id="searchCheckout"></div>
         </div>
         <div class="search-field">
           <label for="searchGuests">Personas</label>
-          <input type="number" id="searchGuests" min="1" max="30" value="2">
+          <div class="sf-box"><input type="number" id="searchGuests" min="1" max="30" value="2"></div>
         </div>
         <div class="search-actions">
           <button class="btn btn-primary" id="searchBtn">Buscar casa</button>
