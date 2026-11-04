@@ -487,6 +487,14 @@ input,textarea{font:inherit;}
 
 /* ============ CONTACT ============ */
 /* ---- Banner "Anúnciate gratis" ---- */
+.playas-section{padding:10px 0 60px;}
+.playas-box{border-radius:28px;padding:30px;background:linear-gradient(135deg,#E4F1EE,#F5F2E8);border:1px solid var(--line);}
+.playas-box h2{font-family:var(--ff-display);font-weight:600;font-size:clamp(24px,4vw,34px);color:var(--atlantic);margin:6px 0 8px;line-height:1.15;}
+.playas-box p{color:var(--ink-soft);max-width:620px;line-height:1.55;margin:0 0 18px;}
+.playas-links{display:flex;flex-wrap:wrap;gap:10px;}
+.playas-links a{font-weight:600;font-size:14.5px;border-radius:999px;padding:11px 18px;background:#fff;border:1.5px solid var(--line);color:var(--atlantic);}
+.playas-links a.main{background:var(--bougain);border-color:var(--bougain);color:#fff;}
+.playas-links a:hover{border-color:var(--atlantic);}
 .anun-banner-section{padding:0 0 60px;}
 .anun-banner{position:relative;display:flex;align-items:center;gap:22px;flex-wrap:wrap;border-radius:28px;padding:26px 30px;overflow:hidden;
   background:radial-gradient(120% 160% at 100% 0%,rgba(231,177,92,.28) 0%,rgba(231,177,92,0) 55%),linear-gradient(135deg,var(--teal-soft) 0%,#fff 70%);
@@ -1000,6 +1008,22 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
   </div>
 </section>
 
+<!-- ============ PLAYAS: VIENTO ============ -->
+<section class="playas-section" id="playas">
+  <div class="wrap">
+    <div class="playas-box">
+      <span class="eyebrow">Guía de playas</span>
+      <h2>¿A qué playa voy hoy en Conil?</h2>
+      <p>Mira el viento y el mar de hoy y te decimos qué playa te conviene. Con levante y con poniente, no todas son iguales.</p>
+      <div class="playas-links">
+        <a class="main" href="/playa-hoy/">Ver qué playa me conviene hoy</a>
+        <a href="/playas-conil-levante/">Playas con levante</a>
+        <a href="/playas-conil-poniente/">Playas con poniente</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ QUÉ HACER Y VER ============ -->
 <section class="quehacer-section" id="quehacer">
   <div class="wrap">
@@ -1106,6 +1130,9 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
     <div class="footer-col"><h5>Explorar</h5>
       <a href="#viviendas">Viviendas</a>
       <a href="/blog/">Blog</a>
+      <a href="/playa-hoy/">¿A qué playa voy hoy?</a>
+      <a href="/playas-conil-levante/">Playas con levante</a>
+      <a href="/playas-conil-poniente/">Playas con poniente</a>
       <a href="/anunciate-con-nosotros/">Anúnciate con nosotros</a>
       <a href="#contacto">Contacto</a>
     </div>
