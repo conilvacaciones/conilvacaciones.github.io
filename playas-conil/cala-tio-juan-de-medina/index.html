@@ -690,6 +690,40 @@ body:has(.cookie-banner.is-visible) .blog-wa{display:none;}
 .pl-wrap{max-width:900px;}
 @media(max-width:560px){.pl-hero{padding-top:104px}.pl-card{grid-template-columns:1fr}.pl-rank{width:36px;height:36px;font-size:16px}}
 
+.pl-hero.sea{background:linear-gradient(160deg,#082A40 0%,#12507A 62%,#177268 120%);padding-bottom:40px;}
+.pl-hero.sea .eyebrow{color:var(--sol);}
+.pl-hero.sea h1{color:#fff;}
+.pl-hero.sea p.lead{color:rgba(255,255,255,.82);}
+.pl-sect{padding:8px 0 0;}
+.hb-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:22px 0 0;}
+@media(min-width:720px){.hb-tiles{grid-template-columns:repeat(4,1fr);}}
+.hb-tile{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:14px;padding:12px 14px;font-weight:600;font-size:14.5px;transition:background .15s;}
+.hb-tile:hover{background:rgba(255,255,255,.22);}
+.hb-tile span{font-size:22px;}
+.hb-wind{display:grid;gap:14px;margin:26px 0 0;}
+@media(min-width:720px){.hb-wind{grid-template-columns:1fr 1fr;}}
+.hb-w{border-radius:var(--radius-lg);padding:20px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow-card);}
+.hb-w h3{font:600 20px var(--ff-display);color:var(--atlantic);margin:0 0 6px;}
+.hb-w p{margin:0 0 12px;color:var(--ink-soft);font-size:14.5px;line-height:1.5;}
+.hb-w a.go{font-weight:700;font-size:14px;color:var(--bougain-dark);}
+.hb-grid{display:grid;gap:14px;margin:18px 0 8px;}
+@media(min-width:720px){.hb-grid{grid-template-columns:1fr 1fr;}}
+.hb-card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-card);transition:transform .2s;}
+.hb-card:hover{transform:translateY(-3px);}
+.hb-top{height:74px;padding:14px 18px;display:flex;align-items:flex-end;color:#fff;font:600 21px var(--ff-display);}
+.hb-b{padding:14px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1;}
+.hb-b p{margin:0;color:var(--ink);font-size:14.5px;line-height:1.5;}
+.hb-badges{display:flex;flex-wrap:wrap;gap:6px;}
+.hb-badge{font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px;}
+.hb-g{background:#DDF1E7;color:#0E6B4A;}.hb-y{background:#FFF1D2;color:#8A5A00;}.hb-r{background:#FBE0E0;color:#9B2323;}.hb-n{background:var(--cal-2);color:var(--ink-soft);}
+.hb-more{margin-top:auto;font-weight:700;font-size:14px;color:var(--bougain-dark);}
+.hb-mini{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0;}
+@media(min-width:720px){.hb-mini{grid-template-columns:repeat(4,1fr);}}
+.hb-mini a{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:600;color:var(--atlantic);font-size:14.5px;}
+.hb-mini a small{display:block;font-weight:500;color:var(--ink-soft);margin-top:3px;font-size:12.5px;}
+.hb-details{margin:18px 0;}
+.hb-details summary{cursor:pointer;font-weight:700;color:var(--atlantic);}
+
 .pl-h2{font:600 clamp(22px,4vw,28px)/1.2 var(--ff-display);color:var(--atlantic);margin:34px 0 10px;}
 .pl-p{color:var(--ink);font-size:16px;line-height:1.65;max-width:720px;margin:0 0 12px;}
 .pl-links{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 0;}
@@ -777,7 +811,7 @@ body:has(.cookie-banner.is-visible) .blog-wa{display:none;}
     </div>
   </div>
 </header>
-<main><section class="pl-hero"><div class="wrap pl-wrap">
+<main><section class="pl-hero "><div class="wrap pl-wrap">
 <span class="eyebrow">Playas de Conil</span><h1>Cala del Tío Juan de Medina</h1><p class="lead">Una cala entre acantilados, con acceso por escaleras y muy recomendada cuando sopla levante.</p>
 <div class="pl-weather" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))"><div class="pl-stat"><b>Tipo</b><span style="font-size:17px">Cala entre acantilados</span></div><div class="pl-stat"><b>Acceso</b><span style="font-size:17px">Escaleras</span></div><div class="pl-stat"><b>Levante</b><span style="font-size:17px">Muy resguardada</span></div><div class="pl-stat"><b>Ambiente</b><span style="font-size:17px">Naturaleza</span></div><div class="pl-stat"><b>Servicios</b><span style="font-size:17px">Pocos</span></div></div><h2 class="pl-h2">Cómo es</h2><p class="pl-p">Es una de las calas más conocidas del entorno del Faro de Roche. Su arena dorada y los acantilados que la rodean le dan un aspecto muy característico.</p><h2 class="pl-h2">El viento en la cala</h2><p class="pl-p">Los acantilados la protegen y es ideal para resguardarse del levante. Con poniente pierde esa ventaja.</p><h2 class="pl-h2">Ambiente</h2><p class="pl-p">Tradicionalmente es una cala naturista, aunque hoy conviven bañistas naturistas y no naturistas. Conviene respetar a todos.</p><h2 class="pl-h2">Acceso y consejos</h2><p class="pl-p">Se baja por escaleras desde la parte superior, así que no es apta para carritos de bebé. No dispone de todos los servicios habituales de una playa urbana, por lo que conviene llevar agua y comida.</p>
 <div class="pl-tool"><h3>¿Qué viento hace hoy?</h3><p>Nuestra herramienta lee el viento y el mar de hoy y ordena las playas según tu plan: familia, tranquilidad, surf, naturaleza o comer.</p><a class="btn btn-primary" href="/playa-hoy/">Ver qué playa me conviene hoy</a></div>
