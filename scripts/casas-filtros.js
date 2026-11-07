@@ -96,26 +96,57 @@ function generate(ctx) {
     return `<a href="/casas-conil/" style="display:inline-block;margin:0 8px 8px 0;padding:8px 14px;border-radius:999px;background:var(--atlantic);color:#fff;font-weight:600;font-size:14px;text-decoration:none">Todas las casas</a>` + links.join("");
   };
 
-  const faqBlock = (qa) => `<div style="margin-top:34px"><h2 style="font-family:var(--ff-display);color:var(--atlantic);font-size:26px;margin:0 0 12px">Preguntas frecuentes</h2>` +
+  const faqBlock = (qa) => `<div style="margin-top:34px;max-width:900px"><h2 style="font-family:var(--ff-display);color:var(--atlantic);font-size:26px;margin:0 0 12px">Preguntas frecuentes</h2>` +
     qa.map(([q, a]) => `<details style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px"><summary style="font-weight:600;cursor:pointer">${h.escapeText(q)}</summary><p style="margin:10px 0 0;color:var(--ink-soft);line-height:1.6">${h.escapeText(a)}</p></details>`).join("") + `</div>`;
 
+
+  const EMO = [["piscina","🏊"],["jard","🌳"],["terraza","☀️"],["barbacoa","🍖"],["wifi","📶"],["tv","📺"],["aire","❄️"],["calef","🌡️"],["parking","🅿️"],["mascota","🐾"],["lavavajillas","🍽️"],["cocina","🍳"],["lavadora","🧺"],["vistas","🌊"],["playa","🏖️"]];
+  const emo = (l) => { const x = String(l).toLowerCase(); for (const [k, e] of EMO) if (x.includes(k)) return e; return "✨"; };
+  const ico = (d) => `<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const I = {
+    pin: ico('<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>'),
+    users: ico('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/>'),
+    bed: ico('<path d="M3 18V6M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/>'),
+    bath: ico('<path d="M3 12h18v2a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5v-2zM6 12V6a2 2 0 0 1 3.5-1.3M7 19l-1 2M17 19l1 2"/>'),
+  };
+  const houseCard = (v) => {
+    const href = `/viviendas/${encodeURIComponent(v.slug)}/`;
+    const foto = v.fotosUrls && v.fotosUrls[0];
+    const am = (v.amenities || []);
+    const chipsH = am.slice(0, 4).map((a) => `<span class="amenity-chip"><span class="em">${emo(a)}</span>${h.escapeText(a)}</span>`).join("") +
+      (am.length > 4 ? `<span class="amenity-chip">+${am.length - 4}</span>` : "");
+    const precio = v.precio
+      ? `<div class="house-price"><span class="from">desde</span><b>${h.escapeText(v.precio)} €</b><span> / ${v.unidadPrecio}</span></div>`
+      : `<div class="house-price"><b style="font-size:15px">Consultar precio</b></div>`;
+    return `<article class="house-card"><a href="${href}" class="house-photo" style="display:block;background:linear-gradient(135deg,#0B3D5C,#177268)" aria-label="${h.escapeAttr(v.nombre)}">` +
+      (foto ? `<img src="${h.escapeAttr(foto)}" alt="${h.escapeAttr(v.nombre)}" loading="lazy">` : "") + `</a>` +
+      `<div class="house-body"><div><h3 class="house-title"><a href="${href}" style="color:inherit;text-decoration:none">${h.escapeText(v.nombre)}</a></h3>` +
+      (v.tagline ? `<p class="house-tagline">${h.escapeText(v.tagline)}</p>` : "") + `</div>` +
+      `<div class="house-loc">${I.pin}<span>${h.escapeText(v.zona || "Conil de la Frontera")}</span>${v.distancia ? `<span class="sep">·</span><span>${h.escapeText(v.distancia)}</span>` : ""}</div>` +
+      `<div class="house-meta"><span>${I.users}${v.huespedes} pers.</span><span>${I.bed}${v.dormitorios} dorm.</span>${v.banos ? `<span>${I.bath}${v.banos} baños</span>` : ""}</div>` +
+      `<div class="house-amenities">${chipsH}</div>` +
+      `<div class="house-foot">${precio}</div>` +
+      `<a class="btn btn-dark house-btn btn-block" href="${href}" style="text-align:center">Más detalles</a></div></article>`;
+  };
+  const HCSS = `<style>.houses-grid{display:grid;grid-template-columns:1fr;gap:26px;align-items:stretch}@media(min-width:641px) and (max-width:1024px){.houses-grid{grid-template-columns:repeat(2,1fr)}}@media(min-width:1025px){.houses-grid{grid-template-columns:repeat(3,1fr)}}.house-card{height:100%;background:var(--card,#fff);border-radius:var(--radius-lg,22px);overflow:hidden;box-shadow:var(--shadow-card,0 10px 30px -14px rgba(11,61,92,.25));border:1px solid rgba(11,61,92,.06);display:flex;flex-direction:column;transition:transform .3s ease,box-shadow .3s ease}.house-card:hover{transform:translateY(-6px);box-shadow:0 26px 50px -20px rgba(11,61,92,.42)}.house-photo{position:relative;aspect-ratio:4/3;overflow:hidden;flex-shrink:0}.house-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2}.house-body{padding:20px 22px 22px;display:flex;flex-direction:column;gap:12px;flex:1}.house-title{font-family:var(--ff-display);font-weight:600;font-size:19px;color:var(--ink);line-height:1.3;margin:0}.house-tagline{font-size:13.5px;color:var(--ink-soft);margin:2px 0 0}.house-loc{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--teal);font-weight:600}.house-loc .icon{color:var(--teal)}.house-loc .sep{color:var(--ink-faint);font-weight:400}.house-meta{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink-soft);padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.house-meta span{display:flex;align-items:center;gap:6px}.house-meta .icon{color:var(--ink-faint)}.house-amenities{display:flex;gap:8px;flex-wrap:wrap}.amenity-chip{display:flex;align-items:center;gap:5px;background:var(--cal,#f6efe3);border-radius:999px;padding:5px 10px 5px 8px;font-size:11.5px;color:var(--ink-soft);font-weight:500}.amenity-chip .em{font-size:15px;line-height:1;flex:none}.house-foot{display:flex;align-items:center;justify-content:flex-end;margin-top:auto;padding-top:6px;gap:12px}.house-price{text-align:right}.house-price .from{display:block;font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em}.house-price b{font-family:var(--ff-mono);font-size:22px;color:var(--atlantic)}.house-price span{font-size:11.5px;color:var(--ink-soft)}.house-btn{margin-top:14px}</style>`;
+
   const section = (h1, intro, cards, current, qa) =>
-    `<section class="blog-section" id="casas" style="padding:120px 0 60px"><div class="wrap" style="max-width:900px">` +
+    `<section class="blog-section" id="casas" style="padding:120px 0 60px"><div class="wrap" style="max-width:1180px">` +
     `<span class="eyebrow">Casas vacacionales en Conil</span>` +
     `<h1 style="font-family:var(--ff-display);color:var(--atlantic);font-size:clamp(30px,5vw,46px);line-height:1.1;margin:10px 0 14px">${h.escapeText(h1)}</h1>` +
     `<p style="color:var(--ink-soft);font-size:17px;line-height:1.6;max-width:720px;margin:0 0 18px">${intro}</p>` +
     `<div style="margin:18px 0 8px"><button type="button" class="btn btn-primary" id="openFiltros">Filtros</button></div>` +
-    `<div class="blog-modal-content" style="max-width:none;margin-top:18px"><div style="display:grid;gap:16px">${cards}</div></div>` +
+    `${HCSS}<div class="houses-grid" style="margin-top:18px">${cards}</div>` +
     `<h2 style="font-family:var(--ff-display);color:var(--atlantic);font-size:26px;margin:34px 0 12px">Otras formas de buscar</h2><div>${chips(current)}</div>` +
     faqBlock(qa) +
-    `<div style="margin-top:34px;background:var(--atlantic);color:#fff;border-radius:20px;padding:26px"><h2 style="font-family:var(--ff-display);font-size:26px;margin:0 0 8px">Reserva directa, sin comisiones</h2><p style="margin:0 0 16px;color:rgba(255,255,255,.85);line-height:1.55">Escríbenos por WhatsApp y te confirmamos disponibilidad y precio para tus fechas.</p><a class="btn btn-primary" href="https://wa.me/34650283373" target="_blank" rel="noopener">Consultar por WhatsApp</a></div>` +
+    `<div style="margin-top:34px;max-width:900px;background:var(--atlantic);color:#fff;border-radius:20px;padding:26px"><h2 style="font-family:var(--ff-display);font-size:26px;margin:0 0 8px">Reserva directa, sin comisiones</h2><p style="margin:0 0 16px;color:rgba(255,255,255,.85);line-height:1.55">Escríbenos por WhatsApp y te confirmamos disponibilidad y precio para tus fechas.</p><a class="btn btn-primary" href="https://wa.me/34650283373" target="_blank" rel="noopener">Consultar por WhatsApp</a></div>` +
     `<p style="margin-top:22px"><a href="/playas-conil/" style="color:var(--atlantic);font-weight:600">Guía de playas de Conil</a> · <a href="/#viviendas" style="color:var(--atlantic);font-weight:600">Ver todas desde la portada</a></p>` +
     `</div><div class="blog-grid" id="blogGrid" style="display:none!important" hidden></div></section>`;
 
   const build = ({ slug, h1, title, desc, intro, houses, qa }) => {
     const url = slug ? `${SITE_URL}/casas-conil/${slug}/` : `${SITE_URL}/casas-conil/`;
     let html = retag(template, { title, desc, url });
-    const cards = houses.map((v) => h.casaCardStatic(v)).join("");
+    const cards = houses.map((v) => houseCard(v)).join("");
     html = html.replace(/<section class="blog-section" id="blog">[\s\S]*?<\/section>/, () => section(h1, intro, cards, slug, qa));
     const ld = h.jsonLdScript({ "@context": "https://schema.org", "@type": "CollectionPage", name: h1, url, description: desc,
       mainEntity: { "@type": "ItemList", itemListElement: houses.map((v, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE_URL}/viviendas/${v.slug}/`, name: v.nombre })) } }) + "\n" +

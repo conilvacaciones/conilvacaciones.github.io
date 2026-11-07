@@ -232,6 +232,7 @@ async function fetchActiveViviendas() {
       precio: r.precio != null && r.precio !== "" ? String(r.precio) : "",
       unidadPrecio: r.unidad_precio === "semana" ? "semana" : "noche",
       distancia: r.distancia || "",
+      zona: String(r.zona || "").trim(),
       amenities: Array.isArray(r.amenities)
         ? [...new Set(r.amenities.map((a) => String((a && a.label) || "").trim()).filter(Boolean))]
         : [],
