@@ -733,7 +733,7 @@ body:has(.cookie-banner.is-visible) .blog-wa{display:none;}
       </div>
     </div>
     <div class="blog-grid" id="blogGrid">
-      <p class="blog-empty">Cargando entradas…</p>
+      <!--BLOGLIST--><p class="blog-empty">Cargando entradas…</p><!--/BLOGLIST-->
     </div>
   </div>
 </section>
@@ -896,20 +896,19 @@ function renderBlogGrid(){
   }
   grid.innerHTML = BLOG_POSTS.map(function(p, idx){
     var cover = blogPhotoUrl(p.portada);
+    var href = '/blog/'+encodeURIComponent(p.slug || p.id)+'/';
     return ''+
     '<article class="blog-card reveal" style="transition-delay:'+(idx*70)+'ms" data-blog-id="'+p.id+'">'+
+      '<a href="'+href+'" style="display:block;color:inherit;text-decoration:none">'+
       '<div class="blog-card-photo">'+(cover ? '<img src="'+cover+'" alt="'+escapeHTML(p.titulo)+'" title="'+escapeHTML(p.titulo)+'" loading="lazy">' : '')+'</div>'+
       '<div class="blog-card-body">'+
         '<span class="blog-date">'+new Date(p.created_at).toLocaleDateString("es-ES", {day:"numeric", month:"long", year:"numeric"})+'</span>'+
         '<h3>'+escapeHTML(p.titulo)+'</h3>'+
         '<p>'+escapeHTML(blogExcerpt(p))+'</p>'+
         '<span class="blog-readmore">Leer más →</span>'+
-      '</div>'+
+      '</div></a>'+
     '</article>';
   }).join("");
-  grid.querySelectorAll("[data-blog-id]").forEach(function(card){
-    card.addEventListener("click", function(){ openBlogModal(card.getAttribute("data-blog-id")); });
-  });
   grid.querySelectorAll(".reveal").forEach(function(el){
     if(revealIO) revealIO.observe(el); else el.classList.add("is-visible");
   });

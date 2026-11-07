@@ -61,6 +61,27 @@ const STATIC_PAGES = [
   { loc: `${SITE_URL}/politica-de-cancelacion/`, changefreq: "yearly", priority: "0.3" },
 ];
 
+// Guías de playas (herramienta, guía general, fichas y guías por plan): se descubren
+// solas buscando carpetas /playa-hoy/, /playas-conil*/ y sus subcarpetas con index.html.
+function discoverBeachPages() {
+  const out = [];
+  const dirs = fs.readdirSync(REPO_ROOT, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && /^(playa-hoy|playas-conil[a-z0-9-]*)$/.test(d.name))
+    .map((d) => d.name).sort();
+  for (const name of dirs) {
+    const base = path.join(REPO_ROOT, name);
+    if (fs.existsSync(path.join(base, "index.html"))) {
+      out.push({ loc: `${SITE_URL}/${name}/`, changefreq: "monthly", priority: name === "playas-conil" ? "0.8" : "0.7" });
+    }
+    for (const sub of fs.readdirSync(base, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort()) {
+      if (fs.existsSync(path.join(base, sub, "index.html"))) {
+        out.push({ loc: `${SITE_URL}/${name}/${sub}/`, changefreq: "monthly", priority: "0.6" });
+      }
+    }
+  }
+  return out;
+}
+
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
 function stripHTML(html) {
@@ -574,7 +595,28 @@ function buildBlogPageContent(template, post) {
       portada +
       `<div class="blog-modal-content">${expandPosts(expandCasas(post.contenidoHtml))}</div>` +
       `</article>`;
-    html = html.replace('<p class="blog-empty">Cargando entradas…</p>', () => articulo);
+    if (/<!--BLOGLIST-->[\s\S]*?<!--\/BLOGLIST-->/.test(html)) {
+      html = html.replace(/<!--BLOGLIST-->[\s\S]*?<!--\/BLOGLIST-->/, () => articulo);
+    } else {
+      html = html.replace('<p class="blog-empty">Cargando entradas…</p>', () => articulo);
+    }
+    // Enlaces reales a las demás entradas y a las guías de playas (rastreables sin JavaScript).
+    const otras = GLOBAL_POSTS.filter((x) => x.slug !== post.slug);
+    const relacionados =
+      `<section class="blog-related" style="padding:10px 0 50px"><div class="wrap" style="max-width:760px">` +
+      `<h2 style="font-family:var(--ff-display);color:var(--atlantic);font-size:26px;margin:0 0 12px">Sigue leyendo</h2>` +
+      `<ul style="line-height:1.9;padding-left:20px;margin:0 0 22px">` +
+      otras.map((x) => `<li><a href="/blog/${encodeURIComponent(x.slug)}/">${escapeText(x.titulo || x.slug)}</a></li>`).join("") +
+      `</ul>` +
+      `<h2 style="font-family:var(--ff-display);color:var(--atlantic);font-size:26px;margin:0 0 12px">Guías de playas de Conil</h2>` +
+      `<ul style="line-height:1.9;padding-left:20px;margin:0">` +
+      `<li><a href="/playas-conil/">Todas las playas de Conil</a></li>` +
+      `<li><a href="/playa-hoy/">¿A qué playa voy hoy?</a></li>` +
+      `<li><a href="/playas-conil-levante/">Playas con levante</a></li>` +
+      `<li><a href="/playas-conil-poniente/">Playas con poniente</a></li>` +
+      `<li><a href="/playas-conil-con-ninos/">Mejores playas para ir con niños</a></li>` +
+      `<li><a href="/#viviendas">Ver las casas vacacionales</a></li></ul></div></section>`;
+    html = html.replace("<!-- ============ BLOG MODAL ============ -->", () => relacionados + "\n<!-- ============ BLOG MODAL ============ -->");
     // Cada entrada debe tener su propio H1 (y no el genérico del listado).
     html = html.replace(
       /<h1>Qué hacer y qué ver en Conil de la Frontera<\/h1>/,
@@ -612,7 +654,7 @@ function buildBlogPageContent(template, post) {
 }
 
 function buildSitemap(viviendas, blogPosts) {
-  const staticEntries = STATIC_PAGES.map(
+  const staticEntries = STATIC_PAGES.concat(discoverBeachPages()).map(
     (p) => `  <url>\n    <loc>${escapeAttr(p.loc)}</loc>\n    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`
   );
   const viviendaEntries = viviendas.map((v) => {
@@ -699,6 +741,19 @@ function main() {
         blogStats = generateStaticPages(blogPosts, blogTemplate, BLOG_OUTPUT_DIR, buildBlogPageContent);
         console.log(`Entradas de blog publicadas: ${blogStats.slugs.length}`);
         console.log(`Páginas de blog creadas: ${blogStats.created}, actualizadas: ${blogStats.updated}, eliminadas: ${blogStats.removed}`);
+      }
+
+      // Listado estático de entradas en /blog/ (enlaces reales para buscadores; el JavaScript lo sustituye por las tarjetas).
+      if (blogPosts.length > 0 && fs.existsSync(BLOG_TEMPLATE_PATH)) {
+        const idxHtml = fs.readFileSync(BLOG_TEMPLATE_PATH, "utf-8");
+        const lista = "<!--BLOGLIST-->" +
+          blogPosts.map((p) => `<article class="blog-card"><a href="/blog/${encodeURIComponent(p.slug)}/" style="display:block;color:inherit;text-decoration:none">` +
+            `<div class="blog-card-body"><h3>${escapeText(p.titulo || p.slug)}</h3>` +
+            (p.resumen ? `<p>${escapeText(truncate(p.resumen, 160))}</p>` : "") +
+            `<span class="blog-readmore">Leer más →</span></div></a></article>`).join("") +
+          "<!--/BLOGLIST-->";
+        const nuevo = idxHtml.replace(/<!--BLOGLIST-->[\s\S]*?<!--\/BLOGLIST-->/, () => lista);
+        if (nuevo !== idxHtml) fs.writeFileSync(BLOG_TEMPLATE_PATH, nuevo, "utf-8");
       }
 
       // Mantiene sitemap.xml sincronizado con las páginas fijas, las viviendas activas y el blog.
