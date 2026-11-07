@@ -146,7 +146,8 @@ function generate(ctx) {
     `` +
     faqBlock(qa) +
     `<div style="margin-top:34px;max-width:900px;background:var(--atlantic);color:#fff;border-radius:20px;padding:26px"><h2 style="font-family:var(--ff-display);font-size:26px;margin:0 0 8px">Reserva directa, sin comisiones</h2><p style="margin:0 0 16px;color:rgba(255,255,255,.85);line-height:1.55">Escríbenos por WhatsApp y te confirmamos disponibilidad y precio para tus fechas.</p><a class="btn btn-primary" href="https://wa.me/34650283373" target="_blank" rel="noopener">Consultar por WhatsApp</a></div>` +
-    `<p style="margin-top:22px"><a href="/playas-conil/" style="color:var(--atlantic);font-weight:600">Guía de playas de Conil</a> · <a href="/#viviendas" style="color:var(--atlantic);font-weight:600">Ver todas desde la portada</a></p>` +
+    `<p style="margin-top:22px;font-size:12.5px;color:var(--ink-faint);line-height:1.8;max-width:900px">Ver también: ${finalPages.filter((p) => p.slug !== current).map((p) => `<a href="/casas-conil/${p.slug}/" style="color:inherit">${h.escapeText(p.filters.map((f) => f.label).join(" + "))}</a>`).join(" · ")}${current ? ` · <a href="/casas-conil/" style="color:inherit">Todas las casas</a>` : ""}</p>` +
+    `<p style="margin-top:14px"><a href="/playas-conil/" style="color:var(--atlantic);font-weight:600">Guía de playas de Conil</a> · <a href="/#viviendas" style="color:var(--atlantic);font-weight:600">Ver todas desde la portada</a></p>` +
     `</div><div class="blog-grid" id="blogGrid" style="display:none!important" hidden></div></section>`;
 
   const build = ({ slug, h1, title, desc, intro, houses, qa }) => {
