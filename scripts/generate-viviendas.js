@@ -82,6 +82,9 @@ function discoverBeachPages() {
   return out;
 }
 
+const casasFiltros = require("./casas-filtros");
+let CASAS_FILTROS_URLS = [];
+
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
 function stripHTML(html) {
@@ -665,7 +668,10 @@ function buildSitemap(viviendas, blogPosts) {
     const loc = `${SITE_URL}/blog/${encodeURIComponent(p.slug)}/`;
     return `  <url>\n    <loc>${escapeAttr(loc)}</loc>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>`;
   });
-  const entries = staticEntries.concat(viviendaEntries).concat(blogEntries).join("\n");
+  const filtroEntries = (CASAS_FILTROS_URLS || []).map(
+    (p) => `  <url>\n    <loc>${escapeAttr(p.loc)}</loc>\n    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`
+  );
+  const entries = staticEntries.concat(viviendaEntries).concat(filtroEntries).concat(blogEntries).join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries}\n</urlset>\n`;
 }
 
@@ -754,6 +760,16 @@ function main() {
           "<!--/BLOGLIST-->";
         const nuevo = idxHtml.replace(/<!--BLOGLIST-->[\s\S]*?<!--\/BLOGLIST-->/, () => lista);
         if (nuevo !== idxHtml) fs.writeFileSync(BLOG_TEMPLATE_PATH, nuevo, "utf-8");
+      }
+
+      // Páginas de filtros de casas (/casas-conil/...)
+      if (viviendas.length > 0 && fs.existsSync(BLOG_TEMPLATE_PATH)) {
+        const r = casasFiltros.generate({
+          viviendas, template: fs.readFileSync(BLOG_TEMPLATE_PATH, "utf-8"), REPO_ROOT, SITE_URL,
+          h: { escapeAttr, escapeText, truncate, casaCardStatic, jsonLdScript, breadcrumbLd },
+        });
+        CASAS_FILTROS_URLS = r.urls;
+        console.log(`Páginas de filtros de casas: ${r.pages.length} (+ listado). Archivos modificados: ${r.changed}`);
       }
 
       // Mantiene sitemap.xml sincronizado con las páginas fijas, las viviendas activas y el blog.
