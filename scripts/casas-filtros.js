@@ -110,7 +110,7 @@ function generate(ctx) {
     faqBlock(qa) +
     `<div style="margin-top:34px;background:var(--atlantic);color:#fff;border-radius:20px;padding:26px"><h2 style="font-family:var(--ff-display);font-size:26px;margin:0 0 8px">Reserva directa, sin comisiones</h2><p style="margin:0 0 16px;color:rgba(255,255,255,.85);line-height:1.55">Escríbenos por WhatsApp y te confirmamos disponibilidad y precio para tus fechas.</p><a class="btn btn-primary" href="https://wa.me/34650283373" target="_blank" rel="noopener">Consultar por WhatsApp</a></div>` +
     `<p style="margin-top:22px"><a href="/playas-conil/" style="color:var(--atlantic);font-weight:600">Guía de playas de Conil</a> · <a href="/#viviendas" style="color:var(--atlantic);font-weight:600">Ver todas desde la portada</a></p>` +
-    `</div><div class="blog-grid" id="blogGrid" hidden></div></section>`;
+    `</div><div class="blog-grid" id="blogGrid" style="display:none!important" hidden></div></section>`;
 
   const build = ({ slug, h1, title, desc, intro, houses, qa }) => {
     const url = slug ? `${SITE_URL}/casas-conil/${slug}/` : `${SITE_URL}/casas-conil/`;
