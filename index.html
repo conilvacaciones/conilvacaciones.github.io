@@ -1785,6 +1785,15 @@ async function initHouses(){
       return;
     }
     renderHouseCards();
+    try{
+      var qp = new URLSearchParams(window.location.search);
+      if(qp.get("entrada") || qp.get("salida") || qp.get("personas")){
+        if(qp.get("entrada")) document.getElementById("searchCheckin").value = qp.get("entrada");
+        if(qp.get("salida")) document.getElementById("searchCheckout").value = qp.get("salida");
+        if(qp.get("personas")) document.getElementById("searchGuests").value = qp.get("personas");
+        runSearch();
+      }
+    }catch(e){}
   }catch(err){
     console.error("Error cargando viviendas desde Supabase:", err);
     grid.removeAttribute("aria-busy");
