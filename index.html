@@ -396,6 +396,13 @@ input,textarea{font:inherit;}
 .gr-rev p{font-size:14.5px;line-height:1.6;color:var(--ink);margin:0;}
 .gr-rev .who{font-size:13px;color:var(--ink-soft);display:flex;flex-direction:column;gap:2px;}
 .gr-rev .who b{color:var(--ink);font-size:15px;}
+@media (max-width:600px){
+  .qh-grid,.gr-grid{display:flex;grid-template-columns:none;gap:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;margin-left:-28px;margin-right:-28px;padding:6px 28px 16px;scroll-padding:0 28px;scrollbar-width:none;max-width:none;}
+  .qh-grid::-webkit-scrollbar,.gr-grid::-webkit-scrollbar{display:none;}
+  .qh-grid .qh-card,.gr-grid .gr-rev{flex:0 0 82%;scroll-snap-align:start;}
+  .gr-grid{margin-top:20px;}
+  .gr-grid[hidden]{display:none;}
+}
 .gr-card{max-width:640px;margin:0 auto;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:44px 32px 40px;}
 .gr-google-badge{
   display:inline-flex;align-items:center;gap:8px;background:var(--teal-soft);color:var(--teal);
