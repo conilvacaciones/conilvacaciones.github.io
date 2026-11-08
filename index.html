@@ -816,6 +816,19 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
   .main-nav{top:0;height:100vh;padding-top:90px;}
   .nav-backdrop{inset:0;}
 }
+
+/* ajuste final: igual que la maqueta aprobada */
+.hero-text .eyebrow::before{display:none !important;}
+.hero-rate{font-family:inherit;font-size:13px;letter-spacing:0;text-transform:none;font-weight:600;}
+.hero-title-main{max-width:720px;}
+.hero-text h1 .hero-title-main em{color:#F0BB62;font-style:normal !important;}
+.hero-text h1{font-size:clamp(40px,5.2vw,68px);letter-spacing:-.035em;}
+.hero-title-sub{font-size:clamp(16px,1.5vw,19px);max-width:520px;}
+.hero-scrim{background:linear-gradient(90deg,rgba(8,34,52,.78) 0%,rgba(8,34,52,.35) 55%,rgba(8,34,52,0) 80%),linear-gradient(180deg,rgba(7,36,54,.5) 0%,rgba(7,36,54,0) 30%,rgba(7,36,54,.35) 100%) !important;}
+.site-header .header-inner{background:rgba(255,255,255,.14);}
+.site-header.scrolled .header-inner{background:rgba(9,45,66,.82);}
+.search-widget.in-hero{border-radius:24px;}
+.search-widget.in-hero #searchBtn,.search-widget.in-hero #openFiltros,.search-widget.in-hero #searchClearBtn{border-radius:15px;}
 </style>
 <script type="application/ld+json">
 {
@@ -959,8 +972,8 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
   <img class="hero-float-photo" id="heroFloatPhoto" alt="">
   <div class="hero-inner">
     <div class="hero-text reveal is-visible">
-      <span class="eyebrow">Conil de la Frontera · Cádiz</span>
-      <h1 id="heroTitulo"><span class="hero-title-main" id="heroTituloMain">Conil Vacaciones</span><span class="hero-title-sub" id="heroTituloSub">Encuentra tu alojamiento vacacional en Conil de la Frontera</span></h1>
+      <a class="eyebrow hero-rate" href="#googleReviews">★ 5,0 · Valoración en Google</a>
+      <h1 id="heroTitulo"><span class="hero-title-main" id="heroTituloMain">Tu casa de vacaciones en <em>Conil</em></span><span class="hero-title-sub" id="heroTituloSub">Casas con piscina privada, trato directo con el propietario y sin comisiones. A minutos de las mejores playas de la Costa de la Luz.</span></h1>
       <p id="heroSubtitulo" hidden></p>
       <div class="hero-trust"><span>Sin comisiones</span><span>Trato directo con el propietario</span><span>Admite mascotas</span></div>
       <div class="hero-cta">
