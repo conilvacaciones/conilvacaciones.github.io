@@ -522,6 +522,19 @@ main.wrap{padding:40px 24px 90px;}
       <div class="drawer-header">
         <button type="button" class="drawer-toggle-btn" data-drawer-toggle>
           <svg class="icon drawer-chevron" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+          <h1>🔔 Avisos de disponibilidad <span id="alertasBadge" style="font-size:13px;font-weight:600;color:var(--bougain)"></span></h1>
+        </button>
+      </div>
+      <div class="drawer-body-wrap"><div class="drawer-body"><div class="drawer-body-inner">
+      <p class="slug-hint" style="margin:0 0 12px">Visitantes que han pedido que les avises si se liberan unas fechas. Las que ya están libres aparecen marcadas: pulsa para avisarles y márcalos como «Avisado».</p>
+      <div id="alertasList"><p class="empty-note">Cargando…</p></div>
+      </div></div></div>
+    </div>
+
+    <div class="drawer" data-drawer>
+      <div class="drawer-header">
+        <button type="button" class="drawer-toggle-btn" data-drawer-toggle>
+          <svg class="icon drawer-chevron" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
           <h1>📩 Solicitudes de propietarios</h1>
         </button>
       </div>
@@ -958,6 +971,7 @@ function showApp(){
   appView.style.display = "block";
   loadViviendas();
   loadReviewsAdmin();
+  if(typeof loadAlertas === "function") loadAlertas();
   /* ============ CAJONES PLEGABLES ============ */
 document.querySelectorAll("[data-drawer-toggle]").forEach(function(btn){
   btn.addEventListener("click", function(){
@@ -3942,7 +3956,62 @@ document.getElementById("solicitudModalClose").addEventListener("click", functio
 });
 solicitudBackdrop.addEventListener("click", function(e){ if(e.target === solicitudBackdrop){ solicitudBackdrop.classList.remove("open"); document.body.style.overflow = ""; } });
 
+/* ============ AVISOS DE DISPONIBILIDAD ============ */
+async function loadAlertas(){
+  var box = document.getElementById("alertasList");
+  box.innerHTML = '<p class="empty-note">Cargando…</p>';
+  var r1 = await sb.from("alertas_disponibilidad").select("*").order("created_at", {ascending:false});
+  if(r1.error){ box.innerHTML = '<p class="empty-note" style="color:var(--bougain)">Error al cargar: '+r1.error.message+'</p>'; return; }
+  var r2 = await sb.from("reservas").select("vivienda_id,fecha_inicio,fecha_fin");
+  var r3 = await sb.from("viviendas").select("id,nombre,activo");
+  var reservas = r2.data || [], casas = r3.data || [];
+  var nombreDe = {}; casas.forEach(function(c){ nombreDe[c.id] = c.nombre; });
+  function libre(vid, e, s){
+    return !reservas.some(function(r){ return r.vivienda_id === vid && !(s <= r.fecha_inicio || e >= r.fecha_fin); });
+  }
+  var rows = (r1.data || []).map(function(a){
+    var casasLibres;
+    if(a.vivienda_id){ casasLibres = libre(a.vivienda_id, a.fecha_entrada, a.fecha_salida) ? [a.vivienda_id] : []; }
+    else { casasLibres = casas.filter(function(c){ return c.activo !== false && libre(c.id, a.fecha_entrada, a.fecha_salida); }).map(function(c){ return c.id; }); }
+    return { a: a, libres: casasLibres };
+  });
+  var pend = rows.filter(function(x){ return x.a.estado === "Pendiente" && x.libres.length; }).length;
+  document.getElementById("alertasBadge").textContent = pend ? "· "+pend+" ya libre"+(pend===1?"":"s") : "";
+  if(!rows.length){ box.innerHTML = '<p class="empty-note">Todavía no hay avisos.</p>'; return; }
+  function fmt(d){ var p = d.split("-"); return p[2]+"/"+p[1]+"/"+p[0]; }
+  rows.sort(function(x, y){ return (y.a.estado==="Pendiente"&&y.libres.length?1:0) - (x.a.estado==="Pendiente"&&x.libres.length?1:0); });
+  box.innerHTML = rows.map(function(x){
+    var a = x.a, esTel = !/@/.test(a.contacto);
+    var cas = a.vivienda_id ? (nombreDe[a.vivienda_id] || a.vivienda_id) : "cualquier casa";
+    var libres = x.libres.map(function(id){ return nombreDe[id] || id; });
+    var estado = x.libres.length ? '<span style="color:#177268;font-weight:700">✅ Libre: '+escapeHTMLAdmin(libres.join(", "))+'</span>' : '<span style="color:var(--ink-faint)">Sigue ocupado</span>';
+    var msg = "Hola "+a.nombre+", soy de Conil Vacaciones. Te avisamos de que ya está libre "+(a.vivienda_id ? cas : (libres[0]||"una casa"))+" del "+fmt(a.fecha_entrada)+" al "+fmt(a.fecha_salida)+". Si te interesa, dínoslo y te lo confirmamos.";
+    var tel = a.contacto.replace(/[^\d+]/g, "").replace(/^00/, "+"); if(!/^\+/.test(tel)) tel = (tel.length === 9 ? "34" : "") + tel; tel = tel.replace(/^\+/, "");
+    var link = esTel ? "https://wa.me/"+tel+"?text="+encodeURIComponent(msg) : "mailto:"+a.contacto+"?subject="+encodeURIComponent("Ya está libre en Conil")+"&body="+encodeURIComponent(msg);
+    return '<div class="v-row"><div class="v-info"><b>'+escapeHTMLAdmin(a.nombre)+' · '+fmt(a.fecha_entrada)+' → '+fmt(a.fecha_salida)+'</b>'+
+      '<span>'+escapeHTMLAdmin(cas)+(a.personas ? ' · '+a.personas+' pers.' : '')+' · '+escapeHTMLAdmin(a.contacto)+' · '+estado+'</span></div>'+
+      '<select data-alerta-estado="'+a.id+'" style="padding:8px 10px;border-radius:8px;border:1px solid var(--line);font-size:13px">'+
+        ['Pendiente','Avisado','Cerrado'].map(function(op){ return '<option value="'+op+'" '+(a.estado===op?"selected":"")+'>'+op+'</option>'; }).join("")+'</select>'+
+      '<div class="v-actions">'+(x.libres.length ? '<a class="btn btn-primary btn-sm" target="_blank" rel="noopener" href="'+link+'">Avisar</a>' : '')+
+      '<button type="button" class="btn btn-ghost btn-sm" data-alerta-del="'+a.id+'">Borrar</button></div></div>';
+  }).join("");
+  box.querySelectorAll("[data-alerta-estado]").forEach(function(sel){
+    sel.addEventListener("change", async function(){
+      var r = await sb.from("alertas_disponibilidad").update({ estado: sel.value }).eq("id", sel.getAttribute("data-alerta-estado"));
+      if(r.error) alert("No se ha podido actualizar: "+r.error.message); else loadAlertas();
+    });
+  });
+  box.querySelectorAll("[data-alerta-del]").forEach(function(b){
+    b.addEventListener("click", async function(){
+      if(!confirm("¿Borrar este aviso?")) return;
+      await sb.from("alertas_disponibilidad").delete().eq("id", b.getAttribute("data-alerta-del"));
+      loadAlertas();
+    });
+  });
+}
+
 loadSolicitudes();
+loadAlertas();
 
 /* ============ APARIENCIA ============ */
 var DEFAULT_APARIENCIA = { hero_color_1:"#0B3D5C", hero_color_2:"#0E4F63" };

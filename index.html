@@ -929,6 +929,7 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
         </div>
       </div>
       <p class="search-result-msg" id="searchResultMsg"></p>
+      <div id="alertSlotHome" style="max-width:560px;margin:10px auto 0"></div>
     </div>
   </div>
   <svg class="hero-wave" viewBox="0 0 1440 110" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -1600,6 +1601,7 @@ function houseIsAvailable(house, start, end){
 }
 
 function runSearch(){
+  var slot0 = document.getElementById("alertSlotHome"); if(slot0) slot0.innerHTML = "";
   var checkinVal = document.getElementById("searchCheckin").value;
   var checkoutVal = document.getElementById("searchCheckout").value;
   var guests = parseInt(document.getElementById("searchGuests").value, 10) || 1;
@@ -1653,7 +1655,15 @@ function runSearch(){
       msgEl.textContent = "No hemos encontrado casas para esos criterios.";
     }
     msgEl.classList.remove("has-results");
+    try{
+      var slot = document.getElementById("alertSlotHome");
+      if(slot && window.cvAlerta && start && end){
+        window.cvAlerta.montar(slot, { sb: sb, viviendaId: null, nombreCasa: "",
+          getFechas: function(){ return { entrada: checkinVal, salida: checkoutVal, personas: guests }; } });
+      }
+    }catch(e){}
   } else {
+    var slotOk = document.getElementById("alertSlotHome"); if(slotOk) slotOk.innerHTML = "";
     msgEl.textContent = "Te recomendamos " + resultHouses.length + " casa" + (resultHouses.length === 1 ? "" : "s") + " para tu búsqueda, ordenadas de mejor a peor encaje.";
     msgEl.classList.add("has-results");
   }
@@ -2669,5 +2679,6 @@ if("serviceWorker" in navigator){
 </script>
 <script src="/img-loading.js" defer></script>
 <script src="/casas-conil/filtros.js" defer></script>
+<script src="/alerta-disponibilidad.js" defer></script>
 </body>
 </html>
