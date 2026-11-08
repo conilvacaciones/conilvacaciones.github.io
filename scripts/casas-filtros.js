@@ -31,6 +31,8 @@ const FILTERS = [
   { key: "lavavajillas", group: "equip", re: /lavavajillas/, label: "Lavavajillas", slug: "con-lavavajillas", phrase: "con lavavajillas", text: "Un lavavajillas facilita las comidas en grupo." },
 ].map((f, i) => ({ ...f, prio: i }));
 
+const ALWAYS = new Set(["piscina", "mascotas", "aire", "barbacoa", "wifi", "p4"]);
+
 function houseKeys(v) {
   const labels = (v.amenities || []).map(norm);
   const keys = [];
@@ -62,6 +64,14 @@ function buildCombos(houses) {
       if (FILTERS[i].group !== "equip" && FILTERS[i].group === FILTERS[j].group) continue;
       consider([FILTERS[i], FILTERS[j]]);
     }
+  }
+  // Búsquedas muy habituales: tienen página propia aunque todas las casas las cumplan
+  // (p. ej. "casas con piscina privada"), con su propio texto y preguntas frecuentes.
+  const ids = hk.map((x) => x.h.id).sort();
+  for (const f of FILTERS) {
+    if (!ALWAYS.has(f.key)) continue;
+    const got = setOf([f]);
+    if (got.join("|") === all && ids.length) best.set("always:" + f.key, { filters: [f], ids: got, cost: f.prio });
   }
   return [...best.values()].sort((a, b) => a.cost - b.cost);
 }
