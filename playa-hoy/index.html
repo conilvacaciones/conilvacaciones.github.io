@@ -675,6 +675,7 @@ body:has(.cookie-banner.is-visible) .blog-wa{display:none;}
 .pl-bar{flex:1;height:8px;border-radius:99px;background:var(--cal-2);overflow:hidden;max-width:260px;}
 .pl-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--sol),var(--teal));}
 .pl-pct{font:600 13px var(--ff-mono);color:var(--ink-soft);}
+.pl-more{display:inline-block;margin-top:14px;font-weight:700;font-size:14.5px;color:var(--bougain);text-decoration:none}.pl-more:hover{text-decoration:underline}
 .pl-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
 .pl-tags span{font-size:12.5px;background:var(--cal-2);color:var(--ink-soft);border-radius:8px;padding:4px 9px;font-weight:500;}
 .pl-note{font-size:13px;color:var(--ink-soft);line-height:1.55;background:var(--cal-2);border-radius:var(--radius-md);padding:14px 16px;margin-top:18px;}
@@ -926,6 +927,7 @@ var BEACHES=[
  {n:"Playa de Castilnovo",z:"Al sur de Conil",lev:0,pon:0,olas:2,fit:{familia:1,tranquila:2,surf:1,naturaleza:2,servicios:0},tags:["Playa abierta","Sin urbanizar","Sin chiringuitos fijos"],d:"Playa abierta y virgen, expuesta al viento y al poniente. Preciosa en días de calma y para pasear."},
  {n:"Playa del Palmar (Vejer)",z:"Término de Vejer, cerca de Conil",lev:0,pon:0,olas:2,fit:{familia:0,tranquila:1,surf:2,naturaleza:1,servicios:1},tags:["Ambiente surfero","Olas","Atardeceres"],d:"Playa extensa y abierta con muy buenas condiciones para el surf. El mar puede ser fuerte."}
 ];
+var MORE={"Cala del Aceite":"/playas-conil/cala-del-aceite/","Calas de Roche":"/blog/calas-de-roche-conil/","Playa de Fuente del Gallo":"/playas-conil/playa-fuente-del-gallo/","Playa de La Fontanilla":"/blog/playa-de-la-fontanilla/","Playa de Los Bateles":"/playas-conil/playa-de-los-bateles/","Playa de Castilnovo":"/playas-conil/playa-de-castilnovo/","Playa del Palmar (Vejer)":"/playas-conil/playa-del-palmar/"};
 var SHEL=["expuesta a este viento","con resguardo medio","bastante resguardada","la mejor resguardada de Conil"];
 var state={plan:"familia",wind:null,spd:null,dir:null,wave:null,manual:null};
 var $=function(i){return document.getElementById(i);};
@@ -984,7 +986,8 @@ function render(){
       '<h3>'+b.n+'</h3><div class="pl-zone">'+b.z+'</div>'+
       '<p class="pl-why">'+why(b,r)+'</p>'+
       '<div class="pl-meter"><div class="pl-bar"><i style="width:'+pct+'%"></i></div><span class="pl-pct">'+pct+'% encaje</span></div>'+
-      '<div class="pl-tags">'+b.tags.map(function(t){return '<span>'+t+'</span>';}).join("")+'</div></div></article>';
+      '<div class="pl-tags">'+b.tags.map(function(t){return '<span>'+t+'</span>';}).join("")+'</div>'+
+      (MORE[b.n]?'<a class="pl-more" href="'+MORE[b.n]+'">Más información →</a>':'')+'</div></article>';
   }).join("");
 }
 function setStats(d){
