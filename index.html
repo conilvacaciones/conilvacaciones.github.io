@@ -843,6 +843,11 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
 /* fondo del hero: cielo degradado + foto de Conil */
 .hero-media{background:linear-gradient(180deg,#0B3D5C 0%,#165d78 40%,#3d8fb0 66%,#f2c47a 100%);}
 .hero-bg{position:absolute;left:0;bottom:0;width:100%;height:auto;min-height:62%;object-fit:cover;object-position:left bottom;-webkit-mask-image:linear-gradient(180deg,transparent,#000 38%);mask-image:linear-gradient(180deg,transparent,#000 38%);}
+
+/* sin hueco vacío arriba */
+.hero{min-height:0;}
+.hero-inner{padding:128px 28px 56px;}
+@media (max-width:900px){.hero-inner{padding:112px 20px 40px;}}
 </style>
 <script type="application/ld+json">
 {
