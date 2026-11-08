@@ -826,6 +826,7 @@ html{scroll-behavior:smooth;}
               </a>
             </div>
             <p class="booking-note">No se realiza ningún cobro aquí: al consultar, hablamos contigo para confirmar la disponibilidad y las condiciones. La reserva se hace pagando el depósito directamente al propietario.</p>
+            <div id="alertSlot"></div>
           </div>
         </div>
       </div>
@@ -1656,6 +1657,12 @@ function openModal(id){
   currentHouse = HOUSES.find(function(h){ return h.id === id; });
   if(!currentHouse) return;
   selStart = null; selEnd = null;
+  try{
+    if(window.cvAlerta) window.cvAlerta.montar(document.getElementById("alertSlot"), {
+      sb: sb, viviendaId: currentHouse.id, nombreCasa: currentHouse.name,
+      getFechas: function(){ return (selStart && selEnd) ? { entrada: toISO(selStart), salida: toISO(selEnd), personas: null } : {}; }
+    });
+  }catch(e){}
 
   var pal = paletteFor(currentHouse.id);
   document.getElementById("modalTitle").textContent = currentHouse.name;
@@ -2382,5 +2389,6 @@ if("serviceWorker" in navigator){
 }
 </script>
 <script src="/img-loading.js" defer></script>
+<script src="/alerta-disponibilidad.js" defer></script>
 </body>
 </html>
