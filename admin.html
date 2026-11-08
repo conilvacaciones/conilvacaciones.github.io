@@ -357,6 +357,7 @@ main.wrap{padding:30px 24px 100px;}
 .servicios-catalogo,.servicio-chip{border-radius:12px;}
 .servicio-chip{background:var(--bg);}
 ::selection{background:rgba(23,114,104,.22);}
+.topbar .logo::before{content:none!important;display:none!important}.panel-logo{height:56px;width:auto;display:block}.panel-tag{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);background:var(--bg);border:1px solid var(--border);padding:4px 10px;border-radius:999px}
 /* login */
 #loginView{background:radial-gradient(1200px 600px at 20% -10%,rgba(231,177,92,.28),transparent 60%),linear-gradient(160deg,#0B3D5C,#0E5666 60%,#177268);}
 .login-card{border-radius:22px;padding:42px 38px;box-shadow:0 30px 70px -20px rgba(0,0,0,.45);}
@@ -415,7 +416,7 @@ main.wrap{padding:30px 24px 100px;}
 <div id="appView">
   <div class="topbar">
     <div class="wrap">
-      <span class="logo">Conil Vacaciones · Panel</span>
+      <span class="logo"><img src="/icons/logo-panel.png" alt="Conil Vacaciones" class="panel-logo"><span class="panel-tag">Panel</span></span>
       <button class="btn btn-ghost btn-sm" id="btnLogout" style="color:var(--cal);border-color:rgba(241,242,234,.35)">Cerrar sesión</button>
     </div>
   </div>
