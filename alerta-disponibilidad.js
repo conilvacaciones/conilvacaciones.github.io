@@ -3,9 +3,9 @@
  * Uso: cvAlerta.montar(elemento, { sb, viviendaId, nombreCasa, getFechas: () => ({entrada:"YYYY-MM-DD", salida:"YYYY-MM-DD", personas:2}) }) */
 (function () {
   "use strict";
-  var CSS = ".cva{margin-top:14px;border:1.5px dashed rgba(11,61,92,.28);border-radius:14px;padding:14px 16px;background:rgba(231,177,92,.12);text-align:left}" +
-    ".cva-t{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;padding:0;font:inherit;font-weight:700;font-size:15px;color:#0B3D5C;cursor:pointer;text-align:left}" +
-    ".cva-s{font-size:13px;color:#4a5a66;margin:6px 0 0;line-height:1.45}" +
+  var CSS = ".cva{margin-top:14px;border:1.5px dashed rgba(11,61,92,.28);border-radius:14px;padding:0;background:#fbf7ee;text-align:left;overflow:hidden}" +
+    ".cva-t{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;padding:14px 16px;font:inherit;font-weight:700;font-size:15px;color:#0B3D5C;cursor:pointer;text-align:left}" +
+    ".cva-ch{margin-left:auto;transition:transform .25s ease;flex:none}.cva-t[aria-expanded=true] .cva-ch{transform:rotate(180deg)}.cva-p{padding:0 16px 16px;border-top:1px solid rgba(11,61,92,.12)}.cva-s{font-size:13px;color:#4a5a66;margin:12px 0 0;line-height:1.45}" +
     ".cva form{margin-top:12px;display:grid;gap:10px}" +
     ".cva label{display:block;font-size:12px;font-weight:600;color:#4a5a66;margin-bottom:4px}" +
     ".cva input{box-sizing:border-box;width:100%;min-height:44px;padding:10px 12px;border:1px solid #d9ddd6;border-radius:10px;background:#fff;font:inherit;font-size:16px;color:#16242e}" +
@@ -25,17 +25,17 @@
     if (!el || !opts || !opts.sb) return;
     ensureCss();
     var uid = "cva" + Math.random().toString(36).slice(2, 7);
-    el.innerHTML = '<div class="cva"><button type="button" class="cva-t" aria-expanded="false">🔔 Avísame si se libera</button>' +
+    el.innerHTML = '<div class="cva"><button type="button" class="cva-t" aria-expanded="false" aria-controls="' + uid + 'p">🔔 Avísame si se libera<svg class="cva-ch" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="cva-p" id="' + uid + 'p" hidden>' +
       '<p class="cva-s">¿Tus fechas están ocupadas? Déjanos tu contacto y te avisamos si queda libre' + (opts.nombreCasa ? ' ' + esc(opts.nombreCasa) : ' alguna casa') + '. Sin compromiso.</p>' +
-      '<form hidden novalidate><div class="cva-r"><div><label for="' + uid + 'e">Entrada</label><input type="date" id="' + uid + 'e" name="e" min="' + today() + '"></div>' +
+      '<form novalidate><div class="cva-r"><div><label for="' + uid + 'e">Entrada</label><input type="date" id="' + uid + 'e" name="e" min="' + today() + '"></div>' +
       '<div><label for="' + uid + 's">Salida</label><input type="date" id="' + uid + 's" name="s" min="' + today() + '"></div></div>' +
       '<div><label for="' + uid + 'n">Tu nombre</label><input type="text" id="' + uid + 'n" name="n" maxlength="80" autocomplete="name"></div>' +
       '<div><label for="' + uid + 'c">WhatsApp o email</label><input type="text" id="' + uid + 'c" name="c" maxlength="120" autocomplete="off" placeholder="+34 600 000 000 o tu@email.com"></div>' +
       '<div class="cva-hp"><label>No rellenar<input type="text" name="web" tabindex="-1" autocomplete="off"></label></div>' +
-      '<button type="submit">Avisarme</button><p class="cva-m" role="status"></p></form></div>';
-    var box = el.querySelector(".cva"), btn = box.querySelector(".cva-t"), form = box.querySelector("form"), msg = box.querySelector(".cva-m");
+      '<button type="submit">Avisarme</button><p class="cva-m" role="status"></p></form></div></div>';
+    var box = el.querySelector(".cva"), btn = box.querySelector(".cva-t"), form = box.querySelector("form"), pan = box.querySelector(".cva-p"), msg = box.querySelector(".cva-m");
     btn.addEventListener("click", function () {
-      var open = form.hidden; form.hidden = !open; btn.setAttribute("aria-expanded", open ? "true" : "false");
+      var open = pan.hidden; pan.hidden = !open; btn.setAttribute("aria-expanded", open ? "true" : "false");
       if (open && typeof opts.getFechas === "function") {
         var f = opts.getFechas() || {};
         if (f.entrada) form.e.value = f.entrada;
