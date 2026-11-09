@@ -855,6 +855,22 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
 .hero-scrim{background:linear-gradient(90deg,rgba(8,40,62,.55) 0%,rgba(8,40,62,.22) 50%,rgba(8,40,62,0) 78%),linear-gradient(180deg,rgba(8,40,62,.22) 0%,rgba(8,40,62,0) 30%,rgba(8,40,62,.18) 100%) !important;}
 .hero-text h1,.hero-title-sub,.hero-trust{text-shadow:0 2px 18px rgba(6,32,50,.45);}
 .site-header .header-inner,.site-header.scrolled .header-inner{background:rgba(255,255,255,.93);}
+
+/* olas al final de la portada + efectos al bajar */
+.hero-wave{display:block !important;height:84px;z-index:2;}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:84px;z-index:1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 110' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' fill-opacity='.45' d='M0,40 C300,100 600,0 900,50 C1150,90 1300,30 1440,60 L1440,120 L0,120Z'/%3E%3C/svg%3E") center/100% 100% no-repeat;animation:cvWave 9s ease-in-out infinite alternate;}
+@keyframes cvWave{from{transform:translateX(-1.5%)}to{transform:translateX(1.5%)}}
+.hero{overflow:hidden;}
+.hero-inner{padding-bottom:110px;}
+.hero-bg{will-change:transform;}
+.hero-text{will-change:transform,opacity;}
+.site-header .header-inner{transition:padding .3s ease,background .3s ease,box-shadow .3s ease,transform .3s ease;}
+.site-header.scrolled .header-inner{padding-top:4px;padding-bottom:4px;box-shadow:0 14px 34px -14px rgba(0,0,0,.35);}
+.site-header.scrolled .logo-img{height:38px;}
+.logo-img{transition:height .3s ease;}
+.houses-grid .house-card.reveal:nth-child(2){transition-delay:.1s}.houses-grid .house-card.reveal:nth-child(3){transition-delay:.2s}.houses-grid .house-card.reveal:nth-child(4){transition-delay:.3s}
+@media (prefers-reduced-motion:reduce){.hero::after{animation:none}.hero-bg,.hero-text{transform:none !important;opacity:1 !important}}
+@media (max-width:900px){.hero-inner{padding-bottom:96px;}.hero-wave,.hero::after{height:54px;}}
 </style>
 <script type="application/ld+json">
 {
@@ -2781,5 +2797,18 @@ if("serviceWorker" in navigator){
 <script src="/img-loading.js" defer></script>
 <script src="/casas-conil/filtros.js" defer></script>
 <script src="/alerta-disponibilidad.js?v=2" defer></script>
+<script>
+/* efecto parallax suave en la portada */
+(function(){
+  if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  var hero=document.getElementById("top"),bg=hero&&hero.querySelector(".hero-bg"),tx=hero&&hero.querySelector(".hero-text"),tick=false;
+  if(!hero||!bg)return;
+  function upd(){tick=false;var y=window.scrollY,h=hero.offsetHeight;if(y>h)return;
+    bg.style.transform="translate3d(0,"+(y*0.25)+"px,0) scale(1.06)";
+    if(tx){tx.style.transform="translate3d(0,"+(y*-0.08)+"px,0)";tx.style.opacity=Math.max(0,1-y/(h*0.9));}}
+  window.addEventListener("scroll",function(){if(!tick){tick=true;requestAnimationFrame(upd);}},{passive:true});
+  upd();
+})();
+</script>
 </body>
 </html>
