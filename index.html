@@ -1677,7 +1677,7 @@ function renderHouseCards(list, matchInfo){
     var more = h.amenities.length > 4 ? '<span class="more">+'+(h.amenities.length-4)+' más</span>' : "";
     var ri = h.ratingInfo;
     var ratingLine = (ri && ri.count) ? '<div class="hc-rate">★ '+formatRatingNum(ri.avg)+' · '+(ri.count===1?'1 reseña':ri.count+' reseñas')+'</div>' : '';
-    var semanal = getWeeklyRateForDate(h, new Date());
+    var semanal = getCardRate(h);
     var priceHTML;
     if(!semanal){
       priceHTML = '<div class="hc-pv nop">Consultar precio</div>'+ratingLine;
@@ -2411,6 +2411,15 @@ function getWeeklyRateForDate(house, date){
     return house.priceUnit === "semana" ? house.price : house.price * 7;
   }
   return null;
+}
+// Precio para la ficha: el de hoy y, si no hay, el más bajo de cualquier temporada/mes ("desde")
+function getCardRate(house){
+  var r = getWeeklyRateForDate(house, new Date());
+  if(r) return r;
+  var all = [];
+  (house.temporadas || []).forEach(function(t){ if(t.precio) all.push(+t.precio); });
+  if(house.preciosMensuales){ Object.keys(house.preciosMensuales).forEach(function(k){ var v = house.preciosMensuales[k]; if(v) all.push(+v); }); }
+  return all.length ? Math.min.apply(null, all) : null;
 }
 function getNightlyRateForDate(house, date){
   var weekly = getWeeklyRateForDate(house, date);
