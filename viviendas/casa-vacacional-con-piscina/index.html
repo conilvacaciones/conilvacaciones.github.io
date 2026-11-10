@@ -677,6 +677,25 @@ html{scroll-behavior:smooth;}
 .modal-head .house-tagline{color:var(--ink-soft);}
 .mh-main .modal-stats{margin-top:18px;}
 .modal-stats span{background:#EEF3F0;border:0;color:var(--atlantic);font-weight:600;}
+
+/* ---- Descripción y servicios ---- */
+.detail-sec{margin-top:34px;padding-top:30px;border-top:1px solid var(--line);}
+.sec-title{font-family:var(--ff-body);font-weight:800;font-size:22px;letter-spacing:-.02em;color:var(--atlantic);margin:0 0 14px;}
+.desc-section .modal-desc{margin-top:0;max-width:760px;font-size:16.5px;line-height:1.8;color:#3a4a55;}
+.desc-section .modal-desc p{margin:0 0 14px;}
+.desc-section .modal-desc h2,.desc-section .modal-desc h3{font-family:var(--ff-body);font-weight:800;letter-spacing:-.01em;color:var(--atlantic);margin:22px 0 8px;font-size:18px;}
+.desc-section .modal-desc ul,.desc-section .modal-desc ol{margin:0 0 14px;padding-left:22px;}
+.desc-section .modal-desc ul{list-style:disc;}.desc-section .modal-desc ol{list-style:decimal;}
+.desc-section .modal-desc li{margin-bottom:6px;}
+.desc-section .modal-desc blockquote{border-left:3px solid var(--sol);background:#FBF6EC;border-radius:0 10px 10px 0;font-style:normal;}
+.modal-desc.is-collapsed{max-height:9.2em;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(#000 60%,transparent);mask-image:linear-gradient(#000 60%,transparent);}
+.desc-more{margin-top:10px;background:none;border:0;padding:0;font:800 15px var(--ff-body);color:var(--bougain);cursor:pointer;}
+.desc-more:hover{text-decoration:underline;}
+#amenSection .modal-amenities #btnToggleAmenities{grid-column:1/-1;justify-self:start;margin-top:4px!important;}
+#amenSection .modal-amenities{margin-top:0;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;}
+#amenSection .modal-amenities .amenity-chip{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;font-weight:600;color:var(--ink);}
+#amenSection .modal-amenities .amenity-chip .em{font-size:18px;}
+@media (max-width:760px){.detail-sec{margin-top:26px;padding-top:24px;}.desc-section .modal-desc{font-size:16px;}}
 /* ============ BANNER DE COOKIES ============ */
 .cookie-banner{position:fixed;left:0;right:0;bottom:0;z-index:200;background:var(--atlantic-dark);color:var(--cal);padding:18px 20px;box-shadow:0 -8px 30px rgba(8,42,64,.35);transform:translateY(110%);transition:transform .35s ease;}
 .cookie-banner.is-visible{transform:translateY(0);}
@@ -804,8 +823,6 @@ html{scroll-behavior:smooth;}
             <div class="share-buttons" id="shareButtons" style="margin-top:0"></div>
             <button type="button" class="fav-detail-btn" id="favDetailBtn" title="Guardar como favorita" aria-label="Guardar como favorita"><svg><use href="#i-heart"/></svg><span class="fav-t-off">Guardar</span><span class="fav-t-on">Guardada</span></button>
           </div>
-          <div class="modal-desc" id="modalDesc">Ubicado en Conil de la Frontera, este apartamento de 45 m² es ideal para hasta 4 huéspedes y cuenta con 1 dormitorio, sofá cama y 1 baño. Disfruta de una cocina totalmente equipada, Wi-Fi de alta velocidad apto para videollamadas, aire acondicionado y calefacción en el dormitorio, lavadora, servicio de vídeo bajo demanda y un espacio de trabajo dedicado.<ul><li>&nbsp;Las familias que viajan con bebés disponen de cuna.&nbsp;</li><li>&nbsp;La piscina montable exterior privada (4 m de largo, 2,50 m de ancho y 1,20 m de alto) y la barbacoa privada ofrecen excelentes opciones para comer y disfrutar al aire libre.
-´</li><li>&nbsp;Puedes aparcar en 2 plazas compartidas dentro de la propiedad.&nbsp;</li><li>-Se admiten hasta 2 mascotas.&nbsp;</li><li>&nbsp;No se permiten eventos en la propiedad.&nbsp;</li></ul></div>
         </div>
         <div class="modal-price-box" id="modalPriceBox">
           <span class="price-ribbon" id="modalRibbon" style="display:none"></span>
@@ -818,7 +835,16 @@ html{scroll-behavior:smooth;}
         </div>
       </div>
 
-      <div class="modal-amenities" id="modalAmenities"></div>
+      <section class="detail-sec desc-section" id="descSection">
+        <h4 class="sec-title">Sobre la casa</h4>
+        <div class="modal-desc is-collapsed" id="modalDesc"></div>
+        <button type="button" class="desc-more" id="descMore" hidden>Leer más <span aria-hidden="true">›</span></button>
+      </section>
+
+      <section class="detail-sec" id="amenSection">
+        <h4 class="sec-title">Qué ofrece</h4>
+        <div class="modal-amenities" id="modalAmenities"></div>
+      </section>
 
       <div id="modalVideosSection" style="display:none">
         <span class="eyebrow"><svg class="icon" style="width:14px;height:14px"><use href="#i-play"/></svg>Vídeos</span>
@@ -1712,7 +1738,18 @@ function openModal(id){
   var pal = paletteFor(currentHouse.id);
   document.getElementById("modalTitle").textContent = currentHouse.name;
   document.getElementById("modalTagline").innerHTML = iconSvg("i-pin") + escapeHTML(currentHouse.tagline + " · " + currentHouse.zone);
-  document.getElementById("modalDesc").innerHTML = currentHouse.description;
+  var descEl = document.getElementById("modalDesc"), descMore = document.getElementById("descMore");
+  descEl.innerHTML = currentHouse.description || "";
+  var hasDesc = descEl.textContent.trim().length > 0;
+  document.getElementById("descSection").style.display = hasDesc ? "" : "none";
+  descEl.classList.add("is-collapsed");
+  descMore.hidden = true;
+  descMore.onclick = function(){
+    var open = descEl.classList.toggle("is-collapsed");
+    descMore.firstChild.textContent = open ? "Leer más " : "Leer menos ";
+    descMore.lastChild.textContent = open ? "›" : "‹";
+  };
+  setTimeout(function(){ if(descEl.scrollHeight > descEl.clientHeight + 8) descMore.hidden = false; else descEl.classList.remove("is-collapsed"); }, 50);
   document.getElementById("bookingSub").textContent = currentHouse.minNights > 1
     ? "Marca la fecha de entrada y de salida. Los días en rosa rayado ya están ocupados. Estancia mínima: " + currentHouse.minNights + " noches."
     : "Marca la fecha de entrada y de salida. Los días en rosa rayado ya están ocupados.";
