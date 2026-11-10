@@ -216,11 +216,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://conilvacaciones.github.io/blog/surfcasting-en-conil/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://conilvacaciones.github.io/blog/conil-en-septiembre/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -267,6 +262,11 @@
   </url>
   <url>
     <loc>https://conilvacaciones.github.io/blog/mejores-restaurantes-conil/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://conilvacaciones.github.io/blog/surfcasting-conil-pescar-desde-costa/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
