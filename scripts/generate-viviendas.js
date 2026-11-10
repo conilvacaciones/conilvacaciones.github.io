@@ -239,6 +239,25 @@ async function fetchActiveViviendas() {
     };
   }).filter((r) => r.id.length > 0);
 
+  // Si la vivienda no tiene precio base, usamos el más bajo (por semana) de sus
+  // precios mensuales y temporadas, para mostrar "desde X €" en vez de "Consultar precio".
+  const minSemana = {};
+  for (const tabla of ["precios_mensuales", "temporadas_especiales"]) {
+    try {
+      const rr = await fetch(`${SUPABASE_URL}/rest/v1/${tabla}?select=vivienda_id,precio_semana`, {
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+      });
+      if (!rr.ok) continue;
+      for (const x of await rr.json()) {
+        const n = Number(x.precio_semana);
+        if (n > 0 && (minSemana[x.vivienda_id] == null || n < minSemana[x.vivienda_id])) minSemana[x.vivienda_id] = n;
+      }
+    } catch (e) { console.warn("Aviso: no se pudieron leer precios de " + tabla); }
+  }
+  for (const c of candidates) {
+    if (!c.precio && minSemana[c.id]) { c.precio = String(Math.round(minSemana[c.id])); c.unidadPrecio = "semana"; }
+  }
+
   const invalid = candidates.filter((r) => !SLUG_PATTERN.test(r.slug));
   if (invalid.length > 0) {
     console.warn("Aviso: se ignoran viviendas cuyo slug/id no tiene un formato válido (no [a-z0-9-]+):", invalid.map((r) => r.id));
