@@ -522,6 +522,9 @@ input,textarea{font:inherit;}
 .blog-modal-backdrop{position:fixed;inset:0;background:var(--cal);display:block;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s ease;}
 .blog-modal-backdrop.open{opacity:1;pointer-events:auto;}
 .blog-modal-panel{background:var(--card);max-width:1100px;width:100%;margin:0 auto;padding:0 0 60px;position:relative;min-height:100%;}
+.blog-modal-back{position:fixed;top:18px;left:18px;height:42px;padding:0 18px;border-radius:999px;background:rgba(255,255,255,.95);color:var(--atlantic);font:700 14px var(--ff-body);z-index:3;display:flex;align-items:center;box-shadow:0 6px 18px rgba(8,42,64,.25);text-decoration:none;}
+.blog-modal-back:hover{background:#fff;color:var(--bougain);}
+@media(max-width:760px){.blog-modal-back{top:14px;left:14px;height:38px;padding:0 14px;font-size:13px;}}
 .blog-modal-close{position:fixed;top:18px;right:18px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.95);border:none;font-size:22px;color:var(--ink);z-index:3;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(8,42,64,.25);cursor:pointer;}
 .blog-modal-cover{width:100%;aspect-ratio:16/8;background:linear-gradient(135deg,var(--atlantic),var(--teal));overflow:hidden;}
 .blog-modal-cover img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -741,7 +744,8 @@ body:has(.cookie-banner.is-visible) .blog-wa{display:none;}
 <!-- ============ BLOG MODAL ============ -->
 <div class="blog-modal-backdrop" id="blogModalBackdrop">
   <div class="blog-modal-panel">
-    <button class="blog-modal-close" id="blogModalClose">×</button>
+    <a class="blog-modal-back" id="blogModalBack" href="/blog/">&larr; Todos los blogs</a>
+    <button class="blog-modal-close" id="blogModalClose" aria-label="Cerrar">×</button>
     <div class="blog-modal-cover" id="blogModalCover"></div>
     <div class="blog-modal-body">
       <span class="blog-date" id="blogModalDate"></span>
