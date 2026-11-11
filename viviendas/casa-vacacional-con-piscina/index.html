@@ -697,6 +697,18 @@ html{scroll-behavior:smooth;}
 #amenSection .modal-amenities .amenity-chip .em{font-size:18px;}
 @media (max-width:760px){.detail-sec{margin-top:26px;padding-top:24px;}.desc-section .modal-desc{font-size:16px;}}
 
+
+/* ---- Antes de reservar (desplegables) ---- */
+.before-book .acc{border-bottom:1px solid var(--line);}
+.before-book .acc:first-of-type{border-top:1px solid var(--line);}
+.before-book summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 2px;font-weight:700;font-size:16.5px;color:var(--ink);}
+.before-book summary::-webkit-details-marker{display:none;}
+.before-book summary:hover{color:var(--atlantic);}
+.acc-ic{position:relative;width:18px;height:18px;flex:none;}
+.acc-ic::before,.acc-ic::after{content:"";position:absolute;left:2px;right:2px;top:8px;height:2px;border-radius:2px;background:#5b6a74;transition:transform .25s ease;}
+.acc-ic::after{transform:rotate(90deg);}
+.before-book details[open] .acc-ic::after{transform:rotate(0);}
+.before-book .acc-grid{margin:0 0 20px;}
 /* ============ BANNER DE COOKIES ============ */
 .cookie-banner{position:fixed;left:0;right:0;bottom:0;z-index:200;background:var(--atlantic-dark);color:var(--cal);padding:18px 20px;box-shadow:0 -8px 30px rgba(8,42,64,.35);transform:translateY(110%);transition:transform .35s ease;}
 .cookie-banner.is-visible{transform:translateY(0);}
@@ -903,26 +915,31 @@ html{scroll-behavior:smooth;}
         </div>
       </div>
 
-      <div class="booking-info-section">
-        <span class="eyebrow">Antes de escribir</span>
-        <h4>Información de la reserva</h4>
-        <div class="booking-info-grid">
+      <section class="detail-sec before-book">
+        <h4 class="sec-title">Antes de reservar</h4>
+        <details class="acc">
+          <summary><span>Cómo funciona la reserva</span><i class="acc-ic" aria-hidden="true"></i></summary>
+          <div class="booking-info-grid acc-grid">
           <div class="bi-card"><span class="bi-ic">💬</span><b>Trato directo</b><p>Tu consulta nos llega a nosotros y hablamos todo contigo: dudas, fechas y condiciones.</p></div>
           <div class="bi-card"><span class="bi-ic">🤝</span><b>Reserva con el propietario</b><p>El primer pago, para reservar, se hace directamente al propietario, nunca a través de esta web.</p></div>
           <div class="bi-card"><span class="bi-ic">🔑</span><b>Llaves y atención</b><p>El propietario es responsable del alojamiento: llaves, limpieza y atención durante la estancia.</p></div>
-        </div>
-      </div>
-
-      <div class="booking-info-section policies-section">
-        <span class="eyebrow">Condiciones</span>
-        <h4>Confianza, normas y cancelación</h4>
-        <div class="booking-info-grid pol-grid">
+          </div>
+        </details>
+        <details class="acc">
+          <summary><span>Confianza y normas</span><i class="acc-ic" aria-hidden="true"></i></summary>
+          <div class="booking-info-grid acc-grid">
           <div class="bi-card"><span class="bi-ic">🛡️</span><b>Confianza</b><ul class="pol-list"><li>Propietarios particulares.</li><li>Dirección verificada.</li><li>Fotos y vídeo hechos por nosotros, para que lo que ves sea lo que hay.</li><li>Limpieza a cargo del propietario.</li></ul></div>
           <div class="bi-card"><span class="bi-ic">📋</span><b>Normas</b><ul class="pol-list"><li>La vivienda debe entregarse en las mismas condiciones en que se recibió.</li><li>No se puede superar el número máximo de huéspedes indicado en la ficha.</li><li>Si la vivienda no admite mascotas, tampoco se admiten en visitas.</li><li>No se permite fumar dentro de la vivienda.</li><li>Cualquier daño o desperfecto lo asume el huésped.</li><li>Respeta a los vecinos y las zonas comunes, si las hay.</li><li>No se admiten fiestas.</li><li>Música baja a partir de las 00:00 h.</li></ul></div>
+          </div>
+        </details>
+        <details class="acc">
+          <summary><span>Depósito y cancelación</span><i class="acc-ic" aria-hidden="true"></i></summary>
+          <div class="booking-info-grid acc-grid">
           <div class="bi-card"><span class="bi-ic">💶</span><b>Depósito y pago</b><ul class="pol-list"><li>Para reservar se abona un depósito o señal directamente al propietario, nunca a través de esta web.</li><li>La reserva queda confirmada cuando el propietario recibe el depósito.</li><li>El resto del alquiler se paga a la llegada.</li></ul></div>
           <div class="bi-card"><span class="bi-ic">📅</span><b>Política de cancelación</b><ul class="pol-list"><li><b>Más de 90 días antes de la llegada:</b> se devuelve el 100 % del depósito.</li><li><b>Entre 90 y 30 días:</b> no se devuelve, pero sirve como crédito para una reserva el año siguiente en la misma vivienda.</li><li><b>Menos de 30 días:</b> no se devuelve.</li><li>Para cancelar, escríbenos por WhatsApp o por email.</li><li><a href="/politica-de-cancelacion/">Ver la política completa</a></li></ul></div>
-        </div>
-      </div>
+          </div>
+        </details>
+      </section>
 
       <div class="reviews-section">
         <span class="eyebrow"><svg class="icon" style="width:14px;height:14px"><use href="#i-star"/></svg>Opiniones</span>
