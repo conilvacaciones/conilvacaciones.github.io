@@ -696,6 +696,13 @@ html{scroll-behavior:smooth;}
 #amenSection .modal-amenities .amenity-chip{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;font-weight:600;color:var(--ink);}
 #amenSection .modal-amenities .amenity-chip .em{font-size:18px;}
 @media (max-width:760px){.detail-sec{margin-top:26px;padding-top:24px;}.desc-section .modal-desc{font-size:16px;}}
+
+/* ---- Horario debajo de la disponibilidad ---- */
+.loc-time,.loc-time.has-map{grid-template-columns:1fr;}
+.time-below{margin-top:18px;}
+.time-below .time-card{max-width:none;padding:18px 20px;}
+.time-below .time-list{flex-direction:row;gap:12px;flex-wrap:wrap;margin-top:12px;}
+.time-below .time-item{flex:1 1 220px;}
 /* ============ BANNER DE COOKIES ============ */
 .cookie-banner{position:fixed;left:0;right:0;bottom:0;z-index:200;background:var(--atlantic-dark);color:var(--cal);padding:18px 20px;box-shadow:0 -8px 30px rgba(8,42,64,.35);transform:translateY(110%);transition:transform .35s ease;}
 .cookie-banner.is-visible{transform:translateY(0);}
@@ -856,10 +863,6 @@ html{scroll-behavior:smooth;}
           <span class="eyebrow"><svg class="icon" style="width:14px;height:14px"><use href="#i-pin"/></svg>Ubicación</span>
           <div class="modal-map-wrap" id="modalMapWrap"></div>
         </div>
-        <div class="time-card" id="modalCheckinoutSection" style="display:none">
-          <span class="eyebrow"><svg class="icon" style="width:14px;height:14px"><use href="#i-cal"/></svg>Horario</span>
-          <div class="time-list" id="modalCheckinout"></div>
-        </div>
       </div>
 
       <div class="booking" id="bookingSection">
@@ -899,6 +902,13 @@ html{scroll-behavior:smooth;}
             <p class="booking-note">No se realiza ningún cobro aquí: al consultar, hablamos contigo para confirmar la disponibilidad y las condiciones. La reserva se hace pagando el depósito directamente al propietario.</p>
             <div id="alertSlot"></div>
           </div>
+        </div>
+      </div>
+
+      <div class="time-below">
+        <div class="time-card" id="modalCheckinoutSection" style="display:none">
+          <span class="eyebrow"><svg class="icon" style="width:14px;height:14px"><use href="#i-cal"/></svg>Horario</span>
+          <div class="time-list" id="modalCheckinout"></div>
         </div>
       </div>
 
@@ -1807,7 +1817,7 @@ function openModal(id){
     document.getElementById("modalMapWrap").innerHTML = "";
   }
   var locTime = document.getElementById("locTime");
-  locTime.style.display = (currentHouse.location || hasTime) ? "" : "none";
+  locTime.style.display = currentHouse.location ? "" : "none";
   locTime.classList.toggle("has-map", !!currentHouse.location);
 
   // galería en mosaico + visor de fotos
