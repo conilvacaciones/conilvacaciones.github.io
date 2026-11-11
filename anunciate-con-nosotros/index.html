@@ -567,6 +567,70 @@ input,textarea{font:inherit;}
 .cookie-banner-actions{display:flex;gap:12px;flex-wrap:wrap;flex-shrink:0;}
 .cookie-banner-actions .btn{padding:10px 18px;font-size:13.5px;}
 @media (max-width:640px){ .cookie-banner-inner{flex-direction:column;align-items:stretch;} .cookie-banner-actions{justify-content:flex-end;} }
+
+/* ============ ANÚNCIATE: DISEÑO MODERNO ============ */
+.anun-hero{padding:48px 0 90px;background:linear-gradient(180deg,#E4F1EE 0%,var(--cal) 100%);}
+.anun-hero .eyebrow,.anun-ventajas .eyebrow,.anun-pasos .eyebrow,.anun-form-section .eyebrow{font-family:var(--ff-body);font-weight:800;letter-spacing:.14em;color:var(--teal);font-size:12.5px;}
+.anun-hero .eyebrow::before,.anun-ventajas .eyebrow::before,.anun-pasos .eyebrow::before,.anun-form-section .eyebrow::before{display:none;}
+.anun-hero h1{font-family:var(--ff-body);font-weight:800;letter-spacing:-.035em;font-size:clamp(36px,5vw,62px);line-height:1.03;margin:16px 0 18px;}
+.anun-hero .anun-intro{font-size:18px;line-height:1.6;color:#3a4a55;max-width:520px;}
+.anun-hero-actions .btn{padding:16px 28px;border-radius:14px;font-weight:800;}
+.anun-hero-actions .btn-outline{background:transparent;border:1.5px solid var(--atlantic);color:var(--atlantic);}
+.anun-hero-actions .btn-outline:hover{background:var(--atlantic);color:#fff;}
+.anun-pics{position:relative;}
+.anun-pics .anun-hero-img{aspect-ratio:auto;height:430px;width:84%;margin-left:auto;border-radius:26px;box-shadow:0 30px 60px -30px rgba(11,61,92,.5);}
+.anun-pics .anun-hero-img:hover{transform:none;}
+.anun-pic-b{position:absolute;left:0;bottom:-26px;width:44%;height:46%;object-fit:cover;border-radius:20px;border:6px solid var(--cal);}
+.anun-badge{position:absolute;left:8px;top:44px;background:#fff;border-radius:16px;padding:13px 18px;box-shadow:0 20px 40px -20px rgba(0,0,0,.35);font-weight:800;color:var(--atlantic);font-size:15px;z-index:2;}
+.anun-badge small{display:block;font-weight:500;color:#5b6a74;font-size:12.5px;}
+.anun-stats-wrap{margin-top:-40px;position:relative;z-index:3;}
+.anun-stats{display:flex;background:#fff;border-radius:20px;padding:22px 10px;border:1px solid var(--line);box-shadow:0 24px 50px -28px rgba(11,61,92,.45);}
+.anun-stats div{flex:1;text-align:center;border-right:1px solid var(--line);font-weight:800;font-size:17px;color:var(--atlantic);padding:0 10px;}
+.anun-stats div:last-child{border:0;}
+.anun-stats small{display:block;font-weight:500;font-size:13px;color:#5b6a74;margin-top:3px;}
+.anun-ventajas{padding:84px 0;}
+.anun-ventajas h2,.anun-pasos h2,.anun-form-section h2{font-family:var(--ff-body);font-weight:800;letter-spacing:-.03em;font-size:clamp(28px,3.4vw,38px);line-height:1.1;color:var(--atlantic);}
+.anun-ventaja-card{border-radius:18px;padding:26px;box-shadow:none;border-top:3px solid var(--teal);}
+.anun-ventaja-card:nth-child(3n+2){border-top-color:var(--sol);}
+.anun-ventaja-card:nth-child(3n){border-top-color:var(--bougain);}
+.anun-ventaja-card h3{font-family:var(--ff-body);font-weight:800;font-size:18px;letter-spacing:-.01em;color:#0f2330;margin:16px 0 8px;}
+.anun-ventaja-card p{font-size:14.5px;color:#4a5a65;}
+.anun-ib{width:52px;height:52px;border-radius:14px;background:#E4F1EE;color:var(--teal);display:flex;align-items:center;justify-content:center;}
+.anun-ic{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.anun-pasos{padding:84px 0;background:#E4F1EE;}
+.anun-pasos-list{max-width:none;margin:46px 0 0;display:grid;grid-template-columns:repeat(5,1fr);gap:16px;position:relative;}
+.anun-pasos-list.n1,.anun-pasos-list.n2,.anun-pasos-list.n3,.anun-pasos-list.n4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));}
+.anun-pasos-list::before{content:"";position:absolute;left:10%;right:10%;top:27px;height:2px;background:#b9d6cf;}
+.anun-paso{display:block;text-align:center;padding:0;border:0;position:relative;}
+.anun-paso .paso-num{width:54px;height:54px;border-radius:50%;background:#fff;border:2px solid var(--teal);color:var(--teal);margin:0 auto 16px;position:relative;z-index:1;}
+.anun-paso h3{font-family:var(--ff-body);font-weight:800;font-size:15.5px;line-height:1.3;color:#0f2330;}
+.anun-paso p{font-size:13px;line-height:1.55;color:#4a5a65;margin-top:8px;}
+.anun-final{padding:84px 0 20px;}
+.anun-final .wrap{max-width:1180px;background:linear-gradient(120deg,#0B3D5C,#177268);color:#fff;border-radius:28px;padding:52px 56px;display:flex;justify-content:space-between;align-items:center;gap:30px;flex-wrap:wrap;text-align:left;}
+.anun-final h2{font-family:var(--ff-body);font-weight:800;letter-spacing:-.03em;font-size:clamp(24px,3vw,34px);line-height:1.12;color:#fff;max-width:560px;margin:0 0 10px;}
+.anun-final p{color:rgba(255,255,255,.86);font-size:16px;margin:0;max-width:560px;}
+.anun-final .btn{white-space:nowrap;}
+.anun-final .wrap>:not(.btn){flex:1 1 360px;}
+.anun-form-section{padding:70px 0 90px;}
+.anun-form{max-width:760px;border-radius:24px;padding:36px;box-shadow:0 30px 60px -36px rgba(11,61,92,.35);}
+.anun-form label{color:var(--teal);font-weight:800;font-size:10.5px;letter-spacing:.08em;}
+.anun-form input,.anun-form textarea,.anun-form select{background:#fff;border:1.5px solid #dfe5e0;border-radius:12px;padding:12px 14px;}
+.anun-form input:focus,.anun-form textarea:focus,.anun-form select:focus{outline:none;border-color:var(--atlantic);}
+.anun-form .btn,.anun-form button[type=submit]{width:100%;border-radius:14px;padding:16px;font-weight:800;}
+@media (max-width:900px){
+  .anun-hero{padding-bottom:70px;}
+  .anun-pics .anun-hero-img{width:100%;height:auto;aspect-ratio:4/3;order:0;}
+  .anun-pic-b{display:none;}
+  .anun-badge{left:12px;top:12px;}
+  .anun-stats{flex-wrap:wrap;gap:16px 0;}
+  .anun-stats div{flex:1 1 50%;border:0;}
+  .anun-pasos-list,.anun-pasos-list.n1,.anun-pasos-list.n2,.anun-pasos-list.n3,.anun-pasos-list.n4{grid-template-columns:1fr;gap:26px;}
+  .anun-pasos-list::before{display:none;}
+  .anun-paso{display:flex;gap:16px;text-align:left;}
+  .anun-paso .paso-num{margin:0;flex:none;}
+  .anun-final .wrap{padding:36px 26px;}
+  .anun-ventajas,.anun-pasos{padding:60px 0;}
+}
 </style>
 <script type="application/ld+json">
 {
@@ -663,7 +727,7 @@ input,textarea{font:inherit;}
 <section class="anun-hero" id="anunciate-top">
   <div class="wrap anun-hero-grid">
     <div class="reveal is-visible">
-      <span class="eyebrow">Propietarios</span>
+      <span class="eyebrow">Para propietarios</span>
       <h1 id="anunTitulo">Anúnciate con nosotros</h1>
       <p class="anun-subtitulo" id="anunSubtitulo"></p>
       <p class="anun-intro" id="anunIntro">Promocionamos tu vivienda vacacional en Conil de la Frontera y alrededores, y te ayudamos a conseguir huéspedes interesados. La gestión de la vivienda y el trato con tus clientes siguen siendo tuyos.</p>
@@ -672,9 +736,22 @@ input,textarea{font:inherit;}
         <a href="#" class="btn btn-outline" id="anunBtnWhatsapp" target="_blank" rel="noopener"><svg class="icon" style="width:16px;height:16px"><use href="#i-whatsapp"/></svg>Hablar por WhatsApp</a>
       </div>
     </div>
-    <div class="anun-hero-img" id="anunHeroImgWrap"></div>
+    <div class="anun-pics">
+      <div class="anun-hero-img" id="anunHeroImgWrap"></div>
+      <img class="anun-pic-b" src="/img/hero-conil.jpg" alt="" aria-hidden="true">
+      <div class="anun-badge">Visibles para viajeros<small>Facebook · Instagram · TikTok</small></div>
+    </div>
   </div>
 </section>
+
+<div class="wrap anun-stats-wrap">
+  <div class="anun-stats">
+    <div>Gratis<small>Sin coste para el propietario</small></div>
+    <div>Trato directo<small>Tú gestionas tus reservas</small></div>
+    <div>Redes sociales<small>Facebook · Instagram · TikTok</small></div>
+    <div>Foto y vídeo<small>Contenido profesional</small></div>
+  </div>
+</div>
 
 <!-- ============ VENTAJAS ============ -->
 <section class="anun-ventajas" id="anun-ventajas">
@@ -705,6 +782,7 @@ input,textarea{font:inherit;}
 <!-- ============ TEXTO FINAL ============ -->
 <section class="anun-final" id="anun-texto-final">
   <div class="wrap">
+    <h2>¿Tienes una vivienda en Conil o alrededores?</h2>
     <p id="anunTextoFinal">Si tienes una vivienda en Conil de la Frontera o alrededores y quieres que te ayudemos a promocionarla y conseguir huéspedes, escríbenos sin compromiso.</p>
     <a href="#anun-form" class="btn btn-primary" id="anunBtnFinal">Quiero anunciarme</a>
   </div>
@@ -884,6 +962,7 @@ function escapeHTML(str){
   return div.innerHTML;
 }
 
+
 /* ============ ANÚNCIATE: CARGA DE CONTENIDO ============ */
 var ANUN = null;
 
@@ -908,16 +987,44 @@ function applySeccionesActivas(sec){
   });
 }
 
+var ANUN_ICONS = {
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+  home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  cal:'<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  hand:'<path d="M3 12l5-4 4 2 5-3 4 3-6 7-4-1-4 2z"/>',
+  wave:'<path d="M2 9c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2.5-2 5-2M2 15c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2.5-2 5-2"/>',
+  cam:'<path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/>',
+  form:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7M9 8h3"/>',
+  spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+  rocket:'<path d="M5 19c0-3 2-4 2-4M9 15l-3-3c1-4 5-8 13-8 0 8-4 12-8 13zM14.5 9.5h.01"/>',
+  phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/>'
+};
+var ANUN_EMOJI_ICON = {"🎯":"target","🏡":"home","🏠":"home","📅":"cal","🤝":"hand","🌊":"wave","📸":"cam","📷":"cam","📝":"form","✨":"spark","🚀":"rocket","📞":"phone","☎":"phone"};
+// separa el emoji inicial del título y lo cambia por un icono de línea
+function anunSplitTitle(t, fallback){
+  t = String(t||"").trim();
+  var m = t.match(/^([^\p{L}\p{N}¿¡"']+)\s*(.*)$/u);
+  var key = fallback;
+  if(m && m[2]){
+    var emo = m[1].replace(/\uFE0F/g,"").trim();
+    key = ANUN_EMOJI_ICON[emo] || ANUN_EMOJI_ICON[Array.from(emo)[0]] || fallback;
+    t = m[2];
+  }
+  return {title:t, icon:key};
+}
+function anunIcon(k){ return '<svg viewBox="0 0 24 24" class="anun-ic" aria-hidden="true">'+(ANUN_ICONS[k]||ANUN_ICONS.spark)+'</svg>'; }
+
 function renderVentajas(ventajas){
   var grid = document.getElementById("anunVentajasGrid");
   if(!ventajas || ventajas.length === 0){
     grid.innerHTML = '<p style="color:var(--ink-soft)">Todavía no se han añadido ventajas.</p>';
     return;
   }
-  grid.innerHTML = ventajas.map(function(v, i){
+  grid.innerHTML = ventajas.map(function(v){
+    var t = anunSplitTitle(v.titulo, "spark");
     return '<div class="anun-ventaja-card reveal is-visible">'+
-      '<div class="num">'+String(i+1).padStart(2,"0")+'</div>'+
-      '<h3>'+escapeHTML(v.titulo||"")+'</h3>'+
+      '<div class="anun-ib">'+anunIcon(t.icon)+'</div>'+
+      '<h3>'+escapeHTML(t.title)+'</h3>'+
       '<p>'+escapeHTML(v.texto||"")+'</p>'+
     '</div>';
   }).join("");
@@ -929,10 +1036,12 @@ function renderPasos(pasos){
     list.innerHTML = '<p style="color:var(--ink-soft);text-align:center">Todavía no se han añadido pasos.</p>';
     return;
   }
+  list.className = "anun-pasos-list n" + pasos.length;
   list.innerHTML = pasos.map(function(p, i){
+    var t = anunSplitTitle(p.titulo, "spark");
     return '<div class="anun-paso reveal is-visible">'+
-      '<div class="paso-num">'+(i+1)+'</div>'+
-      '<div><h3>'+escapeHTML(p.titulo||"")+'</h3><p>'+escapeHTML(p.texto||"")+'</p></div>'+
+      '<div class="paso-num">'+anunIcon(t.icon)+'</div>'+
+      '<div><h3>'+escapeHTML(t.title)+'</h3><p>'+escapeHTML(p.texto||"")+'</p></div>'+
     '</div>';
   }).join("");
 }
