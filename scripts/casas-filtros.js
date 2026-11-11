@@ -146,7 +146,7 @@ function generate(ctx) {
     `<div class="acts"><button type="submit" class="btn btn-s">Buscar casa</button><a href="/casas-conil/" class="btn btn-o">Ver todas</a><button type="button" class="btn btn-o" id="openFiltros">Filtros</button></div></div></form>`;
 
   const section = (h1, intro, cards, current, qa) =>
-    `<section class="blog-section" id="casas" style="padding:120px 0 60px"><div class="wrap" style="max-width:1180px">` +
+    `<section class="blog-section" id="casas" style="padding:36px 0 60px"><div class="wrap" style="max-width:1180px">` +
     `<span class="eyebrow">Casas vacacionales en Conil</span>` +
     `<h1 style="font-family:var(--ff-display);color:var(--atlantic);font-size:clamp(30px,5vw,46px);line-height:1.1;margin:10px 0 14px">${h.escapeText(h1)}</h1>` +
     `<p style="color:var(--ink-soft);font-size:17px;line-height:1.6;max-width:720px;margin:0 0 18px">${intro}</p>` +
