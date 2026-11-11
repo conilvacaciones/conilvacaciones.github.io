@@ -16,7 +16,6 @@ const norm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-
 const FILTERS = [
   { key: "p6", group: "personas", min: 6, label: "6 o más personas", slug: "para-6-personas", phrase: "para 6 o más personas", text: "Si viajáis varias familias o un grupo grande, estas casas tienen capacidad para 6 o más personas." },
   { key: "p4", group: "personas", min: 4, label: "4 o más personas", slug: "para-4-personas", phrase: "para 4 o más personas", text: "Casas con espacio para 4 o más personas, pensadas para familias y grupos pequeños de amigos." },
-  { key: "p8", group: "personas", min: 8, label: "8 o más personas", slug: "para-8-personas", phrase: "para 8 o más personas", text: "Casas para grupos grandes, con capacidad para 8 o más personas." },
   { key: "d3", group: "dormitorios", min: 3, label: "3 o más dormitorios", slug: "con-3-dormitorios", phrase: "con 3 o más dormitorios", text: "Casas con 3 o más dormitorios, para que cada pareja o familia tenga su espacio." },
   { key: "d2", group: "dormitorios", min: 2, label: "2 o más dormitorios", slug: "con-2-dormitorios", phrase: "con 2 o más dormitorios", text: "Casas con 2 o más dormitorios: más intimidad para familias con niños o dos parejas." },
   { key: "piscina", group: "equip", re: /piscina priv/, label: "Piscina privada", slug: "con-piscina-privada", phrase: "con piscina privada", text: "Una piscina privada permite bañarse sin compartir espacio ni depender de horarios, algo muy valorado con niños y en los meses de calor." },
@@ -26,12 +25,9 @@ const FILTERS = [
   { key: "calefaccion", group: "equip", re: /calefaccion/, label: "Calefacción", slug: "con-calefaccion", phrase: "con calefacción", text: "Conil se disfruta también fuera del verano. La calefacción hace cómodas las estancias de otoño, invierno y primavera." },
   { key: "barbacoa", group: "equip", re: /barbacoa/, label: "Barbacoa", slug: "con-barbacoa", phrase: "con barbacoa", text: "Una barbacoa propia permite cenar al aire libre sin salir de casa." },
   { key: "jardin", group: "equip", re: /jardin privado/, label: "Jardín privado", slug: "con-jardin-privado", phrase: "con jardín privado", text: "Un jardín privado da espacio para que los niños jueguen y para disfrutar del exterior a cualquier hora." },
-  { key: "terraza", group: "equip", re: /terraza|solarium/, label: "Terraza o solárium", slug: "con-terraza", phrase: "con terraza o solárium", text: "Una terraza o solárium permite desayunar, comer o tomar el sol sin salir de la casa." },
-  { key: "wifi", group: "equip", re: /wi-?fi/, label: "WiFi", slug: "con-wifi", phrase: "con WiFi", text: "WiFi en la casa, útil para conectarse o teletrabajar durante la estancia." },
-  { key: "lavavajillas", group: "equip", re: /lavavajillas/, label: "Lavavajillas", slug: "con-lavavajillas", phrase: "con lavavajillas", text: "Un lavavajillas facilita las comidas en grupo." },
 ].map((f, i) => ({ ...f, prio: i }));
 
-const ALWAYS = new Set(["piscina", "mascotas", "aire", "barbacoa", "wifi", "p4"]);
+const ALWAYS = new Set(["piscina", "mascotas", "aire", "barbacoa", "p4"]);
 
 function houseKeys(v) {
   const labels = (v.amenities || []).map(norm);
@@ -186,7 +182,7 @@ function generate(ctx) {
   const mainQa = [
     ["¿Cuántas casas vacacionales tenéis en Conil?", `Ahora mismo hay ${viviendas.length} casas disponibles: ${list(viviendas)}.`],
     ["¿Cómo reservo una casa?", "Escríbenos por WhatsApp con tus fechas y el número de personas: te confirmamos disponibilidad y precio directamente, sin comisiones de intermediarios."],
-    ["¿Qué filtros puedo usar?", "Puedes filtrar por número de personas, dormitorios y equipamiento (piscina privada, mascotas, parking, aire acondicionado, calefacción, barbacoa, jardín, terraza, WiFi y lavavajillas)."],
+    ["¿Qué filtros puedo usar?", "Puedes filtrar por número de personas, dormitorios y equipamiento (piscina privada, mascotas, parking, aire acondicionado, calefacción, barbacoa y jardín)."],
   ];
   changed += write(path.join(OUT, "index.html"), build({
     slug: "", h1: "Casas vacacionales en Conil de la Frontera",
