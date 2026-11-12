@@ -33,7 +33,7 @@
   }
   function load() {
     if (data) return Promise.resolve(data);
-    if (!loading) loading = fetch("/casas-conil/filtros.json").then(function (r) { return r.json(); }).then(function (d) { data = d; return d; });
+    if (!loading) loading = fetch("/casas-conil/filtros.json", { cache: "no-cache" }).then(function (r) { return r.json(); }).then(function (d) { data = d; return d; });
     return loading;
   }
   function matches() {
