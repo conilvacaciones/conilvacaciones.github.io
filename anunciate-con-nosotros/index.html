@@ -578,7 +578,8 @@ input,textarea{font:inherit;}
 .anun-hero-actions .btn-outline{background:transparent;border:1.5px solid var(--atlantic);color:var(--atlantic);}
 .anun-hero-actions .btn-outline:hover{background:var(--atlantic);color:#fff;}
 .anun-pics{position:relative;}
-.anun-pics .anun-hero-img{aspect-ratio:auto;height:430px;width:84%;margin-left:auto;border-radius:26px;box-shadow:0 30px 60px -30px rgba(11,61,92,.5);}
+.anun-pics .anun-hero-img{aspect-ratio:auto;height:auto;width:100%;border-radius:26px;box-shadow:0 30px 60px -30px rgba(11,61,92,.5);background:none;}
+.anun-pics .anun-hero-img img{height:auto;object-fit:contain;}
 .anun-pics .anun-hero-img:hover{transform:none;}
 .anun-pic-b{position:absolute;left:0;bottom:-26px;width:44%;height:46%;object-fit:cover;border-radius:20px;border:6px solid var(--cal);}
 .anun-badge{position:absolute;left:8px;top:44px;background:#fff;border-radius:16px;padding:13px 18px;box-shadow:0 20px 40px -20px rgba(0,0,0,.35);font-weight:800;color:var(--atlantic);font-size:15px;z-index:2;}
@@ -619,7 +620,7 @@ input,textarea{font:inherit;}
 .anun-form .btn,.anun-form button[type=submit]{width:100%;border-radius:14px;padding:16px;font-weight:800;}
 @media (max-width:900px){
   .anun-hero{padding-bottom:70px;}
-  .anun-pics .anun-hero-img{width:100%;height:auto;aspect-ratio:4/3;order:0;}
+  .anun-pics .anun-hero-img{width:100%;height:auto;aspect-ratio:auto;order:0;}
   .anun-pic-b{display:none;}
   .anun-badge{left:12px;top:12px;}
   .anun-stats{flex-wrap:wrap;gap:16px 0;}
@@ -738,8 +739,6 @@ input,textarea{font:inherit;}
     </div>
     <div class="anun-pics">
       <div class="anun-hero-img" id="anunHeroImgWrap"></div>
-      <img class="anun-pic-b" src="/img/hero-conil.jpg" alt="" aria-hidden="true">
-      <div class="anun-badge">Visibles para viajeros<small>Facebook · Instagram · TikTok</small></div>
     </div>
   </div>
 </section>
