@@ -186,11 +186,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://conilvacaciones.github.io/casas-conil/con-wifi/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://conilvacaciones.github.io/casas-conil/para-6-personas/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
