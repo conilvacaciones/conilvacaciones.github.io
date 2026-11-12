@@ -27,6 +27,10 @@
       ".flt-list{margin:12px 0 0;padding:0;list-style:none}.flt-list a{display:block;padding:10px 12px;border:1px solid #e4e1d6;border-radius:12px;margin-bottom:8px;color:var(--atlantic,#0B3D5C);font-weight:600;text-decoration:none}";
     document.head.appendChild(s);
   }
+  function pre() {
+    var el = document.querySelector(".flt-applied"), k = el && el.getAttribute("data-keys");
+    return k ? k.split(",") : [];
+  }
   function load() {
     if (data) return Promise.resolve(data);
     if (!loading) loading = fetch("/casas-conil/filtros.json").then(function (r) { return r.json(); }).then(function (d) { data = d; return d; });
@@ -36,22 +40,20 @@
     var keys = Object.keys(sel).filter(function (k) { return sel[k]; });
     return data.houses.filter(function (h) { return keys.every(function (k) { return h.keys.indexOf(k) !== -1; }); });
   }
-  function target(list) {
-    var ids = list.map(function (h) { return h.id; }).sort().join("|");
-    if (list.length === data.houses.length) return data.all;
-    var p = data.pages.filter(function (x) { return x.ids.slice().sort().join("|") === ids; })[0];
-    return p ? p.url : null;
+  function selKeys() { return Object.keys(sel).filter(function (k) { return sel[k]; }).sort(); }
+  function target() {
+    var keys = selKeys();
+    if (!keys.length) return data.all;
+    return (data.combos && data.combos[keys.join(",")]) || (data.all + "?f=" + keys.join(","));
   }
   function refresh() {
     var list = matches(), n = list.length;
     panel.querySelector(".flt-n").textContent = n === 0 ? "Ninguna casa cumple todo. Prueba a quitar algún filtro." : n + (n === 1 ? " casa cumple tus filtros" : " casas cumplen tus filtros");
     var go = panel.querySelector(".flt-go"); go.disabled = n === 0;
-    var url = target(list), ul = panel.querySelector(".flt-list");
+    var url = list.length ? target() : null, ul = panel.querySelector(".flt-list");
     ul.innerHTML = "";
-    go.textContent = url || n === 0 ? "Ver resultados" : "Ver casas";
-    if (n > 0 && !url) list.forEach(function (h) { var li = document.createElement("li"); var a = document.createElement("a"); a.href = h.url; a.textContent = h.nombre; li.appendChild(a); ul.appendChild(li); });
-    go.onclick = function () { if (url) location.href = url; else if (list[0]) { ul.scrollIntoView({ behavior: "smooth", block: "nearest" }); } };
-    go.style.display = n > 0 && !url ? "none" : "";
+    go.textContent = "Ver resultados";
+    go.onclick = function () { if (url) location.href = url; };
   }
   function chip(f) {
     var b = document.createElement("button"); b.type = "button"; b.className = "flt-chip"; b.textContent = f.label; b.setAttribute("aria-pressed", "false");
@@ -70,6 +72,7 @@
     load().then(function () {
       if (panel) panel.remove();
       sel = {};
+      pre().forEach(function (k) { sel[k] = true; });
       panel = document.createElement("div"); panel.className = "flt-bd"; panel.setAttribute("role", "dialog"); panel.setAttribute("aria-modal", "true"); panel.setAttribute("aria-label", "Filtros");
       var box = document.createElement("div"); box.className = "flt-box";
       box.innerHTML = '<div class="flt-h"><h2>Filtros</h2><button type="button" class="flt-x" aria-label="Cerrar">×</button></div>';
@@ -79,7 +82,7 @@
         if (!items.length) return;
         var w = document.createElement("div"); w.className = "flt-g"; w.setAttribute("data-g", g[0]);
         w.innerHTML = "<b>" + g[1] + '</b><div class="flt-c"></div>';
-        var c = w.querySelector(".flt-c"); items.slice().sort(function (a, b) { return g[0] === "equip" ? 0 : 0; }).forEach(function (f) { c.appendChild(chip(f)); });
+        var c = w.querySelector(".flt-c"); items.forEach(function (f) { var b = chip(f); if (sel[f.key]) b.setAttribute("aria-pressed", "true"); c.appendChild(b); });
         box.appendChild(w);
       });
       var ul = document.createElement("ul"); ul.className = "flt-list"; box.appendChild(ul);
@@ -96,4 +99,27 @@
     }).catch(function () { location.href = "/casas-conil/"; });
   }
   btn.addEventListener("click", open);
+
+  // /casas-conil/?f=a,b,c  → filtra el listado y muestra los filtros aplicados
+  (function () {
+    var m = /[?&]f=([^&]+)/.exec(location.search);
+    var grid = document.querySelector(".houses-grid"), bar = document.querySelector(".flt-applied");
+    if (!m || !grid || !bar) return;
+    var keys = decodeURIComponent(m[1]).split(",").filter(Boolean).sort();
+    load().then(function (d) {
+      keys = keys.filter(function (k) { return d.filters.some(function (f) { return f.key === k; }); });
+      if (!keys.length) return;
+      var ok = {};
+      d.houses.forEach(function (h) { ok[h.id] = keys.every(function (k) { return h.keys.indexOf(k) !== -1; }); });
+      var shown = 0;
+      grid.querySelectorAll(".house-card").forEach(function (c) { var v = ok[c.getAttribute("data-id")]; c.style.display = v ? "" : "none"; if (v) shown++; });
+      var labels = keys.map(function (k) { return d.filters.filter(function (f) { return f.key === k; })[0].label; });
+      bar.setAttribute("data-keys", keys.join(","));
+      bar.hidden = false;
+      bar.innerHTML = '<span class="fa-l">Filtros aplicados:</span>' + labels.map(function (l) { return '<span class="fa-c">' + l + "</span>"; }).join("") + '<a class="fa-x" href="/casas-conil/">Quitar filtros</a>';
+      var h1 = document.querySelector("#casas h1");
+      if (h1) h1.textContent = shown ? "Casas en Conil con tus filtros (" + shown + ")" : "Ninguna casa cumple todos los filtros";
+      var rb = document.createElement("meta"); rb.name = "robots"; rb.content = "noindex,follow"; document.head.appendChild(rb);
+    });
+  })();
 })();

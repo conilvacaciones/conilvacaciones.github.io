@@ -27,8 +27,6 @@ const FILTERS = [
   { key: "jardin", group: "equip", re: /jardin privado/, label: "Jardín privado", slug: "con-jardin-privado", phrase: "con jardín privado", text: "Un jardín privado da espacio para que los niños jueguen y para disfrutar del exterior a cualquier hora." },
 ].map((f, i) => ({ ...f, prio: i }));
 
-const ALWAYS = new Set(["piscina", "mascotas", "aire", "barbacoa", "p4"]);
-
 function houseKeys(v) {
   const labels = (v.amenities || []).map(norm);
   const keys = [];
@@ -43,17 +41,14 @@ function houseKeys(v) {
 function buildCombos(houses) {
   const hk = houses.map((h) => ({ h, keys: new Set(houseKeys(h)) }));
   const setOf = (fs_) => hk.filter((x) => fs_.every((f) => x.keys.has(f.key))).map((x) => x.h.id).sort();
-  const all = houses.map((h) => h.id).sort().join("|");
-  const best = new Map(); // setKey -> {filters, ids, cost}
+  const out = [];
   const consider = (fs_) => {
     const ids = setOf(fs_);
     if (!ids.length) return;
-    const key = ids.join("|");
-    if (key === all) return;
-    const cost = fs_.length * 1000 + fs_.reduce((a, f) => a + f.prio, 0);
-    const cur = best.get(key);
-    if (!cur || cost < cur.cost) best.set(key, { filters: fs_, ids, cost });
+    out.push({ filters: fs_, ids, cost: fs_.length * 1000 + fs_.reduce((a, f) => a + f.prio, 0) });
   };
+  // Una página propia por cada combinación de 1 o 2 filtros que dé resultados
+  // (no se combinan dos de personas ni dos de dormitorios).
   for (let i = 0; i < FILTERS.length; i++) {
     consider([FILTERS[i]]);
     for (let j = i + 1; j < FILTERS.length; j++) {
@@ -61,15 +56,7 @@ function buildCombos(houses) {
       consider([FILTERS[i], FILTERS[j]]);
     }
   }
-  // Búsquedas muy habituales: tienen página propia aunque todas las casas las cumplan
-  // (p. ej. "casas con piscina privada"), con su propio texto y preguntas frecuentes.
-  const ids = hk.map((x) => x.h.id).sort();
-  for (const f of FILTERS) {
-    if (!ALWAYS.has(f.key)) continue;
-    const got = setOf([f]);
-    if (got.join("|") === all && ids.length) best.set("always:" + f.key, { filters: [f], ids: got, cost: f.prio });
-  }
-  return [...best.values()].sort((a, b) => a.cost - b.cost);
+  return out.sort((a, b) => a.cost - b.cost);
 }
 
 const slugOf = (fs_) => fs_.map((f) => f.slug).join("-y-").replace(/-y-(con|que|para)-/g, "-y-");
@@ -125,7 +112,7 @@ function generate(ctx) {
     const precio = v.precio
       ? `<div class="hc-pl">Desde</div><div class="hc-pv">${h.escapeText(v.precio)} € <small>/ ${v.unidadPrecio}</small></div>`
       : `<div class="hc-pv nop">Consultar precio</div>`;
-    return `<article class="house-card"><a href="${href}" class="house-photo" style="display:block;background:linear-gradient(135deg,#0B3D5C,#177268)" aria-label="${h.escapeAttr(v.nombre)}">` +
+    return `<article class="house-card" data-id="${h.escapeAttr(v.id)}"><a href="${href}" class="house-photo" style="display:block;background:linear-gradient(135deg,#0B3D5C,#177268)" aria-label="${h.escapeAttr(v.nombre)}">` +
       (foto ? `<img src="${h.escapeAttr(foto)}" alt="${h.escapeAttr(v.nombre)}" loading="lazy">` : "") + `</a>` +
       `<div class="house-body"><h3 class="house-title"><a href="${href}" style="color:inherit;text-decoration:none">${h.escapeText(v.nombre)}</a></h3>` +
       `<div class="house-loc">${I.pin}<span>${h.escapeText(v.zona || "Conil de la Frontera")}</span>${v.distancia ? `<span>${h.escapeText(v.distancia)}</span>` : ""}</div>` +
@@ -141,12 +128,18 @@ function generate(ctx) {
     `<div class="row"><div><label for="cvE">Entrada</label><input type="date" id="cvE" name="e"></div><div><label for="cvS">Salida</label><input type="date" id="cvS" name="s"></div><div><label for="cvP">Personas</label><input type="number" id="cvP" name="p" min="1" max="30" value="2"></div>` +
     `<div class="acts"><button type="submit" class="btn btn-s">Buscar casa</button><a href="/casas-conil/" class="btn btn-o">Ver todas</a><button type="button" class="btn btn-o" id="openFiltros">Filtros</button></div></div></form>`;
 
-  const section = (h1, intro, cards, current, qa) =>
+  const banner = (fs_) => fs_ && fs_.length
+    ? `<div class="flt-applied" data-keys="${fs_.map((f) => f.key).join(",")}"><span class="fa-l">Filtros aplicados:</span>${fs_.map((f) => `<span class="fa-c">${h.escapeText(f.label)}</span>`).join("")}<a class="fa-x" href="/casas-conil/">Quitar filtros</a></div>`
+    : `<div class="flt-applied" data-keys="" hidden></div>`;
+  const BCSS = `<style>.flt-applied{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px;padding:12px 14px;background:#E4F1EE;border:1px solid #bfe0da;border-radius:14px;color:#0B3D5C}.flt-applied[hidden]{display:none}.fa-l{font-weight:800;font-size:13px;margin-right:2px}.fa-c{background:#177268;color:#fff;border-radius:999px;padding:5px 12px;font-weight:600;font-size:13.5px}.fa-x{margin-left:auto;font-size:13.5px;color:#0B3D5C;text-decoration:underline;font-weight:600}</style>`;
+
+  const section = (h1, intro, cards, current, qa, fs_) =>
     `<section class="blog-section" id="casas" style="padding:36px 0 60px"><div class="wrap" style="max-width:1180px">` +
     `<span class="eyebrow">Casas vacacionales en Conil</span>` +
     `<h1 style="font-family:var(--ff-display);color:var(--atlantic);font-size:clamp(30px,5vw,46px);line-height:1.1;margin:10px 0 14px">${h.escapeText(h1)}</h1>` +
     `<p style="color:var(--ink-soft);font-size:17px;line-height:1.6;max-width:720px;margin:0 0 18px">${intro}</p>` +
     `${SEARCH}` +
+    `${BCSS}${banner(fs_)}` +
     `${HCSS}<div class="houses-grid" style="margin-top:18px">${cards}</div>` +
     `` +
     faqBlock(qa) +
@@ -155,11 +148,11 @@ function generate(ctx) {
     `<p style="margin-top:14px"><a href="/playas-conil/" style="color:var(--atlantic);font-weight:600">Guía de playas de Conil</a> · <a href="/#viviendas" style="color:var(--atlantic);font-weight:600">Ver todas desde la portada</a></p>` +
     `</div><div class="blog-grid" id="blogGrid" style="display:none!important" hidden></div></section>`;
 
-  const build = ({ slug, h1, title, desc, intro, houses, qa }) => {
+  const build = ({ slug, h1, title, desc, intro, houses, qa, filters }) => {
     const url = slug ? `${SITE_URL}/casas-conil/${slug}/` : `${SITE_URL}/casas-conil/`;
     let html = retag(template, { title, desc, url });
     const cards = houses.map((v) => houseCard(v)).join("");
-    html = html.replace(/<section class="blog-section" id="blog">[\s\S]*?<\/section>/, () => section(h1, intro, cards, slug, qa));
+    html = html.replace(/<section class="blog-section" id="blog">[\s\S]*?<\/section>/, () => section(h1, intro, cards, slug, qa, filters));
     const ld = h.jsonLdScript({ "@context": "https://schema.org", "@type": "CollectionPage", name: h1, url, description: desc,
       mainEntity: { "@type": "ItemList", itemListElement: houses.map((v, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE_URL}/viviendas/${v.slug}/`, name: v.nombre })) } }) + "\n" +
       h.jsonLdScript(h.breadcrumbLd([{ name: "Inicio", url: `${SITE_URL}/` }, { name: "Casas en Conil", url: `${SITE_URL}/casas-conil/` }].concat(slug ? [{ name: h1, url }] : []))) + "\n" +
@@ -202,10 +195,10 @@ function generate(ctx) {
       slug: p.slug, h1: Hh,
       title: h.truncate(`Casas en Conil ${p.phrase} · Conil Vacaciones`, 70),
       desc: h.truncate(`Casas vacacionales en Conil ${p.phrase}: ${list(p.houses)}. Reserva directa con el propietario, sin comisiones.`, 158),
-      intro, houses: p.houses, qa })) ? 1 : 0;
+      intro, houses: p.houses, qa, filters: p.filters })) ? 1 : 0;
   }
 
-  // Páginas huérfanas (filtros que ya no dan un resultado distinto)
+  // Páginas huérfanas (combinaciones que ya no existen)
   const active = new Set(finalPages.map((p) => p.slug));
   if (fs.existsSync(OUT)) {
     for (const d of fs.readdirSync(OUT, { withFileTypes: true })) {
@@ -218,6 +211,8 @@ function generate(ctx) {
     filters: FILTERS.map(({ key, group, label }) => ({ key, group, label })),
     houses: viviendas.map((v) => ({ id: v.id, nombre: v.nombre, url: `/viviendas/${v.slug}/`, keys: houseKeys(v) })),
     pages: finalPages.map((p) => ({ url: `/casas-conil/${p.slug}/`, ids: p.ids })),
+    combos: Object.fromEntries(finalPages.map((p) => [p.filters.map((f) => f.key).sort().join(","), `/casas-conil/${p.slug}/`])),
+    labels: Object.fromEntries(FILTERS.map((f) => [f.key, f.phrase])),
     all: "/casas-conil/",
   };
   changed += write(path.join(OUT, "filtros.json"), JSON.stringify(manifest)) ? 1 : 0;
