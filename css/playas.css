@@ -1,0 +1,41 @@
+/* Playas de Conil — estilo claro (fichas y guías) */
+main{background:#FBF8F2}
+.pl-hero,.pl-hero.sea{background:none!important;padding:64px 0 6px}
+.pl-wrap{max-width:1000px}
+.pl-hero .eyebrow{font:800 12.5px Archivo,sans-serif;letter-spacing:.16em}
+.pl-hero h1{font-weight:700;color:#0B3D5C;letter-spacing:-.02em;line-height:1.05}
+.pl-hero p.lead{color:#5b6a74;font-size:18px;max-width:680px}
+.pl-h2{font-weight:500;color:#0B3D5C;margin:52px 0 12px;padding-top:26px;border-top:1px solid #e7e1d4;letter-spacing:-.01em}
+.pl-hero .pl-h2:first-of-type{border-top:0;padding-top:0}
+.pl-p{color:#4b5a64;font-size:16.5px;line-height:1.7}
+.pl-list{gap:0;border-top:1px solid #e7e1d4;margin-top:22px}
+.pl-card{background:transparent;border:0!important;border-bottom:1px solid #e7e1d4!important;border-radius:0;box-shadow:none;padding:26px 0;grid-template-columns:54px 1fr;gap:20px}
+.pl-card.top{background:#fff;margin:0 -22px;padding:26px 22px;border-radius:0}
+.pl-rank{width:46px;height:46px;border:1px solid #cfc6b2;background:none!important;color:#7a6c4d!important;font:500 16px Archivo,sans-serif}
+.pl-card.top .pl-rank{background:#0B3D5C!important;border-color:#0B3D5C;color:#fff!important}
+.pl-badge{background:#E4F1EE;color:#177268;letter-spacing:.04em}
+.pl-card h3{font-weight:500;font-size:25px;color:#0B3D5C}
+.pl-zone{color:#7a8791}
+.pl-why{color:#4b5a64;line-height:1.65;font-size:15.5px}
+.pl-bar i{background:#177268}
+.pl-tags span{background:none;border:1px solid #e3dccb;color:#4c5a64;border-radius:999px;padding:4px 12px;font-weight:600}
+.pl-weather{gap:10px}
+.pl-stat{background:#fff;border:1px solid #e7e1d4;border-radius:16px}
+.pl-stat b{color:#177268;letter-spacing:.12em}
+.pl-stat span{font-family:Archivo,sans-serif;font-weight:700;color:#0B3D5C}
+.pl-tool{background:#fff;border:1px solid #e7e1d4;border-radius:20px;padding:28px;margin-top:44px}
+.pl-tool h3{font-weight:500;font-size:26px}
+.pl-tool .btn-primary,.pl-cta .btn-primary{background:#0B3D5C;border-radius:999px;padding:14px 26px;color:#fff;box-shadow:none;border:0}
+.pl-note{background:transparent;border-left:3px solid #cfc6b2;border-radius:0;margin-top:24px}
+.pl-cta{background:#fff;color:#0B3D5C;border:1px solid #e7e1d4;border-radius:26px;padding:44px 40px;margin:64px 0}
+.pl-cta h2{color:#0B3D5C;font-weight:500;font-size:clamp(26px,4vw,36px)}
+.pl-cta p{color:#5b6a74}
+.pl-cta .btn-outline{background:#fff;color:#0B3D5C!important;border:1.5px solid #cfc6b2!important;border-radius:999px;padding:14px 26px}
+.pl-faqs h2{font-weight:500;font-size:34px;color:#0B3D5C}
+.pl-faq{background:#fff;border:1px solid #e7e1d4;border-radius:16px;padding:8px 20px}
+.pl-faq summary{padding:8px 0}
+.pl-links a{background:#fff;border:1px solid #e7e1d4;color:#0B3D5C}
+.pl-links a:hover{background:#E4F1EE}
+.hb-wind{gap:16px}.hb-w{background:#fff;border:1px solid #e7e1d4;border-radius:20px;box-shadow:none}
+.hb-w h3{font-weight:500;font-size:24px}.hb-w a.go{color:#0B3D5C;border-bottom:1.5px solid #177268}
+@media(max-width:560px){.pl-card.top{margin:0 -16px;padding:22px 16px}.pl-cta{padding:30px 22px}}
