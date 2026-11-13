@@ -583,6 +583,48 @@ input,textarea{font:inherit;}
 .blog-modal-content .cv-cta p{font-size:14.5px;opacity:.92;margin:0;}
 .blog-modal-content .cv-cta-btn{background:#25D366;color:#fff !important;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:600;white-space:nowrap;text-decoration:none;}
 @media(max-width:700px){.blog-modal-content .cv-casa-card{grid-template-columns:1fr;}.blog-modal-content .ccc-photo{min-height:0;aspect-ratio:16/10;}.blog-modal-content .cv-cta{flex-direction:column;align-items:flex-start;}}
+
+/* Bloques de diseño para artículos (cv-*) */
+.blog-modal-content h2{position:relative;padding-top:18px;margin-top:44px;font-size:clamp(24px,3vw,30px);line-height:1.2;letter-spacing:-.01em;}
+.blog-modal-content h2::before{content:"";position:absolute;left:0;top:0;width:44px;height:3px;border-radius:3px;background:#177268;}
+.blog-modal-content hr{border:0;height:0;margin:8px 0;}
+.blog-modal-content .cv-intro p:first-child{font-size:1.14em;line-height:1.7;color:var(--atlantic);}
+.blog-modal-content .cv-datos{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:26px 0;}
+.blog-modal-content .cv-dato{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 16px 14px;line-height:1.35;}
+.blog-modal-content .cv-dato strong{display:block;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#177268;font-weight:800;margin-bottom:6px;}
+.blog-modal-content .cv-dato p{margin:0;font-weight:700;color:var(--atlantic);font-size:16.5px;}
+.blog-modal-content .cv-aviso{display:block;background:#EAF4F1;border-left:4px solid #177268;border-radius:12px;padding:16px 20px;margin:24px 0;font-size:16px;line-height:1.65;}
+.blog-modal-content .cv-aviso p{margin:0;}
+.blog-modal-content .cv-aviso strong:first-child{color:#177268;}
+.blog-modal-content .cv-tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:22px 0;}
+.blog-modal-content .cv-tarjeta{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 20px 16px;transition:transform .2s,box-shadow .2s;}
+.blog-modal-content .cv-tarjeta:hover{transform:translateY(-3px);box-shadow:0 18px 30px -22px rgba(11,61,92,.5);}
+.blog-modal-content .cv-tarjeta h3{margin:0 0 6px;font-size:20px;}
+.blog-modal-content .cv-tarjeta p{margin:0;font-size:15.5px;line-height:1.6;color:#51606B;}
+.blog-modal-content .cv-tarjeta.cv-foto{padding:0;overflow:hidden;}
+.blog-modal-content .cv-tarjeta.cv-foto>img{margin:0;border-radius:0;width:100%;aspect-ratio:16/10;object-fit:cover;display:block;}
+.blog-modal-content .cv-tarjeta.cv-foto .cv-tb{padding:16px 18px 16px;}
+.blog-modal-content .cv-tarjeta .cv-tb h3{margin:0 0 6px;font-size:20px;}
+.blog-modal-content .cv-tarjetas.cv-dos{grid-template-columns:repeat(2,1fr);}
+@media(max-width:700px){.blog-modal-content .cv-tarjetas.cv-dos{grid-template-columns:1fr;}}
+.blog-modal-content .cv-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0;}
+.blog-modal-content .cv-chips p{margin:0;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:15px;font-weight:600;color:var(--atlantic);}
+.blog-modal-content .cv-lista{border-top:1px solid var(--line);margin:22px 0;}
+.blog-modal-content .cv-lista>div{display:grid;grid-template-columns:210px 1fr;gap:18px;padding:16px 0;border-bottom:1px solid var(--line);}
+.blog-modal-content .cv-lista strong{font-family:var(--ff-display);font-size:19px;color:var(--atlantic);font-weight:600;}
+.blog-modal-content .cv-lista p{margin:0;font-size:15.5px;line-height:1.6;color:#51606B;}
+.blog-modal-content .cv-dias{margin:26px 0;border-left:2px solid #cfe3de;padding-left:22px;}
+.blog-modal-content .cv-dia{position:relative;padding:0 0 18px;}
+.blog-modal-content .cv-dia::before{content:"";position:absolute;left:-29px;top:6px;width:12px;height:12px;border-radius:50%;background:#177268;box-shadow:0 0 0 4px #EAF4F1;}
+.blog-modal-content .cv-dia strong{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#177268;font-weight:800;}
+.blog-modal-content .cv-dia p{margin:2px 0 0;font-size:16.5px;color:var(--atlantic);font-weight:600;}
+.blog-modal-content .cv-final{background:linear-gradient(135deg,var(--atlantic),#177268);color:#fff;border-radius:22px;padding:30px 30px 26px;margin:36px 0 10px;}
+.blog-modal-content .cv-final h3{font-family:var(--ff-display);font-size:26px;color:#fff;margin:0 0 8px;}
+.blog-modal-content .cv-final p{margin:0 0 12px;color:rgba(255,255,255,.92);font-size:16.5px;line-height:1.65;}
+.blog-modal-content .cv-final .cv-cta-btn{display:inline-block;background:#fff;color:var(--atlantic)!important;border-radius:999px;padding:13px 26px;font-weight:700;font-size:15px;margin:4px 8px 0 0;text-decoration:none;}
+.blog-modal-content .cv-final .cv-cta-btn.cv-sec{background:transparent;color:#fff!important;border:1.5px solid rgba(255,255,255,.7);}
+.blog-modal-content .cv-bloque.cv-fila figure{margin:0;}
+@media(max-width:700px){.blog-modal-content .cv-lista>div{grid-template-columns:1fr;gap:4px}.blog-modal-content .cv-final{padding:24px 20px}}
 .blog-wa{position:fixed;right:18px;bottom:18px;z-index:150;display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;border-radius:40px;padding:12px 18px;font-size:14px;font-weight:600;text-decoration:none;box-shadow:0 8px 20px rgba(0,0,0,.25);}
 .blog-wa:hover{filter:brightness(.95);}
 /* No tapar el aviso de cookies: el botón vuelve cuando se acepta o rechaza */
@@ -648,6 +690,7 @@ body:has(.cookie-banner.is-visible) .blog-wa{display:none;}
 <link rel="stylesheet" href="/css/chrome.css?v=1">
 <script type="application/ld+json" id="blogPostJsonLd">{"@context":"https://schema.org","@type":"BlogPosting","@id":"https://conilvacaciones.github.io/blog/conil-en-septiembre/#articulo","mainEntityOfPage":{"@type":"WebPage","@id":"https://conilvacaciones.github.io/blog/conil-en-septiembre/"},"headline":"Conil en septiembre: qué hacer y por qué viajar | Conil Vacaciones","inLanguage":"es-ES","author":{"@id":"https://conilvacaciones.github.io/#organization"},"publisher":{"@id":"https://conilvacaciones.github.io/#organization"},"description":"Descubre Conil en septiembre: playas, actividades, rutas en barco, atardeceres, gastronomía y excursiones. ¡Prepara tus vacaciones con Conil Vacaciones!","image":["https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/conilseptiembre/portada-1793219790238-Conil_en_septiembre_junto_al_mar.png"],"datePublished":"2026-08-24T15:12:42.297Z"}</script>
 <script type="application/ld+json" id="breadcrumbJsonLd">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://conilvacaciones.github.io/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://conilvacaciones.github.io/blog/"},{"@type":"ListItem","position":3,"name":"Conil en septiembre: qué hacer y por qué viajar | Conil Vacaciones","item":"https://conilvacaciones.github.io/blog/conil-en-septiembre/"}]}</script>
+<script type="application/ld+json" id="faqJsonLd">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Merece la pena viajar a Conil en septiembre?","acceptedAnswer":{"@type":"Answer","text":"Sí. Si buscas unas vacaciones en la Costa de la Luz con playa, gastronomía, naturaleza y actividades, septiembre es una época muy interesante: el verano todavía está presente, pero el ambiente suele ser más tranquilo que en los meses de mayor afluencia."}},{"@type":"Question","name":"¿Qué tiempo hace en Conil en septiembre?","acceptedAnswer":{"@type":"Answer","text":"Normalmente todavía se puede disfrutar de temperaturas agradables durante el día, con noches algo más frescas. Conviene llevar ropa fresca, protección solar y una chaqueta ligera para la noche."}},{"@type":"Question","name":"¿Qué se puede hacer en Conil en septiembre?","acceptedAnswer":{"@type":"Answer","text":"Ir a la playa, hacer una ruta en barco, probar surf u otros deportes acuáticos, ver el atardecer, pasear por el centro histórico, comer pescado y atún de almadraba, y hacer excursiones a Vejer, El Palmar, Caños de Meca, Barbate, Zahara o Cádiz."}},{"@type":"Question","name":"¿Cuántos días conviene pasar en Conil?","acceptedAnswer":{"@type":"Answer","text":"Para una primera visita, entre 4 y 5 días pueden bastar para conocer lo más importante. Con una semana puedes combinar playa, actividades, excursiones y descanso con más calma."}}]}</script>
 </head>
 <body>
 
@@ -739,176 +782,7 @@ body:has(.cookie-banner.is-visible) .blog-wa{display:none;}
       </div>
     </div>
     <div class="blog-grid" id="blogGrid">
-      <article class="blog-static-post" style="grid-column:1/-1;max-width:760px"><p class="blog-date">24 de agosto de 2026</p><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/conilseptiembre/portada-1793219790238-Conil_en_septiembre_junto_al_mar.png" alt="Conil en septiembre: qué hacer y por qué viajar | Conil Vacaciones" title="Conil en septiembre: qué hacer y por qué viajar | Conil Vacaciones" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0"><div class="blog-modal-content"><h2>🌅 Conil en septiembre: por qué es una de las mejores épocas para viajar</h2>
-<p><strong>¿Estás pensando en viajar a Conil en septiembre?</strong> Después de los meses de verano, Conil de la Frontera recupera un ritmo más tranquilo sin perder el encanto de sus playas, sus calles blancas y el ambiente de la Costa de la Luz.</p>
-<p>Septiembre es un mes perfecto para quienes buscan <strong>unas vacaciones en Conil</strong> disfrutando del mar, el buen tiempo y actividades al aire libre, pero prefieren evitar parte de la masificación de julio y agosto.</p>
-<p>En esta guía te contamos <strong>qué hacer en Conil en septiembre, cómo es el tiempo, qué playas visitar, qué actividades puedes disfrutar y por qué alojarte con Conil Vacaciones puede ser una buena opción para tu escapada.</strong> 🏖️☀️</p>
-<h2>☀️ ¿Por qué viajar a Conil en septiembre?</h2>
-<p>Septiembre tiene algo especial.</p>
-<p>El verano todavía se siente en las playas, pero el ambiente suele ser más relajado. Puedes disfrutar de la costa, salir a comer, pasear por el centro y descubrir los alrededores de Conil sin tener que organizar cada plan con tanta antelación como en plena temporada alta.</p>
-<p>Además, las temperaturas suelen seguir siendo agradables para disfrutar de actividades al aire libre.</p>
-<p>Si buscas <strong>qué hacer en Conil en septiembre</strong>, tienes muchas posibilidades:</p>
-<p>🏖️ Pasar el día en la playa<br>
-🌊 Practicar deportes acuáticos<br>
-🚤 Hacer una ruta en barco<br>
-🏄 Probar el surf<br>
-🌅 Ver el atardecer<br>
-🚶 Pasear por el centro histórico<br>
-🍤 Disfrutar de la gastronomía local<br>
-🚗 Hacer excursiones por la provincia de Cádiz</p>
-<h2>🏖️ Las playas de Conil en septiembre</h2>
-<p>Uno de los principales motivos para viajar a Conil en septiembre sigue siendo, sin duda, sus playas.</p>
-<p>Durante este mes puedes seguir disfrutando de algunos de los grandes atractivos de la Costa de la Luz: kilómetros de arena, aguas del Atlántico y paisajes espectaculares.</p>
-<p>Entre las playas y zonas de costa que puedes incluir en tu viaje están:</p>
-<h3>🌊 Playa de La Fontanilla</h3>
-<p>Una de las playas más conocidas de Conil y una opción muy cómoda para quienes se alojan cerca del centro.</p>
-<h3>🏖️ Playa de Los Bateles</h3>
-<p>Situada junto al núcleo urbano, es una de las playas más populares y fáciles de visitar.</p>
-<h3>🌅 Fuente del Gallo</h3>
-<p>Su entorno de acantilados ofrece un paisaje diferente y unas vistas especialmente bonitas al atardecer.</p>
-<h3>🌊 Cala del Aceite</h3>
-<p>Una alternativa interesante para descubrir otro tipo de paisaje costero.</p>
-<h3>🏝️ Calas de Roche</h3>
-<p>Si buscas rincones más naturales y quieres conocer otra cara de la costa de Conil, las calas de Roche son una parada imprescindible.</p>
-<p>👉 <strong>Consejo:</strong> aunque septiembre sea más tranquilo que agosto, conviene comprobar siempre las condiciones del mar y las recomendaciones locales antes de bañarse.</p>
-<h2>🌡️ ¿Qué tiempo hace en Conil en septiembre?</h2>
-<p>Una de las grandes ventajas de viajar a Conil en septiembre es que normalmente todavía puedes disfrutar de temperaturas agradables.</p>
-<p>Durante el día puedes encontrarte con temperaturas propias del final del verano, mientras que por la noche suele refrescar algo más.</p>
-<p>Esto hace que septiembre sea un buen momento para combinar <strong>playa y turismo</strong>.</p>
-<p>Puedes pasar la mañana en la costa, comer tranquilamente y dedicar la tarde a conocer algún pueblo cercano.</p>
-<p>🌞 <strong>Durante el día:</strong> ropa fresca y protección solar.</p>
-<p>🌙 <strong>Por la noche:</strong> puede ser recomendable llevar una chaqueta ligera.</p>
-<p>🌊 <strong>Para la playa:</strong> septiembre sigue siendo un mes interesante, aunque las condiciones del mar pueden variar.</p>
-<h2>🚤 Actividades que hacer en Conil en septiembre</h2>
-<p>Septiembre no significa que se termine el verano.</p>
-<p>Muchas actividades relacionadas con el mar continúan dependiendo de la temporada y de las condiciones meteorológicas.</p>
-<h2>🚤 Ruta en barco</h2>
-<p>Una excursión en barco es una de las mejores maneras de descubrir la costa desde otra perspectiva.</p>
-<p>Puedes disfrutar de las vistas de los acantilados, calas y playas mientras navegas por el Atlántico.</p>
-<p>Además, algunas empresas locales ofrecen diferentes tipos de experiencias, desde rutas por la costa hasta actividades relacionadas con la tradición marinera de Conil.</p>
-<h2>🏍️ Motos de agua</h2>
-<p>Si buscas un plan con un poco más de adrenalina, septiembre puede ser un buen momento para disfrutar de una excursión en moto de agua.</p>
-<p>Es una actividad ideal para quienes quieren añadir algo diferente a sus vacaciones.</p>
-<p>Eso sí, consulta siempre <strong>disponibilidad, edades, requisitos y condiciones de la actividad</strong> antes de reservar.</p>
-<h2>🏄 Surf y deportes acuáticos</h2>
-<p>La costa de Conil y sus alrededores también son una buena opción para quienes quieren practicar deportes acuáticos.</p>
-<p>Si nunca has probado el surf, septiembre puede ser un momento interesante para iniciarte, especialmente si buscas un ambiente algo más tranquilo.</p>
-<p>También puedes encontrar actividades como:</p>
-<p>🏄 Surf<br>
-🏄‍♂️ Paddle surf<br>
-🛶 Kayak<br>
-🌊 Otras actividades náuticas</p>
-<p>La disponibilidad depende de las empresas y de las condiciones del mar.</p>
-<h2>🌅 Los atardeceres de Conil en septiembre</h2>
-<p>Si hay algo que no debería faltar en tu viaje es un atardecer.</p>
-<p>La costa de Conil ofrece numerosos lugares desde los que contemplar cómo el sol desaparece sobre el Atlántico.</p>
-<p>Puedes acercarte a:</p>
-<p>🌅 Fuente del Gallo<br>
-🌅 Las calas de Roche<br>
-🌅 La costa de Conil<br>
-🌅 Zonas próximas a Cabo Roche</p>
-<p>Lleva el móvil, algo de beber y busca un lugar tranquilo.</p>
-<p>No necesitas mucho más.</p>
-<h2>🚶 Pasear por el centro de Conil</h2>
-<p>No todo son playas.</p>
-<p>Una de las mejores cosas que hacer en Conil en septiembre es simplemente <strong>perderse por sus calles</strong>.</p>
-<p>El centro histórico conserva el característico ambiente de los pueblos blancos de Cádiz.</p>
-<p>Puedes recorrer sus calles, descubrir pequeñas plazas, entrar en tiendas y terminar tomando algo en alguna terraza.</p>
-<p>Y lo mejor es que, al bajar algo el ritmo respecto a los meses de mayor afluencia, puedes disfrutar del paseo con más tranquilidad.</p>
-<h2>🍤 ¿Qué comer en Conil en septiembre?</h2>
-<p>Una escapada a Conil no estaría completa sin disfrutar de su gastronomía.</p>
-<p>El pescado y el marisco tienen un papel protagonista en la cocina local.</p>
-<p>Y, por supuesto, el <strong>atún rojo de almadraba</strong> es uno de los productos más conocidos de la zona.</p>
-<p>Durante tu estancia puedes aprovechar para probar diferentes platos y descubrir restaurantes y establecimientos locales.</p>
-<p>🍣 Atún<br>
-🐟 Pescado fresco<br>
-🦐 Marisco<br>
-🍤 Fritura de pescado<br>
-🥗 Productos de la gastronomía gaditana</p>
-<p>💡 <strong>Consejo:</strong> si quieres visitar un restaurante concreto, especialmente durante un fin de semana, es recomendable consultar horarios y reservar cuando sea necesario.</p>
-<h2>🚗 Excursiones desde Conil en septiembre</h2>
-<p>Otra ventaja de viajar en septiembre es que puedes aprovechar algunos días para descubrir otros lugares de la provincia de Cádiz.</p>
-<p>Desde Conil puedes organizar excursiones a lugares como:</p>
-<h3>🏘️ Vejer de la Frontera</h3>
-<p>Uno de los pueblos blancos más conocidos de la provincia.</p>
-<h3>🌊 El Palmar</h3>
-<p>Una visita imprescindible para los amantes de la playa y el surf.</p>
-<h3>🌅 Caños de Meca</h3>
-<p>Ideal para descubrir otro paisaje de la Costa de la Luz.</p>
-<h3>🐟 Barbate</h3>
-<p>Una buena opción para conocer más sobre la tradición pesquera y gastronómica de la zona.</p>
-<h3>🏖️ Zahara de los Atunes</h3>
-<p>Playas espectaculares y gastronomía vinculada al atún.</p>
-<h3>🏛️ Cádiz</h3>
-<p>Una excursión perfecta si quieres combinar playa, historia y gastronomía.</p>
-<h2>👨‍👩‍👧‍👦 Conil en septiembre con niños</h2>
-<p>Si viajas en familia, septiembre puede ser especialmente interesante.</p>
-<p>Puedes organizar días tranquilos sin necesidad de llenar cada jornada de actividades.</p>
-<p>Por ejemplo:</p>
-<p><strong>Día 1:</strong> 🏖️ Playa + paseo por Conil</p>
-<p><strong>Día 2:</strong> 🚤 Ruta en barco</p>
-<p><strong>Día 3:</strong> 🏘️ Excursión a Vejer</p>
-<p><strong>Día 4:</strong> 🏖️ Playa + atardecer</p>
-<p><strong>Día 5:</strong> 🌊 Actividad acuática</p>
-<p><strong>Día 6:</strong> 🚗 Excursión</p>
-<p><strong>Día 7:</strong> 😎 Día tranquilo en Conil</p>
-<p>La clave está en combinar playa, descanso y alguna actividad.</p>
-<h2>❤️ Conil en septiembre para parejas</h2>
-<p>Si buscas una escapada romántica, septiembre también puede ser una opción fantástica.</p>
-<p>Imagina un día así:</p>
-<p>☀️ Desayuno tranquilo.</p>
-<p>🏖️ Mañana en la playa.</p>
-<p>🍤 Comida con productos locales.</p>
-<p>😴 Descanso en el alojamiento.</p>
-<p>🌅 Atardecer frente al Atlántico.</p>
-<p>🍷 Cena en Conil.</p>
-<p>❤️ Paseo nocturno por el centro.</p>
-<p>Sin prisas y disfrutando del ambiente de la Costa de la Luz.</p>
-<h2>🏡 ¿Dónde alojarse en Conil en septiembre?</h2>
-<p>Elegir bien el alojamiento puede marcar una gran diferencia en tus vacaciones.</p>
-<p>Si estás buscando <strong>alquiler vacacional en Conil</strong>, en <strong>Conil Vacaciones</strong> encontrarás diferentes opciones para disfrutar de tu estancia y utilizar el alojamiento como punto de partida para conocer la localidad y sus alrededores.</p>
-<p>Conil Vacaciones</p>
-<p>Una de las ventajas de reservar un <strong>alojamiento vacacional en Conil</strong> es poder disfrutar de tus vacaciones con mayor independencia y organizar cada día a tu ritmo.</p>
-<p>🏡 Tu alojamiento.</p>
-<p>🏖️ La playa cerca.</p>
-<p>🍤 Restaurantes y gastronomía.</p>
-<p>🚤 Actividades.</p>
-<p>🚗 Excursiones.</p>
-<p>🌅 Atardeceres.</p>
-<p>Todo preparado para disfrutar de Conil.</p>
-<h2>💡 ¿Por qué elegir Conil Vacaciones para tu escapada de septiembre?</h2>
-<p>Si estás buscando <strong>apartamento turístico en Conil</strong>, <strong>casa vacacional en Conil</strong> o simplemente un lugar donde alojarte durante tus vacaciones, Conil Vacaciones puede ser una opción a tener en cuenta.</p>
-<p>La idea es que puedas encontrar un alojamiento desde el que disfrutar de todo lo que ofrece Conil y la Costa de la Luz.</p>
-<p>👉 <strong>Consulta los alojamientos disponibles en Conil Vacaciones y encuentra el que mejor se adapte a tu viaje.</strong></p>
-<h2>📅 ¿Cuántos días pasar en Conil en septiembre?</h2>
-<p>Para una primera visita, <strong>4 o 5 días</strong> pueden ser suficientes para conocer algunos de los lugares más importantes.</p>
-<p>Pero si tienes una semana, mucho mejor.</p>
-<p>Puedes combinar:</p>
-<p>🏖️ Días de playa<br>
-🚤 Actividades<br>
-🚗 Excursiones<br>
-🍤 Gastronomía<br>
-🌅 Atardeceres<br>
-😴 Descanso</p>
-<p>Y precisamente ahí está uno de los atractivos de septiembre: <strong>no tienes que elegir entre turismo y descanso</strong>.</p>
-<p>Puedes hacer ambas cosas.</p>
-<h2>🌞 Conil en septiembre: ¿merece la pena?</h2>
-<p><strong>Sí.</strong></p>
-<p>Si buscas unas vacaciones en la Costa de la Luz con playa, gastronomía, naturaleza y actividades, septiembre es una época muy interesante para visitar Conil.</p>
-<p>El verano todavía está presente, pero el ambiente puede ser más tranquilo que en los meses de mayor afluencia.</p>
-<p>Puedes disfrutar de sus playas, descubrir sus calas, hacer una ruta en barco, probar actividades acuáticas, conocer pueblos cercanos y terminar cada día contemplando el atardecer.</p>
-<p>Y después de todo eso, tener un alojamiento donde descansar y desconectar.</p>
-<h2>🏡 Tu escapada a Conil empieza aquí</h2>
-<p>¿Estás pensando en viajar a Conil en septiembre?</p>
-<p>🌊 Playas increíbles.<br>
-🌅 Atardeceres.<br>
-🚤 Actividades en el mar.<br>
-🍤 Gastronomía.<br>
-🏘️ Pueblos blancos.<br>
-☀️ Buen ambiente.<br>
-🏡 Alojamientos vacacionales.</p>
-<p><strong>Descubre Conil Vacaciones y empieza a preparar tu próxima escapada a la Costa de la Luz.</strong></p>
-<p>👉 <strong>Reserva tu alojamiento vacacional en Conil y disfruta de septiembre junto al Atlántico.</strong></p></div></article>
+      <article class="blog-static-post" style="grid-column:1/-1;max-width:760px"><p class="blog-date">24 de agosto de 2026</p><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/conilseptiembre/portada-1793219790238-Conil_en_septiembre_junto_al_mar.png" alt="Conil en septiembre: qué hacer y por qué viajar | Conil Vacaciones" title="Conil en septiembre: qué hacer y por qué viajar | Conil Vacaciones" loading="lazy" style="max-width:100%;border-radius:12px;margin:12px 0"><div class="blog-modal-content"><div class="cv-intro"><h2>Conil en septiembre: una de las mejores épocas para viajar</h2><p><strong>¿Estás pensando en viajar a Conil en septiembre?</strong> Pasados los meses de más afluencia, Conil de la Frontera recupera un ritmo más tranquilo sin perder el encanto de sus playas, sus calles blancas y el ambiente de la Costa de la Luz.</p><p>Septiembre es perfecto para quienes buscan unas <strong>vacaciones en Conil</strong> con mar, buen tiempo y actividades al aire libre, pero prefieren evitar parte de la masificación de julio y agosto. En esta guía te contamos qué hacer, qué playas visitar, qué comer y cómo organizar tu escapada.</p></div><div class="cv-datos"><div class="cv-dato"><strong>Ambiente</strong><p>Más relajado que en pleno verano</p></div><div class="cv-dato"><strong>Playas</strong><p>Siguen siendo las protagonistas</p></div><div class="cv-dato"><strong>Plan ideal</strong><p>De 4 a 7 días</p></div><div class="cv-dato"><strong>Perfecto para</strong><p>Parejas y familias</p></div></div><h2>Por qué viajar a Conil en septiembre</h2><p>El verano todavía se siente en las playas, pero el ambiente suele ser más tranquilo. Puedes disfrutar de la costa, salir a comer, pasear por el centro y descubrir los alrededores sin tener que organizar cada plan con tanta antelación como en temporada alta. Y las temperaturas suelen seguir siendo agradables para las actividades al aire libre.</p><p>Si buscas <strong>qué hacer en Conil en septiembre</strong>, tienes muchas opciones:</p><div class="cv-chips"><p>🏖️ Día de playa</p><p>🌊 Deportes acuáticos</p><p>🚤 Ruta en barco</p><p>🏄 Surf</p><p>🌅 Atardeceres</p><p>🚶 Centro histórico</p><p>🍤 Gastronomía local</p><p>🚗 Excursiones por Cádiz</p></div><h2>Las playas de Conil en septiembre</h2><p>Uno de los principales motivos para viajar a Conil en septiembre sigue siendo, sin duda, sus playas: kilómetros de arena, aguas del Atlántico y paisajes espectaculares. Estas son las que no deberías perderte.</p><div class="cv-tarjetas cv-dos"><div class="cv-tarjeta cv-foto"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/playafontanilla/1786886738328-Playa-la-fontanilla-conil-4.jpg" alt="Playa de La Fontanilla, Conil" loading="lazy"><div class="cv-tb"><h3>Playa de La Fontanilla</h3><p>Una de las playas más conocidas de Conil y una opción muy cómoda para quienes se alojan cerca del centro.</p></div></div><div class="cv-tarjeta cv-foto"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejores-playas-conil/cuerpo-1793435500814-playa-los-bateles-conil.jpg" alt="Playa de Los Bateles, Conil" loading="lazy"><div class="cv-tb"><h3>Playa de Los Bateles</h3><p>Junto al núcleo urbano, es una de las playas más populares y fáciles de visitar.</p></div></div><div class="cv-tarjeta cv-foto"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejoreslugaresatardecer/cuerpo-1794500037652-cala-de-fuente-del-gallo-en-conil.jpg" alt="Cala de Fuente del Gallo, Conil" loading="lazy"><div class="cv-tb"><h3>Fuente del Gallo</h3><p>Su entorno de acantilados ofrece un paisaje diferente y unas vistas especialmente bonitas al atardecer.</p></div></div><div class="cv-tarjeta cv-foto"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejores-playas-conil/cuerpo-1793455189781-Calas-de-Roche-Cala-Aspero-1.webp" alt="Calas de Roche, Conil" loading="lazy"><div class="cv-tb"><h3>Calas de Roche</h3><p>Si buscas rincones más naturales y otra cara de la costa de Conil, son una parada imprescindible.</p></div></div></div><p>Y si quieres un paisaje costero distinto, la <strong>Cala del Aceite</strong> es una alternativa muy interesante.</p><div class="cv-aviso"><p><strong>Consejo:</strong> aunque septiembre sea más tranquilo que agosto, comprueba siempre las condiciones del mar y las recomendaciones locales antes de bañarte.</p></div><div class="cv-post" data-post="mejores-playas-conil"><a class="cv-post-card" href="/blog/mejores-playas-conil/"><span class="cpc-photo"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejores-playas-conil/portada-1793296151300-Gu_a_de_playas_de_Conil_al_atardecer.jpg" alt="Las mejores playas de Conil: guía para tus vacaciones" loading="lazy"></span><span class="cpc-body"><small>Te puede interesar</small><b>Las mejores playas de Conil: guía para tus vacaciones</b><span class="cpc-text">Descubre las mejores playas de Conil de la Frontera: Los Bateles, La Fontanilla, Fuente del Gallo, las Calas de Roche y más.</span><span class="cpc-btn">Leer más →</span></span></a></div><h2>¿Qué tiempo hace en Conil en septiembre?</h2><p>Una de las grandes ventajas es que normalmente todavía puedes disfrutar de temperaturas agradables, de final de verano durante el día y algo más frescas por la noche. Es un buen momento para combinar <strong>playa y turismo</strong>: mañana en la costa, comida tranquila y tarde para conocer un pueblo cercano.</p><div class="cv-tarjetas"><div class="cv-tarjeta"><h3>🌞 Durante el día</h3><p>Ropa fresca y protección solar.</p></div><div class="cv-tarjeta"><h3>🌙 Por la noche</h3><p>Puede apetecer una chaqueta ligera.</p></div><div class="cv-tarjeta"><h3>🌊 En la playa</h3><p>Sigue siendo un mes interesante, aunque las condiciones del mar pueden variar.</p></div></div><h2>Actividades que hacer en Conil en septiembre</h2><p>Septiembre no significa que se termine el verano. Muchas actividades relacionadas con el mar continúan, dependiendo de la temporada y de las condiciones meteorológicas.</p><div class="cv-bloque cv-lado"><div class="cv-medios"><figure class="cv-media"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/puertodeconil/cuerpo-1787572184736-puerto-deportivo-conil.jpg" alt="Puerto deportivo de Conil" loading="lazy"></figure></div><div class="cv-texto"><h3>🚤 Ruta en barco</h3><p>Una excursión en barco es una de las mejores maneras de descubrir la costa desde otra perspectiva: acantilados, calas y playas vistos desde el Atlántico.</p><p>Algunas empresas locales ofrecen desde rutas por la costa hasta experiencias relacionadas con la tradición marinera de Conil.</p></div></div><div class="cv-bloque cv-lado cv-inv"><div class="cv-medios"><figure class="cv-media"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/puertodeconil/cuerpo-1787572966388-jetski_conil_motos_de_agua.jpg" alt="Motos de agua en Conil" loading="lazy"></figure></div><div class="cv-texto"><h3>🏍️ Motos de agua</h3><p>Si buscas un plan con algo más de adrenalina, septiembre puede ser un buen momento para una excursión en moto de agua.</p><div class="cv-aviso"><p><strong>Importante:</strong> consulta siempre disponibilidad, edades, requisitos y condiciones antes de reservar.</p></div></div></div><h3>🏄 Surf y deportes acuáticos</h3><p>La costa de Conil y sus alrededores son una buena opción para practicar deportes acuáticos. Si nunca has probado el surf, septiembre puede ser un momento interesante para iniciarte, con un ambiente algo más tranquilo.</p><div class="cv-chips"><p>🏄 Surf</p><p>🏄‍♂️ Paddle surf</p><p>🛶 Kayak</p><p>🌊 Otras actividades náuticas</p></div><p>La disponibilidad depende de las empresas y de las condiciones del mar.</p><h2>Los atardeceres de Conil en septiembre</h2><p>Si hay algo que no debería faltar en tu viaje es un atardecer. La costa de Conil ofrece numerosos lugares desde los que ver cómo el sol desaparece sobre el Atlántico.</p><div class="cv-bloque cv-fila"><figure class="cv-media"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejoreslugaresatardecer/cuerpo-1794500117304-atardecer-fontanilla.jpg" alt="Atardecer en la playa de La Fontanilla" loading="lazy"><figcaption>La Fontanilla</figcaption></figure><figure class="cv-media"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejoreslugaresatardecer/cuerpo-1794500037652-cala-de-fuente-del-gallo-en-conil.jpg" alt="Atardecer en Fuente del Gallo" loading="lazy"><figcaption>Fuente del Gallo</figcaption></figure><figure class="cv-media"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejoreslugaresatardecer/cuerpo-1794500506544-faro_de_roche.jpg" alt="Faro de Roche al atardecer" loading="lazy"><figcaption>Faro de Roche</figcaption></figure></div><div class="cv-chips"><p>🌅 Fuente del Gallo</p><p>🌅 Calas de Roche</p><p>🌅 La costa de Conil</p><p>🌅 Cabo Roche</p></div><p>Lleva el móvil, algo de beber y busca un lugar tranquilo. No necesitas mucho más.</p><div class="cv-post" data-post="los-mejores-lugares-para-ver-el-atardecer-en-conil-de-la-frontera"><a class="cv-post-card" href="/blog/los-mejores-lugares-para-ver-el-atardecer-en-conil-de-la-frontera/"><span class="cpc-photo"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejoreslugaresatardecer/portada-1793220053391-Atardecer_dorado_en_Conil_de_la_Frontera.png" alt="🌅 Los mejores lugares para ver el atardecer en Conil de la Frontera" loading="lazy"></span><span class="cpc-body"><small>Te puede interesar</small><b>🌅 Los mejores lugares para ver el atardecer en Conil de la Frontera</b><span class="cpc-text">Hay momentos en los que Conil de la Frontera parece todavía más especial. 🌊✨ Y uno de ellos llega cada tarde, cuando el sol comienza a bajar sobre el Atlántico y el cielo se llena de tonos dorados, naranjas y rojizos</span><span class="cpc-btn">Leer más →</span></span></a></div><h2>Pasear por el centro de Conil</h2><p>No todo son playas. Una de las mejores cosas que hacer en Conil en septiembre es simplemente <strong>perderse por sus calles</strong>. El centro histórico conserva el ambiente de los pueblos blancos de Cádiz: pequeñas plazas, tiendas y terrazas donde terminar el paseo tomando algo. Y al bajar el ritmo respecto a los meses de mayor afluencia, se disfruta con más tranquilidad.</p><h2>¿Qué comer en Conil en septiembre?</h2><div class="cv-bloque cv-lado"><div class="cv-medios"><figure class="cv-media"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejores-restaurantes-conil/cuerpo-1793434800738-45-Tartar-de-atun-rojo-salvaje-de-almadraba-en-Antonio-de-Zahara.jpg" alt="Tartar de atún rojo de almadraba" loading="lazy"></figure></div><div class="cv-texto"><p>Una escapada a Conil no estaría completa sin su gastronomía. El pescado y el marisco tienen un papel protagonista y el <strong>atún rojo de almadraba</strong> es uno de los productos más conocidos de la zona.</p><p>Aprovecha para probar diferentes platos y descubrir restaurantes y establecimientos locales.</p></div></div><div class="cv-chips"><p>🍣 Atún</p><p>🐟 Pescado fresco</p><p>🦐 Marisco</p><p>🍤 Fritura de pescado</p><p>🥗 Gastronomía gaditana</p></div><div class="cv-aviso"><p><strong>Consejo:</strong> si quieres ir a un restaurante concreto, sobre todo en fin de semana, consulta horarios y reserva cuando sea necesario.</p></div><div class="cv-post" data-post="mejores-restaurantes-conil"><a class="cv-post-card" href="/blog/mejores-restaurantes-conil/"><span class="cpc-photo"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejores-restaurantes-conil/portada-1793295232702-Sabores_del_mar_en_Conil.jpg" alt="Los mejores restaurantes de Conil de la Frontera: dónde comer" loading="lazy"></span><span class="cpc-body"><small>Te puede interesar</small><b>Los mejores restaurantes de Conil de la Frontera: dónde comer</b><span class="cpc-text">Descubre dónde comer en Conil de la Frontera: restaurantes de pescado, atún rojo, tapas y cocina andaluza para disfrutar durante tus vacaciones.</span><span class="cpc-btn">Leer más →</span></span></a></div><h2>Excursiones desde Conil en septiembre</h2><p>Otra ventaja de viajar en septiembre es que puedes dedicar algunos días a descubrir otros lugares de la provincia de Cádiz.</p><div class="cv-tarjetas"><div class="cv-tarjeta"><h3>🏘️ Vejer de la Frontera</h3><p>Uno de los pueblos blancos más conocidos de la provincia.</p></div><div class="cv-tarjeta"><h3>🌊 El Palmar</h3><p>Visita imprescindible para los amantes de la playa y el surf.</p></div><div class="cv-tarjeta"><h3>🌅 Caños de Meca</h3><p>Ideal para descubrir otro paisaje de la Costa de la Luz.</p></div><div class="cv-tarjeta"><h3>🐟 Barbate</h3><p>Una buena opción para conocer la tradición pesquera y gastronómica de la zona.</p></div><div class="cv-tarjeta"><h3>🏖️ Zahara de los Atunes</h3><p>Playas espectaculares y gastronomía vinculada al atún.</p></div><div class="cv-tarjeta"><h3>🏛️ Cádiz</h3><p>Perfecta si quieres combinar playa, historia y gastronomía.</p></div></div><h2>Conil en septiembre con niños</h2><p>Si viajas en familia, septiembre puede ser especialmente interesante: puedes organizar días tranquilos sin llenar cada jornada de actividades. La clave está en combinar playa, descanso y alguna actividad.</p><div class="cv-dias"><div class="cv-dia"><strong>Día 1</strong><p>🏖️ Playa + paseo por Conil</p></div><div class="cv-dia"><strong>Día 2</strong><p>🚤 Ruta en barco</p></div><div class="cv-dia"><strong>Día 3</strong><p>🏘️ Excursión a Vejer</p></div><div class="cv-dia"><strong>Día 4</strong><p>🏖️ Playa + atardecer</p></div><div class="cv-dia"><strong>Día 5</strong><p>🌊 Actividad acuática</p></div><div class="cv-dia"><strong>Día 6</strong><p>🚗 Excursión</p></div><div class="cv-dia"><strong>Día 7</strong><p>😎 Día tranquilo en Conil</p></div></div><h2>Conil en septiembre para parejas</h2><div class="cv-bloque cv-lado"><div class="cv-medios"><figure class="cv-media"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/mejoreslugaresatardecer/cuerpo-1794500186465-pasarela-al-atardecer-playa-bateles-conil-frontera-cadiz_242111-22033.avif" alt="Pasarela al atardecer en la playa de Los Bateles" loading="lazy"></figure></div><div class="cv-texto"><p>Si buscas una escapada romántica, septiembre también es una opción fantástica, sin prisas y disfrutando del ambiente de la Costa de la Luz. Un día perfecto podría ser así:</p></div></div><div class="cv-dias"><div class="cv-dia"><strong>Mañana</strong><p>☀️ Desayuno tranquilo y 🏖️ playa</p></div><div class="cv-dia"><strong>Mediodía</strong><p>🍤 Comida con productos locales y 😴 descanso en el alojamiento</p></div><div class="cv-dia"><strong>Atardecer</strong><p>🌅 Puesta de sol frente al Atlántico</p></div><div class="cv-dia"><strong>Noche</strong><p>🍷 Cena en Conil y ❤️ paseo por el centro</p></div></div><div class="cv-post" data-post="conil-en-pareja"><a class="cv-post-card" href="/blog/conil-en-pareja/"><span class="cpc-photo"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-blog/conilenpareja/portada-1793218671110-Conil_en_pareja_al_atardecer.png" alt="❤️ Conil en pareja, 10 planes románticos para disfrutar de la Costa de la Luz" loading="lazy"></span><span class="cpc-body"><small>Te puede interesar</small><b>❤️ Conil en pareja, 10 planes románticos para disfrutar de la Costa de la Luz</b><span class="cpc-text">Descubre 10 planes románticos en Conil de la Frontera: atardeceres en la playa, cenas junto al mar, paseos con encanto y escapadas en pareja por la Costa de la Luz.</span><span class="cpc-btn">Leer más →</span></span></a></div><h2>¿Dónde alojarse en Conil en septiembre?</h2><p>Elegir bien el alojamiento marca una gran diferencia. Si buscas <strong>alquiler vacacional en Conil</strong>, en <strong>Conil Vacaciones</strong> encontrarás casas, bungalows y apartamentos desde los que organizar cada día a tu ritmo: la playa cerca, restaurantes, actividades, excursiones y atardeceres.</p><div class="cv-casa" data-casa="casacristina"><a class="cv-casa-card" href="/viviendas/casa-los-3-olivos-de-roche/"><span class="ccc-photo"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-viviendas/casacristina/1792242686448-casa_cristina.png" alt="Casa los 3 olivos de Roche" loading="lazy"></span><span class="ccc-body"><small>Casa vacacional · Conil</small><b>Casa los 3 olivos de Roche</b><span class="ccc-meta">6 huéspedes · 2 dormitorios · 2 baños</span><span class="ccc-chips"><i>Piscina privada</i><i>Jardín</i><i>Barbacoa</i><i>Admite mascotas</i></span><span class="ccc-row"><span class="ccc-price">desde <strong>1000 €</strong> / semana</span><span class="ccc-btn">Ver casa y fechas →</span></span></span></a></div><div class="cv-casa" data-casa="bungalowpiscina"><a class="cv-casa-card" href="/viviendas/bungalow-con-piscina-privada/"><span class="ccc-photo"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-viviendas/bungalowpiscina/1787571402789-DANEE8338.png" alt="Bungalow con Piscina Privada" loading="lazy"></span><span class="ccc-body"><small>Casa vacacional · Conil</small><b>Bungalow con Piscina Privada</b><span class="ccc-meta">4 huéspedes · 2 dormitorios · 2 baños</span><span class="ccc-chips"><i>Piscina privada</i><i>Jardín</i><i>Barbacoa</i><i>Admite mascotas</i></span><span class="ccc-row"><span class="ccc-price">desde <strong>1100 €</strong> / semana</span><span class="ccc-btn">Ver casa y fechas →</span></span></span></a></div><div class="cv-casa" data-casa="apartamentomargot"><a class="cv-casa-card" href="/viviendas/casa-vacacional-con-piscina/"><span class="ccc-photo"><img src="https://bjuxswhdktkvlrnuejuz.supabase.co/storage/v1/object/public/fotos-viviendas/apartamentomargot/1787655462704-apartamento_margot_exterior.png" alt="Casa Vacacional con Piscina" loading="lazy"></span><span class="ccc-body"><small>Casa vacacional · Conil</small><b>Casa Vacacional con Piscina</b><span class="ccc-meta">4 huéspedes · 1 dormitorio · 1 baño</span><span class="ccc-chips"><i>Piscina privada</i><i>Barbacoa</i><i>Admite mascotas</i><i>Aire acondicionado</i></span><span class="ccc-row"><span class="ccc-price">desde <strong>900 €</strong> / semana</span><span class="ccc-btn">Ver casa y fechas →</span></span></span></a></div><p>Si estás buscando <strong>apartamento turístico en Conil</strong> o <strong>casa vacacional en Conil</strong>, consulta los alojamientos disponibles y encuentra el que mejor se adapte a tu viaje.</p><h2>¿Cuántos días pasar en Conil en septiembre?</h2><div class="cv-datos"><div class="cv-dato"><strong>Primera visita</strong><p>4 o 5 días</p></div><div class="cv-dato"><strong>Lo ideal</strong><p>Una semana</p></div><div class="cv-dato"><strong>Combina</strong><p>Playa, actividades y excursiones</p></div></div><p>Precisamente ahí está uno de los atractivos de septiembre: <strong>no tienes que elegir entre turismo y descanso</strong>. Puedes hacer ambas cosas.</p><div class="cv-faq"><h2>Preguntas frecuentes sobre Conil en septiembre</h2><div class="cv-faq-item"><h3>¿Merece la pena viajar a Conil en septiembre?</h3><div class="cv-faq-a">Sí. Si buscas unas vacaciones en la Costa de la Luz con playa, gastronomía, naturaleza y actividades, septiembre es una época muy interesante: el verano todavía está presente, pero el ambiente suele ser más tranquilo que en los meses de mayor afluencia.</div></div><div class="cv-faq-item"><h3>¿Qué tiempo hace en Conil en septiembre?</h3><div class="cv-faq-a">Normalmente todavía se puede disfrutar de temperaturas agradables durante el día, con noches algo más frescas. Conviene llevar ropa fresca, protección solar y una chaqueta ligera para la noche.</div></div><div class="cv-faq-item"><h3>¿Qué se puede hacer en Conil en septiembre?</h3><div class="cv-faq-a">Ir a la playa, hacer una ruta en barco, probar surf u otros deportes acuáticos, ver el atardecer, pasear por el centro histórico, comer pescado y atún de almadraba, y hacer excursiones a Vejer, El Palmar, Caños de Meca, Barbate, Zahara o Cádiz.</div></div><div class="cv-faq-item"><h3>¿Cuántos días conviene pasar en Conil?</h3><div class="cv-faq-a">Para una primera visita, entre 4 y 5 días pueden bastar para conocer lo más importante. Con una semana puedes combinar playa, actividades, excursiones y descanso con más calma.</div></div></div><div class="cv-final"><h3>Tu escapada a Conil empieza aquí</h3><p>Playas increíbles, atardeceres, actividades en el mar, gastronomía, pueblos blancos y alojamientos vacacionales. Descubre Conil Vacaciones y empieza a preparar tu próxima escapada a la Costa de la Luz.</p><a class="cv-cta-btn" href="/#viviendas" rel="noopener">Ver alojamientos</a><a class="cv-cta-btn cv-sec" href="https://wa.me/34650283373" rel="noopener">Escríbenos por WhatsApp</a></div></div></article>
     </div>
   </div>
 </section>
