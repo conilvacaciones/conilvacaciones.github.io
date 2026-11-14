@@ -431,6 +431,16 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://conilvacaciones.github.io/blog/mejores-restaurantes-conil/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://conilvacaciones.github.io/blog/conil-en-pareja/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://conilvacaciones.github.io/blog/entre-ramas-conil/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -441,22 +451,12 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://conilvacaciones.github.io/blog/conil-en-pareja/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://conilvacaciones.github.io/blog/mejores-playas-conil/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://conilvacaciones.github.io/blog/playa-de-la-fontanilla/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://conilvacaciones.github.io/blog/mejores-restaurantes-conil/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
