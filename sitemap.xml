@@ -416,6 +416,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://conilvacaciones.github.io/blog/como-llegar-a-conil-sin-coche/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://conilvacaciones.github.io/blog/los-mejores-lugares-para-ver-el-atardecer-en-conil-de-la-frontera/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -427,11 +432,6 @@
   </url>
   <url>
     <loc>https://conilvacaciones.github.io/blog/conil-en-pareja/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://conilvacaciones.github.io/blog/como-llegar-a-conil-sin-coche/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
