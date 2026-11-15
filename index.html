@@ -919,6 +919,13 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
 .hc-tag.o{background:#D6336C;color:#fff;}
 .hc-tags .house-match-tag{position:static;border-radius:8px;}
 .house-card .fav-btn{top:10px;right:10px;box-shadow:none;background:#fff;}
+
+/* Titulares: estilo grande y apretado con una palabra en cursiva */
+.section-head h2,.how-top h2,.qh-head h2,.playas-box h2,.contact-grid h2,.about-grid h2{font-family:var(--ff-body);font-weight:800;font-size:clamp(30px,4.2vw,52px);line-height:1.04;letter-spacing:-.04em;color:#122130;max-width:780px;}
+.section-head h2 em,.how-top h2 em,.qh-head h2 em,.playas-box h2 em,.contact-grid h2 em,.about-grid h2 em{font-family:var(--ff-display);font-style:italic;font-weight:600;letter-spacing:-.02em;color:#177268;}
+.playas-box h2{font-size:clamp(28px,3.6vw,44px);}
+.section-head h2+p{margin-top:14px;}
+.hero-text h1 em{font-family:var(--ff-display);font-style:italic;font-weight:600;letter-spacing:-.02em;}
 </style>
 <script type="application/ld+json">
 {
@@ -1109,7 +1116,7 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
     <div class="section-head reveal">
       <div>
         <span class="eyebrow">Alojamientos</span>
-        <h2>Casas y apartamentos de alquiler vacacional en Conil</h2>
+        <h2>Casas y apartamentos de <em>alquiler</em> vacacional en Conil</h2>
         <p>Elige una casa para ver todas las fotos, la información completa y el calendario de disponibilidad.</p>
         <div class="interest-badge" id="weeklyInterestBadge" style="display:none"></div>
       </div>
@@ -1144,7 +1151,7 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
     <div class="section-head" style="justify-content:center;text-align:center">
       <div>
         <span class="eyebrow">Preguntas frecuentes</span>
-        <h2>Todo lo que necesitas saber antes de reservar</h2>
+        <h2>Todo lo que necesitas saber antes de <em>reservar</em></h2>
       </div>
     </div>
     <div class="faq-list" id="faqList">
@@ -1189,7 +1196,7 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
   <div class="wrap">
     <div class="playas-box">
       <span class="eyebrow">Guía de playas</span>
-      <h2>¿A qué playa voy hoy en Conil?</h2>
+      <h2>¿A qué <em>playa</em> voy hoy en Conil?</h2>
       <p>Mira el viento y el mar de hoy y te decimos qué playa te conviene. Con levante y con poniente, no todas son iguales.</p>
       <div class="playas-links">
         <a class="main" href="/playa-hoy/">Ver qué playa me conviene hoy</a>
@@ -1207,7 +1214,7 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
     <div class="qh-head">
       <div>
         <span class="eyebrow">Blog</span>
-        <h2>Qué hacer y ver en Conil de la Frontera</h2>
+        <h2>Qué hacer y ver en <em>Conil</em> de la Frontera</h2>
       </div>
       <a href="/blog/" class="qh-link">Ver todas las entradas<svg class="icon"><use href="#i-chev-r"/></svg></a>
     </div>
@@ -1222,7 +1229,7 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
     <div class="section-head" style="justify-content:center;text-align:center">
       <div>
         <span class="eyebrow">Reseñas</span>
-        <h2>Lo que dicen quienes ya se han alojado con nosotros</h2>
+        <h2>Lo que dicen quienes ya se han <em>alojado</em> con nosotros</h2>
       </div>
     </div>
     <div class="gr-card">
@@ -1280,7 +1287,7 @@ a.contact-item:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
   <div class="wrap contact-grid">
     <div class="reveal">
       <span class="eyebrow">Contacto</span>
-      <h2>¿Hablamos y cerramos tu reserva?</h2>
+      <h2>¿Hablamos y <em>cerramos</em> tu reserva?</h2>
       <p>Escríbenos con las fechas que te interesan y la casa que has visto, y te confirmamos disponibilidad y precio directamente. También puedes usar el calendario de cada casa para elegir tus fechas antes de escribirnos.</p>
       <div class="contact-list">
         <a class="contact-item" href="https://wa.me/34650283373" target="_blank" rel="noopener"><div class="ci-icon ci-whatsapp"><svg class="icon"><use href="#i-whatsapp"/></svg></div><div><b>WhatsApp</b><span>+34 650 28 33 73</span></div></a>
