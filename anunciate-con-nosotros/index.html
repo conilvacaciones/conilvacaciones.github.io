@@ -800,7 +800,7 @@ input,textarea{font:inherit;}
       <div>
         <span class="eyebrow">Formulario</span>
         <h2>Cuéntanos sobre tu vivienda</h2>
-        <p>Rellena tus datos y nos pondremos en contacto contigo lo antes posible.</p>
+        <p>Déjanos tus datos y te escribiremos por WhatsApp para contarte cómo funciona y pasarte el formulario completo de tu vivienda.</p>
       </div>
     </div>
     <div class="intermediary-note">
@@ -809,36 +809,13 @@ input,textarea{font:inherit;}
     <form class="anun-form" id="anunForm">
       <div class="anun-form-row">
         <div class="field"><label for="an-nombre">Nombre *</label><input id="an-nombre" type="text" required></div>
-        <div class="field"><label for="an-telefono">Teléfono *</label><input id="an-telefono" type="tel" required></div>
-      </div>
-      <div class="field"><label for="an-email">Email *</label><input id="an-email" type="email" required></div>
-      <div class="anun-form-row">
-        <div class="field"><label for="an-vivienda">Nombre de la vivienda</label><input id="an-vivienda" type="text"></div>
-        <div class="field"><label for="an-localidad">Localidad</label><input id="an-localidad" type="text"></div>
+        <div class="field"><label for="an-telefono">Teléfono (con WhatsApp) *</label><input id="an-telefono" type="tel" required></div>
       </div>
       <div class="anun-form-row">
-        <div class="field">
-          <label for="an-tipo">Tipo de alojamiento</label>
-          <select id="an-tipo">
-            <option value="">Selecciona…</option>
-            <option value="Casa">Casa</option>
-            <option value="Apartamento">Apartamento</option>
-            <option value="Chalet">Chalet</option>
-            <option value="Estudio">Estudio</option>
-            <option value="Otro">Otro</option>
-          </select>
-        </div>
-        <div class="field"><label for="an-huespedes">Nº de huéspedes</label><input id="an-huespedes" type="number" min="1"></div>
+        <div class="field"><label for="an-email">Email *</label><input id="an-email" type="email" required></div>
+        <div class="field"><label for="an-localidad">Localidad de la vivienda</label><input id="an-localidad" type="text"></div>
       </div>
-      <div class="anun-form-row">
-        <div class="field"><label for="an-dormitorios">Nº de dormitorios</label><input id="an-dormitorios" type="number" min="0"></div>
-        <div class="field"><label for="an-enlace">Enlace a Airbnb/Booking (opcional)</label><input id="an-enlace" type="url" placeholder="https://"></div>
-      </div>
-      <div class="field"><label for="an-mensaje">Mensaje</label><textarea id="an-mensaje" style="min-height:110px"></textarea></div>
-      <div class="field">
-        <label for="an-fotos">Fotos (opcional)</label>
-        <input id="an-fotos" type="file" accept="image/*" multiple>
-      </div>
+      <div class="field"><label for="an-mensaje">Mensaje (opcional)</label><textarea id="an-mensaje" style="min-height:100px"></textarea></div>
       <label class="privacy-check">
         <input type="checkbox" id="an-privacidad" required>
         <span>He leído y acepto la <a href="/politica-privacidad/" target="_blank" rel="noopener">Política de Privacidad</a>. *</span>
@@ -1113,31 +1090,12 @@ document.getElementById("anunForm").addEventListener("submit", async function(e)
   submitBtn.textContent = "Enviando…";
 
   try{
-    var fotosPaths = [];
-    var files = Array.from(document.getElementById("an-fotos").files || []);
-    if(files.length > 0){
-      var folder = "solicitud-" + Date.now();
-      for(var i=0;i<files.length;i++){
-        var file = files[i];
-        var safeName = file.name.replace(/[^a-zA-Z0-9.-]/g,"_");
-        var path = folder + "/" + i + "-" + safeName;
-        var up = await sb.storage.from("fotos-propietarios").upload(path, file);
-        if(!up.error) fotosPaths.push(path);
-      }
-    }
-
     var payload = {
       nombre: document.getElementById("an-nombre").value.trim(),
       telefono: document.getElementById("an-telefono").value.trim(),
       email: document.getElementById("an-email").value.trim(),
-      vivienda_nombre: document.getElementById("an-vivienda").value.trim() || null,
       localidad: document.getElementById("an-localidad").value.trim() || null,
-      tipo_alojamiento: document.getElementById("an-tipo").value || null,
-      huespedes: document.getElementById("an-huespedes").value ? parseInt(document.getElementById("an-huespedes").value,10) : null,
-      dormitorios: document.getElementById("an-dormitorios").value ? parseInt(document.getElementById("an-dormitorios").value,10) : null,
-      enlace_externo: document.getElementById("an-enlace").value.trim() || null,
       mensaje: document.getElementById("an-mensaje").value.trim() || null,
-      fotos: fotosPaths,
       acepta_privacidad: true,
       estado: "Pendiente"
     };
