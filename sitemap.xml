@@ -16,6 +16,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://conilvacaciones.github.io/quienes-somos/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://conilvacaciones.github.io/politica-de-cancelacion/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>

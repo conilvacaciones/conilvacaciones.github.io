@@ -58,6 +58,7 @@ const STATIC_PAGES = [
   { loc: `${SITE_URL}/`, changefreq: "weekly", priority: "1.0" },
   { loc: `${SITE_URL}/blog/`, changefreq: "weekly", priority: "0.8" },
   { loc: `${SITE_URL}/anunciate-con-nosotros/`, changefreq: "monthly", priority: "0.6" },
+  { loc: `${SITE_URL}/quienes-somos/`, changefreq: "monthly", priority: "0.6" },
   { loc: `${SITE_URL}/politica-de-cancelacion/`, changefreq: "yearly", priority: "0.3" },
 ];
 
