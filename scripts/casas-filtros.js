@@ -166,7 +166,6 @@ function generate(ctx) {
   const extraQa = [
     ["¿Dónde alojarse en Conil de la Frontera?", "Depende de lo que busques: el centro de Conil para ir andando a tiendas y restaurantes, la zona de Los Bateles y La Fontanilla para tener la playa cerca, o la zona de Roche si prefieres algo más tranquilo y cerca de las calas. Cada ficha incluye un mapa con la ubicación exacta."],
     ["¿Cuánto cuesta alquilar una casa en Conil?", "El precio depende de la vivienda, de las fechas y de la temporada: en agosto y Semana Santa suele ser más alto que en temporada baja. Escríbenos por WhatsApp con tus fechas y cuántos sois y te confirmamos el precio."],
-    ["¿Hay alquiler en Conil para familias, parejas y grupos?", "Sí. Hay casas para distintos tamaños de grupo; filtra por personas y dormitorios para ver cuáles encajan."],
   ];
   const write = (file, content) => {
     fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -180,7 +179,6 @@ function generate(ctx) {
   const mainQa = [
     ["¿Cuántas casas vacacionales tenéis en Conil?", `Ahora mismo hay ${viviendas.length} casas disponibles: ${list(viviendas)}.`],
     ["¿Cómo reservo una casa?", "Escríbenos por WhatsApp con tus fechas y el número de personas: te confirmamos disponibilidad y precio directamente, sin comisiones de intermediarios."],
-    ["¿Hay casas con piscina privada o que admitan mascotas en Conil?", "Sí. Varias casas tienen piscina privada y algunas admiten mascotas. Usa los filtros de piscina privada y mascotas para verlas, o consúltanos por WhatsApp."],
     ["¿Qué filtros puedo usar?", "Puedes filtrar por número de personas, dormitorios y equipamiento (piscina privada, mascotas, parking, aire acondicionado, calefacción, barbacoa y jardín)."],
   ];
   changed += write(path.join(OUT, "index.html"), build({
