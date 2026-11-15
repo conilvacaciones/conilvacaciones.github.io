@@ -163,6 +163,11 @@ function generate(ctx) {
   };
 
   const list = (vs) => vs.map((v) => v.nombre).join(", ");
+  const extraQa = [
+    ["¿Dónde alojarse en Conil de la Frontera?", "Depende de lo que busques: el centro de Conil para ir andando a tiendas y restaurantes, la zona de Los Bateles y La Fontanilla para tener la playa cerca, o la zona de Roche si prefieres algo más tranquilo y cerca de las calas. Cada ficha incluye un mapa con la ubicación exacta."],
+    ["¿Cuánto cuesta alquilar una casa en Conil?", "El precio depende de la vivienda, de las fechas y de la temporada: en agosto y Semana Santa suele ser más alto que en temporada baja. Escríbenos por WhatsApp con tus fechas y cuántos sois y te confirmamos el precio."],
+    ["¿Hay alquiler en Conil para familias, parejas y grupos?", "Sí. Hay casas para distintos tamaños de grupo; filtra por personas y dormitorios para ver cuáles encajan."],
+  ];
   const write = (file, content) => {
     fs.mkdirSync(path.dirname(file), { recursive: true });
     const prev = fs.existsSync(file) ? fs.readFileSync(file, "utf-8") : null;
@@ -175,17 +180,18 @@ function generate(ctx) {
   const mainQa = [
     ["¿Cuántas casas vacacionales tenéis en Conil?", `Ahora mismo hay ${viviendas.length} casas disponibles: ${list(viviendas)}.`],
     ["¿Cómo reservo una casa?", "Escríbenos por WhatsApp con tus fechas y el número de personas: te confirmamos disponibilidad y precio directamente, sin comisiones de intermediarios."],
+    ["¿Hay casas con piscina privada o que admitan mascotas en Conil?", "Sí. Varias casas tienen piscina privada y algunas admiten mascotas. Usa los filtros de piscina privada y mascotas para verlas, o consúltanos por WhatsApp."],
     ["¿Qué filtros puedo usar?", "Puedes filtrar por número de personas, dormitorios y equipamiento (piscina privada, mascotas, parking, aire acondicionado, calefacción, barbacoa y jardín)."],
   ];
   changed += write(path.join(OUT, "index.html"), build({
-    slug: "", h1: "Casas vacacionales en Conil de la Frontera",
-    title: "Casas vacacionales en Conil de la Frontera con piscina · Conil Vacaciones",
-    desc: h.truncate(`Casas vacacionales en Conil de la Frontera con piscina privada: ${list(viviendas)}. Reserva directa con el propietario, sin comisiones.`, 158),
-    intro: `Casas vacacionales en Conil con piscina privada, para familias, parejas y grupos. Filtra por personas, dormitorios o equipamiento para encontrar la que mejor encaja con tu viaje.`,
-    houses: viviendas, qa: mainQa })) ? 1 : 0;
+    slug: "", h1: "Alquiler de casas vacacionales en Conil de la Frontera",
+    title: "Alquiler de casas en Conil con piscina privada · Conil Vacaciones",
+    desc: h.truncate(`Alquiler de casas vacacionales en Conil de la Frontera con piscina privada y mascotas: ${list(viviendas)}. Reserva directa con el propietario.`, 158),
+    intro: `Alquiler de casas vacacionales en Conil de la Frontera: casas con piscina privada, que admiten mascotas y cerca de la playa, para familias, parejas y grupos. Filtra por personas, dormitorios o equipamiento para encontrar la que mejor encaja con tu viaje.`,
+    houses: viviendas, qa: mainQa.concat(extraQa) })) ? 1 : 0;
 
   for (const p of finalPages) {
-    const Hh = `Casas vacacionales en Conil ${p.phrase}`;
+    const Hh = `Alquiler de casas vacacionales en Conil ${p.phrase}`;
     const intro = h.escapeText(`Estas son las casas vacacionales de Conil de la Frontera ${p.phrase}. `) + p.filters.map((f) => h.escapeText(f.text)).join(" ") + " " + h.escapeText(`Ahora mismo hay ${p.houses.length} ${p.houses.length === 1 ? "casa" : "casas"}: ${list(p.houses)}.`);
     const qa = [
       [`¿Qué casas vacacionales hay en Conil ${p.phrase}?`, `${list(p.houses)}. Todas se reservan directamente con el propietario.`],
@@ -193,9 +199,9 @@ function generate(ctx) {
     ];
     changed += write(path.join(OUT, p.slug, "index.html"), build({
       slug: p.slug, h1: Hh,
-      title: h.truncate(`Casas en Conil ${p.phrase} · Conil Vacaciones`, 70),
-      desc: h.truncate(`Casas vacacionales en Conil ${p.phrase}: ${list(p.houses)}. Reserva directa con el propietario, sin comisiones.`, 158),
-      intro, houses: p.houses, qa, filters: p.filters })) ? 1 : 0;
+      title: h.truncate(`Alquiler de casas en Conil ${p.phrase} · Conil Vacaciones`, 70),
+      desc: h.truncate(`Alquiler de casas vacacionales en Conil ${p.phrase}: ${list(p.houses)}. Reserva directa con el propietario.`, 158),
+      intro, houses: p.houses, qa: qa.concat(extraQa), filters: p.filters })) ? 1 : 0;
   }
 
   // Páginas huérfanas (combinaciones que ya no existen)
