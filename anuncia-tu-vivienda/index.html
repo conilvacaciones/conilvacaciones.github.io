@@ -840,6 +840,7 @@ if("serviceWorker" in navigator){
 </script>
 <script>
 (function(){
+var sb=window.supabase.createClient("https://bjuxswhdktkvlrnuejuz.supabase.co","sb_publishable_Z_Mlw0dn2p9uOOpQn4QL4w_wx74m27G");
 var form=document.getElementById("fvForm"),msg=document.getElementById("fvMsg"),btn=document.getElementById("fvSend");
 function val(id){var e=document.getElementById(id);return e?e.value.trim():"";}
 form.addEventListener("submit",async function(e){
