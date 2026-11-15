@@ -4009,6 +4009,7 @@ function abrirDetalleSolicitud(s){
       '<div class="field full"><label>Enlace Airbnb/Booking</label><p>'+(s.enlace_externo ? '<a href="'+escapeHTMLAdmin(s.enlace_externo)+'" target="_blank" rel="noopener">'+escapeHTMLAdmin(s.enlace_externo)+'</a>' : "—")+'</p></div>'+
       '<div class="field full"><label>Mensaje</label><p>'+escapeHTMLAdmin(s.mensaje||"—")+'</p></div>'+
     '</div>'+
+    (s.ficha && Object.keys(s.ficha).length ? '<h4 style="margin:20px 0 10px;font-size:15px">Ficha completa de la vivienda</h4><div class="form-grid">'+Object.keys(s.ficha).map(function(k){ return '<div class="field full"><label>'+escapeHTMLAdmin(k)+'</label><p style="white-space:pre-wrap">'+escapeHTMLAdmin(String(s.ficha[k]))+'</p></div>'; }).join("")+'</div>' : "")+
     (fotos ? '<div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px">'+fotos+'</div>' : '');
   solicitudBackdrop.classList.add("open");
   document.body.style.overflow = "hidden";
