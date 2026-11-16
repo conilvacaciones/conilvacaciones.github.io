@@ -1995,7 +1995,7 @@ function setMetaContent(selector, value){
 function updateViviendaSocialMeta(house){
   var title = house.name + " · Conil Vacaciones";
   var desc = house.tagline || stripHTML(house.description) || "Vivienda vacacional en Conil de la Frontera. Consulta disponibilidad y contacta directamente con el propietario a través de Conil Vacaciones.";
-  var img = (house.photoUrls && house.photoUrls[0]) || "https://conilvacaciones.github.io/images/og-image.png";
+  var img = (house.photoUrls && house.photoUrls[0]) || "https://conilvacaciones.github.io/images/og-logo.png";
   var url = preferredViviendaUrl(house);
   setMetaContent('meta[property="og:title"]', title);
   setMetaContent('meta[property="og:description"]', desc);

@@ -43,7 +43,7 @@ const SUPABASE_URL = "https://bjuxswhdktkvlrnuejuz.supabase.co";
 // Misma clave pública ("publishable"/anon) ya embebida en vivienda.html del lado cliente.
 const SUPABASE_KEY = "sb_publishable_Z_Mlw0dn2p9uOOpQn4QL4w_wx74m27G";
 const SITE_URL = "https://conilvacaciones.github.io";
-const FALLBACK_IMAGE = `${SITE_URL}/images/og-image.png`;
+const FALLBACK_IMAGE = `${SITE_URL}/images/og-logo.png`;
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const TEMPLATE_PATH = path.join(REPO_ROOT, "vivienda.html");
