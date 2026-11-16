@@ -855,22 +855,31 @@ function loadGoogleAnalytics(){
   document.head.appendChild(gaScript);
   window.dataLayer = window.dataLayer || [];
   window.gtag = function(){ window.dataLayer.push(arguments); };
+  // Consent Mode v2: sin consentimiento, Google no guarda cookies ni datos personales
+  window.gtag("consent", "default", {
+    analytics_storage: "denied", ad_storage: "denied",
+    ad_user_data: "denied", ad_personalization: "denied", wait_for_update: 500
+  });
   window.gtag("js", new Date());
   window.gtag("config", GA_MEASUREMENT_ID);
+}
+function grantAnalytics(){
+  if(window.gtag) window.gtag("consent", "update", { analytics_storage: "granted" });
 }
 
 function initCookieConsent(){
   var banner = document.getElementById("cookieBanner");
   var consent = localStorage.getItem("cv_cookie_consent");
+  loadGoogleAnalytics();
   if(consent === "accepted"){
-    loadGoogleAnalytics();
+    grantAnalytics();
   } else if(consent !== "rejected"){
     banner.classList.add("is-visible");
   }
   document.getElementById("cookieAcceptBtn").addEventListener("click", function(){
     localStorage.setItem("cv_cookie_consent", "accepted");
     banner.classList.remove("is-visible");
-    loadGoogleAnalytics();
+    grantAnalytics();
   });
   document.getElementById("cookieRejectBtn").addEventListener("click", function(){
     localStorage.setItem("cv_cookie_consent", "rejected");

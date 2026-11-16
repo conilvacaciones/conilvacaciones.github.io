@@ -610,7 +610,7 @@ input,textarea{font:inherit;}
     <h1>Política de Cookies</h1>
     <p class="legal-updated">Última actualización: 28 de agosto de 2026</p>
 
-    <p>Esta web utiliza <b>Google Analytics</b> para entender cómo se usa el sitio (páginas más visitadas, tiempo de permanencia, etc.), pero <b>solo se activa si nos das tu consentimiento expreso</b> a través del aviso que aparece la primera vez que visitas la web. Si rechazas o no respondes, Google Analytics no se activa en ningún momento.</p>
+    <p>Esta web utiliza <b>Google Analytics</b> para entender cómo se usa el sitio (páginas más visitadas, tiempo de permanencia, etc.), pero <b>solo se activa si nos das tu consentimiento expreso</b> a través del aviso que aparece la primera vez que visitas la web. Si rechazas o no respondes, no se instala ninguna cookie de análisis ni se guarda información que te identifique; Google solo recibe una señal anónima de que se ha producido una visita (Modo de consentimiento de Google), que se usa para estimar el tráfico total de la web.</p>
 
     <h2>1. Cómo funciona el aviso de cookies</h2>
     <p>Al entrar por primera vez, verás un aviso en la parte inferior de la pantalla con dos opciones: "Aceptar" o "Rechazar". Tu elección se guarda en tu propio navegador, así que no volverás a ver el aviso en próximas visitas, salvo que decidas cambiar tu preferencia.</p>
@@ -705,22 +705,31 @@ function loadGoogleAnalytics(){
   document.head.appendChild(gaScript);
   window.dataLayer = window.dataLayer || [];
   window.gtag = function(){ window.dataLayer.push(arguments); };
+  // Consent Mode v2: sin consentimiento, Google no guarda cookies ni datos personales
+  window.gtag("consent", "default", {
+    analytics_storage: "denied", ad_storage: "denied",
+    ad_user_data: "denied", ad_personalization: "denied", wait_for_update: 500
+  });
   window.gtag("js", new Date());
   window.gtag("config", GA_MEASUREMENT_ID);
+}
+function grantAnalytics(){
+  if(window.gtag) window.gtag("consent", "update", { analytics_storage: "granted" });
 }
 
 function initCookieConsent(){
   var banner = document.getElementById("cookieBanner");
   var consent = localStorage.getItem("cv_cookie_consent");
+  loadGoogleAnalytics();
   if(consent === "accepted"){
-    loadGoogleAnalytics();
+    grantAnalytics();
   } else if(consent !== "rejected"){
     banner.classList.add("is-visible");
   }
   document.getElementById("cookieAcceptBtn").addEventListener("click", function(){
     localStorage.setItem("cv_cookie_consent", "accepted");
     banner.classList.remove("is-visible");
-    loadGoogleAnalytics();
+    grantAnalytics();
   });
   document.getElementById("cookieRejectBtn").addEventListener("click", function(){
     localStorage.setItem("cv_cookie_consent", "rejected");
