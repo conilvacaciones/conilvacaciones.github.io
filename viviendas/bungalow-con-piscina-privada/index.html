@@ -678,6 +678,15 @@ html{scroll-behavior:smooth;}
 .mh-main .modal-stats{margin-top:18px;}
 .modal-stats span{background:#EEF3F0;border:0;color:var(--atlantic);font-weight:600;}
 
+/* ---- Móvil: ficha a todo el ancho, sin huecos a los lados ---- */
+@media (max-width:640px){
+  .detail-page-wrap{padding:10px 0 50px;}
+  #modalClose{margin-left:16px;}
+  .detail-page-wrap .modal{border-radius:0;box-shadow:none;border-left:0;border-right:0;}
+  .detail-page-wrap .modal-body{padding:0 14px 8px;}
+  .detail-page-wrap .gallery.mosaic{margin:0 -14px 22px;border-radius:0;}
+}
+
 /* ---- Descripción y servicios ---- */
 .detail-sec{margin-top:34px;padding-top:30px;border-top:1px solid var(--line);}
 .sec-title{font-family:var(--ff-body);font-weight:800;font-size:22px;letter-spacing:-.02em;color:var(--atlantic);margin:0 0 14px;}
